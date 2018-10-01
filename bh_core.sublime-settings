@@ -1,6 +1,7 @@
 {
 "content_highlight_bar": true,
 "align_content_highlight_bar": true,
+"search_threshold": 10000,
 // Define region highlight styles
 "bracket_styles": {
     // "default" and "unmatched" styles are special

@@ -132,6 +132,40 @@
 				<string>#ff624a</string>
 			</dict>
 		</dict>
+		
+		<dict>
+			<key>name</key>
+			<string>Punctuation Accessor</string>
+			<key>scope</key>
+			<string>punctuation.accessor</string>
+			<key>settings</key>
+			<dict>
+				<key>foreground</key>
+				<string>#e80202</string>
+			</dict>
+		</dict>
+		<dict>
+			<key>name</key>
+			<string>Punctuation Separator</string>
+			<key>scope</key>
+			<string>punctuation.separator</string>
+			<key>settings</key>
+			<dict>
+				<key>foreground</key>
+				<string>#9fcbf2</string>
+			</dict>
+		</dict>
+		<dict>
+			<key>name</key>
+			<string>Punctuation Terminator</string>
+			<key>scope</key>
+			<string>punctuation.terminator</string>
+			<key>settings</key>
+			<dict>
+				<key>foreground</key>
+				<string>#21bfff</string>
+			</dict>
+		</dict>
 		<dict>
 			<key>name</key>
 			<string>Keyword Operator Logical</string>
