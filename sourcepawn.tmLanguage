@@ -77,12 +77,19 @@
 		</dict>
 		<dict>
 			<key>begin</key>
-			<string>"</string>
+			<string>(?&lt;!\\)"</string>
 			<key>patterns</key>
 			<array>
 				<dict>
 				<key>name</key>
 				<string>constant.other.placeholder.SourcePawn</string>
+				<key>match</key>
+				<string>\\"</string>
+				</dict>
+
+				<dict>
+				<key>name</key>
+				<string>constant.character.escape.SourcePawn</string>
 				<key>match</key>
 				<string>%(c|\.?\d*d|\d*\.?\d*f|\d*\.?\d*i|s|L|N|t|T|u|\d*x|\d*X)</string>
 				</dict>
@@ -94,7 +101,7 @@
 				</dict>
 			</array>
 			<key>end</key>
-			<string>"</string>
+			<string>(?&lt;!\\)"</string>
 			<key>name</key>
 			<string>string.SourcePawn</string>
 		</dict>
