@@ -64,6 +64,17 @@
 		</dict>
 		<dict>
 			<key>name</key>
+			<string>Constant</string>
+			<key>scope</key>
+			<string>constant</string>
+			<key>settings</key>
+			<dict>
+				<key>foreground</key>
+				<string>#74b8f9</string>
+			</dict>
+		</dict>
+		<dict>
+			<key>name</key>
 			<string>Number</string>
 			<key>scope</key>
 			<string>constant.numeric</string>
@@ -132,7 +143,39 @@
 				<string>#ff624a</string>
 			</dict>
 		</dict>
-		
+		<dict>
+			<key>name</key>
+			<string>Keyword Control</string>
+			<key>scope</key>
+			<string>keyword.control</string>
+			<key>settings</key>
+			<dict>
+				<key>foreground</key>
+				<string>#ff624a</string>
+			</dict>
+		</dict>
+		<dict>
+			<key>name</key>
+			<string>Keyword</string>
+			<key>scope</key>
+			<string>keyword.control.conditional</string>
+			<key>settings</key>
+			<dict>
+				<key>foreground</key>
+				<string>#ff624a</string>
+			</dict>
+		</dict>
+		<dict>
+			<key>name</key>
+			<string>Keyword Control Other</string>
+			<key>scope</key>
+			<string>keyword.control.other</string>
+			<key>settings</key>
+			<dict>
+				<key>foreground</key>
+				<string>#54afff</string>
+			</dict>
+		</dict>
 		<dict>
 			<key>name</key>
 			<string>Punctuation Accessor</string>
@@ -166,6 +209,17 @@
 				<string>#21bfff</string>
 			</dict>
 		</dict>
+		<dict>
+			<key>name</key>
+			<string>Punctuation definition</string>
+			<key>scope</key>
+			<string>punctuation.definition.generic</string>
+			<key>settings</key>
+			<dict>
+				<key>foreground</key>
+				<string>#ff624a</string>
+			</dict>
+		</dict>		
 		<dict>
 			<key>name</key>
 			<string>Keyword Operator Logical</string>

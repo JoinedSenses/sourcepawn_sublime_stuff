@@ -1,0 +1,10 @@
+{
+	"color_scheme": "Packages/Colorsublime - Themes/feel_good.tmTheme",
+	"font_face": "",
+	"font_size": 8,
+	"ignored_packages":
+	[
+		"Vintage"
+	],
+	"theme": "Adaptive.sublime-theme"
+}
