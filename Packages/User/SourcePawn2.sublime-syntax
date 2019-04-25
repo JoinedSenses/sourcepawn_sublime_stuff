@@ -22,12 +22,13 @@ variables:
   hex_numerals: '\b0x[0-9a-fA-F]{0,8}\b'
   binary_numerals: '\b0b[0-1]+\b'
   constant_placeholder: \%(c|\.?\d*d|\d*\.?\d*f|\d*\.?\d*i|s|L|N|t|T|u|\d*x|\d*X)
-  constant_character_escape: \\x0(7[\w\d]{6}|8[\w\d]{8}|\d|\b)|\\n|\\0
+  constant_character_escape: (?<!\\)\\x(0(7[\w\d]{6}|8[\w\d]{8}|\d|[A-F]\b)|10)|\\n|\\0
 
   # Storage types
   storage_types: '\b(any|bool|char|float(?!\()|int|void|Action|Handle|Function)\b'
+  storage_types_lookbehind: 'any |bool |char |float |int |void |Action |Handle |Function '
   support_types: '\b(ArrayList|ArrayStack|StringMap|DataPack|DataPackPos|Transaction|KeyValues|Menu|Panel|Profiler|Regex|FrameIterator|SMCParser|TopMenu|AdminFlag|OverrideType|OverrideRule|OverrideId|GroupId|AdminId|AdmAccessMode|AdminCachePart|StringMapSnapshot|BfWrite|BfRead|CookieAccess|CookieMenu|CookieMenuAction|CookieMenuHandler|NetFlow|AuthIdType|MultiTargetFilter|QueryCookie|ReplySource|SrvCmd|ConCmd|CommandListener|CommandIterator|ConVarBounds|ConVarQueryResult|ConVarChanged|ConVar|ConVarQueryFinished|PlVers|Identity|PluginStatus|PluginInfo|CSRoundEndReason|CSWeaponID|DBResult|DBBindType|DBPriority|DBDriver|DBResultSet|SQLTxnSuccess|Database|SQLTxnFailure|SQLConnectCallback|SQLQueryCallback|DBStatement|SQLTCallback|PropType|PropFieldType|MoveType|RenderMode|RenderFx|EventHookMode|EventHook|Event|FileType|FileTimeMode|PathType|DirectoryListing|File|ParamType|ExecType|NativeCall|RequestFrameCallback|DialogType|EngineVersion|FindMapResult|ClientRangeType|KvDataTypes|GameLogHook|NominateResult|MapChange|MenuStyle|MenuAction|MenuSource|MenuHandler|VoteHandler|Protobuf|RegexError|SDKHookType|UseType|SDKHookCB|SDKCallType|SDKLibrary|SDKFuncConfSource|SDKType|SDKPassMethod|EntityOutput|RoundState|AmbientSHook|NormalSHook|TEHook|RayType|TraceEntityFilter|ListenOverride|SortOrder|SortType|SortFunc1D|SortFunc2D|SortFuncADTArray|TraceEntityEnumerator|Plugin|SharedPlugin|Extension|APLRes|FeatureType|FeatureStatus|NumberType|Address|SMCResult|SMCError|SMC_ParseStart|SMC_NewSection|SMC_KeyValue|SMC_EndSection|SMC_ParseEnd|SMC_RawLine|TFClassType|TFTeam|TFCond|TFHoliday|TFObjectType|TFObjectMode|TFResourceType|Timer|TopMenuAction|TopMenuObjectType|TopMenuPosition|TopMenuObject|TopMenuHandler|UserMsg|UserMessageType|MsgHook|MsgPostHook|GameData)\b'
-
+  support_types_lookbehind: 'ArrayList |ArrayStack |StringMap |DataPack |DataPackPos |Transaction |KeyValues |Menu |Panel |Profiler |Regex |FrameIterator |SMCParser |TopMenu |AdminFlag |OverrideType |OverrideRule |OverrideId |GroupId |AdminId |AdmAccessMode |AdminCachePart |StringMapSnapshot |BfWrite |BfRead |CookieAccess |CookieMenu |CookieMenuAction |CookieMenuHandler |NetFlow |AuthIdType |MultiTargetFilter |QueryCookie |ReplySource |SrvCmd |ConCmd |CommandListener |CommandIterator |ConVarBounds |ConVarQueryResult |ConVarChanged |ConVar |ConVarQueryFinished |PlVers |Identity |PluginStatus |PluginInfo |CSRoundEndReason |CSWeaponID |DBResult |DBBindType |DBPriority |DBDriver |DBResultSet |SQLTxnSuccess |Database |SQLTxnFailure |SQLConnectCallback |SQLQueryCallback |DBStatement |SQLTCallback |PropType |PropFieldType |MoveType |RenderMode |RenderFx |EventHookMode |EventHook |Event |FileType |FileTimeMode |PathType |DirectoryListing |File |ParamType |ExecType |NativeCall |RequestFrameCallback |DialogType |EngineVersion |FindMapResult |ClientRangeType |KvDataTypes |GameLogHook |NominateResult |MapChange |MenuStyle |MenuAction |MenuSource |MenuHandler |VoteHandler |Protobuf |RegexError |SDKHookType |UseType |SDKHookCB |SDKCallType |SDKLibrary |SDKFuncConfSource |SDKType |SDKPassMethod |EntityOutput |RoundState |AmbientSHook |NormalSHook |TEHook |RayType |TraceEntityFilter |ListenOverride |SortOrder |SortType |SortFunc1D |SortFunc2D |SortFuncADTArray |TraceEntityEnumerator |Plugin |SharedPlugin |Extension |APLRes |FeatureType |FeatureStatus |NumberType |Address |SMCResult |SMCError |SMC_ParseStart |SMC_NewSection |SMC_KeyValue |SMC_EndSection |SMC_ParseEnd |SMC_RawLine |TFClassType |TFTeam |TFCond |TFHoliday |TFObjectType |TFObjectMode |TFResourceType |Timer |TopMenuAction |TopMenuObjectType |TopMenuPosition |TopMenuObject |TopMenuHandler |UserMsg |UserMessageType |MsgHook |MsgPostHook |GameData '
   # 1.6 syntax storage types
   storage_types_oldsyntax: '\b(any|_|bool|String|Handle|Float|String|Action|Function)\b'
 
@@ -108,7 +109,7 @@ variables:
   convars_constants: '\b(ConVarBound_Upper|ConVarBound_Lower|ConVarQuery_Okay|ConVarQuery_NotFound|ConVarQuery_NotValid|ConVarQuery_Protected)\b'
   convars_functions: '\b(CreateConVar|FindConVar|HookConVarChange|UnhookConVarChange|GetConVarBool|SetConVarBool|GetConVarInt|SetConVarInt|GetConVarFloat|SetConVarFloat|GetConVarString|SetConVarString|ResetConVar|GetConVarDefault|GetConVarFlags|SetConVarFlags|GetConVarBounds|SetConVarBounds|GetConVarName|SendConVarValue|QueryClientConVar|IsValidConVarChar)\b'
   convars_methods: '\b(SetBool|SetInt|SetFloat|RestoreDefault|GetDefault|GetBounds|SetBounds|GetName|ReplicateToClient|AddChangeHook|RemoveChangeHook)\b'
-  convars_properties: '\b(BoolValue|IntValue|Floatvalue|Flags)\b'
+  convars_properties: '\b(BoolValue|IntValue|FloatValue|Flags)\b'
 
   # core.inc
   core_constants: '\b(SOURCEMOD_PLUGINAPI_VERSION|Plugin_Continue|Plugin_Changed|Plugin_Handled|Plugin_Stop|Identity_Core|Identity_Extension|Identity_Plugin|Plugin_Running|Plugin_Paused|Plugin_Error|Plugin_Loaded|Plugin_Failed|Plugin_Created|Plugin_Uncompiled|Plugin_BadLoad|Plugin_Evicted|PlInfo_Name|PlInfo_Author|PlInfo_Description|PlInfo_Version|PlInfo_URL|NULL_VECTOR|NULL_STRING|AUTOLOAD_EXTENSIONS|REQUIRE_EXTENSIONS|REQUIRE_PLUGIN|__DATE__|__TIME__)\b'
@@ -361,7 +362,7 @@ contexts:
       scope: storage.modifier
 
   variable:
-    - match: this
+    - match: \bthis\b
       scope: variable.language
 
   punctuation:
@@ -482,7 +483,7 @@ contexts:
     - match: (?<!\\)\"
       push:
         - meta_scope: string
-        - match: (?<!\\)\"
+        - match: (?<!\\)\"|\\\\"
           pop: true
         - match: '{{constant_placeholder}}'
           scope: constant.other.placeholder
@@ -491,7 +492,7 @@ contexts:
     - match: (?<!\\)\'
       push:
         - meta_scope: string
-        - match: (?<!\\)\'
+        - match: (?<!\\)\'|\\\\'
           pop: true
         - match: '{{constant_placeholder}}'
           scope: constant.other.placeholder
@@ -499,12 +500,13 @@ contexts:
           scope: constant.character.escape
 
   pragmatics:
-    - match: '(?<=\#)(pragma)(?:\s+)(?:(codepage|ctrlchar|dynamic|newdecls|rational|semicolon|tabsize|unused)|(deprecated))(?:\s+)(.+)'
+    - match: '(?<=\#)(pragma)(?:\s+)(?:(codepage|ctrlchar|dynamic|newdecls|rational|semicolon|tabsize|unused)|(deprecated))(?:\s+)(.*)(\/\/.*)?'
       captures:
         1: punctuation.definition.generic
         2: variable.parameter.function
         3: invalid.deprecated
         4: constant
+        5: comment
 
   enums:
     # Enum highlighting
@@ -547,7 +549,7 @@ contexts:
       scope: constant.language
     - match: '\?|:(?!:)'
       scope: keyword.operator.conditional
-    - match: '(\+|\-|\*)'
+    - match: '(\+|\-|\*|\%|(?<=\w| |\d)\/)'
       scope: keyword.operator.arithmetic
     - match: '(&&|\|\=?|\!\=?|\=\=|<=?|>=?)'
       scope: keyword.operator.logical
@@ -573,7 +575,7 @@ contexts:
     - match: '({{admin_functions}}|{{adminmenu_functions}}|{{adt_array_functions}}|{{adt_stack_functions}}|{{adt_trie_functions}}|{{banning_functions}}|{{basecomm_functions}}|{{bitbuffer_functions}}|{{clientprefs_functions}}|{{clients_functions}}|{{commandfilters_functions}}|{{commandline_functions}}|{{console_functions}}|{{convars_functions}}|{{core_functions}}|{{cstrike_functions}}|{{datapack_functions}}|{{dbi_functions}}|{{entity_functions}}|{{entityps_functions}}|{{events_functions}}|{{files_functions}}|{{float_functions}}|{{float_operators}}|{{functions_functions}}|{{geoip_functions}}|{{halflife_functions}}|{{handles_functions}}|{{helpers_functions}}|{{keyvalues_functions}}|{{lang_functions}}|{{logging_functions}}|{{mapchooser_functions}}|{{menus_functions}}|{{nextmap_functions}}|{{profiler_functions}}|{{protobuf_functions}}|{{regex_functions}}|{{sdkhooks_functions}}|{{sdktools_functions}}|{{sdktools_client_functions}}|{{sdktools_engine_functions}}|{{sdktools_entinput_functions}}|{{sdktools_entoutput_functions}}|{{sdktools_functions_functions}}|{{sdktools_gamerules_functions}}|{{sdktools_hooks_functions}}|{{sdktools_sound_functions}}|{{sdktools_stocks_functions}}|{{sdktools_stringtables_functions}}|{{sdktools_tempents_functions}}|{{sdktools_testocks_functions}}|{{sdktools_trace_functions}}|{{sdktools_variant_functions}}|{{sdktools_voice_functions}}|{{sorting_functions}}|{{sourcemod_functions}}|{{string_functions}}|{{testing_functions}}|{{textparse_functions}}|{{tf2_functions}}|{{tf2stocks_functions}}|{{timers_functions}}|{{topmenus_functions}}|{{usermessages_functions}}|{{vector_functions}})(?=\()'
       scope: support.function
     # MethodMaps
-    - match: '(?<=\.)({{admin_methods}}|{{adt_array_methods}}|{{adt_stack_methods}}|{{adt_trie_methods}}|{{bitbuffer_methods}}|{{console_methods}}|{{convars_methods}}|{{datapack_methods}}|{{dbi_methods}}|{{events_methods}}|{{keyvalues_methods}}|{{menus_methods}}|{{profiler_methods}}|{{protobuf_methods}}|{{regex_methods}}|{{sourcemod_methods}}|{{textparse_methods}}|{{topmenus_methods}})(?=\()'
+    - match: '(?<=\.|{{storage_types_lookbehind}}|{{support_types_lookbehind}})({{admin_methods}}|{{adt_array_methods}}|{{adt_stack_methods}}|{{adt_trie_methods}}|{{bitbuffer_methods}}|{{console_methods}}|{{convars_methods}}|{{datapack_methods}}|{{dbi_methods}}|{{events_methods}}|{{files_methods}}|{{keyvalues_methods}}|{{menus_methods}}|{{profiler_methods}}|{{protobuf_methods}}|{{regex_methods}}|{{sourcemod_methods}}|{{textparse_methods}}|{{topmenus_methods}})(?=\()'
       scope: support.function
     # Properties
     - match: '(?<=\.)({{admin_properties}}|{{adt_array_properties}}|{{adt_stack_properties}}|{{adt_trie_properties}}|{{convars_properties}}|{{datapack_properties}}|{{dbi_properties}}|{{events_properties}}|{{keyvalues_properties}}|{{menus_properties}}|{{profiler_properties}}|{{sourcemod_properties}}|{{textparse_properties}}|{{topmenus_properties}})(\b)'
