@@ -1,0 +1,18 @@
+strictness: medium
+doc-warnings: true
+test-warnings: false
+max-line-length: 120
+ignore-patterns:
+  - docs
+  - docs_theme
+  - site(\\|/).*\.py
+dodgy:
+  run: false
+pep257:
+  disable:
+    - D202
+    - D203
+    - D401
+pylint:
+  disable:
+    - import-error

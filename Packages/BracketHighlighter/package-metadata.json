@@ -1,0 +1,1 @@
+{"dependencies": [], "url": "https://github.com/facelessuser/BracketHighlighter", "version": "2.27.6", "platforms": ["*"], "description": "Bracket and tag highlighter for Sublime Text http://facelessuser.github.io/BracketHighlighter/", "sublime_text": ">=3000"}
