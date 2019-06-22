@@ -1,6 +1,5 @@
 {
-	"cmd": ["G:/Documents/TF2/sourcemod-1.10.0-git6380-windows/addons/sourcemod/scripting/spcomp", "-o$file_path/../plugins/$file_name", "$file"],
-	// "cmd": ["G:/Documents/TF2/SourceMod 1.9.0-6245/addons/sourcemod/scripting/spcomp", "-o$file_path/../plugins/$file_name", "$file"],
+	"cmd": ["G:\\Documents\\TF2\\sourcemod-1.10.0-git6380-windows\\addons\\sourcemod\\scripting\\spcomp", "-o$file_path\\..\\plugins\\$file_name", "$file"],
 	"file_regex": "(.*)\\((\\d+)\\) :",
 	"selector": "source.sp"
 }
