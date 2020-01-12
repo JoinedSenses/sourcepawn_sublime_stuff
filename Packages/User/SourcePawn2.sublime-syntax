@@ -478,10 +478,10 @@
 		  <string>brackethighlighter.default</string>
 		  <key>settings</key>
 		  <dict>
-		    <key>background</key>
-		    <string>#d1d1d1</string>
-		    <key>foreground</key>
-		    <string>#f4f5f7</string>
+			<key>background</key>
+			<string>#d1d1d1</string>
+			<key>foreground</key>
+			<string>#f4f5f7</string>
 		  </dict>
 		</dict>
 
