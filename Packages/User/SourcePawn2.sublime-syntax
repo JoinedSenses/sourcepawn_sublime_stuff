@@ -1,616 +1,1851 @@
-%YAML 1.2
----
-name: SourcePawn - 1.7+
-file_extensions: [sp, inc]
-scope: source.sp
-
-################################################
-# SourcePawn "Transitional" syntax highlighting
-# Created by 404UNF. Modified by JoinedSenses
-#
-# Version: 18w51b
-#
-# http://www.steamcommunity.com/id/404UNF
-# http://www.404UNF.ca
-# http://www.github.com/404UNFca
-################################################
-
-# BEGIN: Variables
-variables:
-  # Numerals
-  numerals: '(?<![\w\]\)])\-?\b[0-9]+\.?[0-9]*\b'
-  hex_numerals: '\b0x[0-9a-fA-F]{0,8}\b'
-  binary_numerals: '\b0b[0-1]+\b'
-  constant_placeholder: \%(c|\.?\d*d|\d*\.?\d*f|\d*\.?\d*i|s|L|N|t|T|u|\d*x|\d*X)
-  constant_character_escape: (?<!\\)\\x(0(7[\w\d]{6}|8[\w\d]{8}|\d|[A-F]\b)|10)|\\n|\\0
-
-  # Storage types
-  storage_types: '\b(?:any|bool|char|float(?!\()|int|void|Action|Handle|Function)\b'
-  storage_types_lookbehind: 'any |bool |char |float |int |void |Action |Handle |Function '
-  support_types: '\b(?:ArrayList|ArrayStack|Cookie|StringMap|DataPack|DataPackPos|PrivateForward|GlobalForward|Transaction|KeyValues|Menu|Panel|Profiler|Regex|FrameIterator|SMCParser|TopMenu|AdminFlag|OverrideType|OverrideRule|OverrideId|GroupId|AdminId|AdmAccessMode|AdminCachePart|StringMapSnapshot|BfWrite|BfRead|CookieAccess|CookieMenu|CookieMenuAction|CookieMenuHandler|NetFlow|AuthIdType|MultiTargetFilter|QueryCookie|ReplySource|SrvCmd|ConCmd|CommandListener|CommandIterator|ConVarBounds|ConVarQueryResult|ConVarChanged|ConVar|ConVarQueryFinished|PlVers|Identity|PluginStatus|PluginInfo|CSRoundEndReason|CSWeaponID|DBResult|DBBindType|DBPriority|DBDriver|DBResultSet|SQLTxnSuccess|Database|SQLTxnFailure|SQLConnectCallback|SQLQueryCallback|DBStatement|SQLTCallback|PropType|PropFieldType|MoveType|RenderMode|RenderFx|EventHookMode|EventHook|Event|FileType|FileTimeMode|PathType|DirectoryListing|File|ParamType|ExecType|NativeCall|RequestFrameCallback|DialogType|EngineVersion|FindMapResult|ClientRangeType|KvDataTypes|GameLogHook|NominateResult|MapChange|MenuStyle|MenuAction|MenuSource|MenuHandler|VoteHandler|Protobuf|RegexError|SDKHookType|UseType|SDKHookCB|SDKCallType|SDKLibrary|SDKFuncConfSource|SDKType|SDKPassMethod|EntityOutput|RoundState|AmbientSHook|NormalSHook|TEHook|RayType|TraceEntityFilter|ListenOverride|SortOrder|SortType|SortFunc1D|SortFunc2D|SortFuncADTArray|TraceEntityEnumerator|Plugin|SharedPlugin|Extension|APLRes|FeatureType|FeatureStatus|NumberType|Address|SMCResult|SMCError|SMC_ParseStart|SMC_NewSection|SMC_KeyValue|SMC_EndSection|SMC_ParseEnd|SMC_RawLine|TFClassType|TFTeam|TFCond|TFHoliday|TFObjectType|TFObjectMode|TFResourceType|Timer|TopMenuAction|TopMenuObjectType|TopMenuPosition|TopMenuObject|TopMenuHandler|UserMsg|UserMessageType|MsgHook|MsgPostHook|GameData)\b'
-  support_types_lookbehind: 'ArrayList |ArrayStack |StringMap |DataPack |DataPackPos |PrivateForward |GlobalForward |Transaction |KeyValues |Menu |Panel |Profiler |Regex |FrameIterator |SMCParser |TopMenu |AdminFlag |OverrideType |OverrideRule |OverrideId |GroupId |AdminId |AdmAccessMode |AdminCachePart |StringMapSnapshot |BfWrite |BfRead |CookieAccess |CookieMenu |CookieMenuAction |CookieMenuHandler |NetFlow |AuthIdType |MultiTargetFilter |QueryCookie |ReplySource |SrvCmd |ConCmd |CommandListener |CommandIterator |ConVarBounds |ConVarQueryResult |ConVarChanged |ConVar |ConVarQueryFinished |PlVers |Identity |PluginStatus |PluginInfo |CSRoundEndReason |CSWeaponID |DBResult |DBBindType |DBPriority |DBDriver |DBResultSet |SQLTxnSuccess |Database |SQLTxnFailure |SQLConnectCallback |SQLQueryCallback |DBStatement |SQLTCallback |PropType |PropFieldType |MoveType |RenderMode |RenderFx |EventHookMode |EventHook |Event |FileType |FileTimeMode |PathType |DirectoryListing |File |ParamType |ExecType |NativeCall |RequestFrameCallback |DialogType |EngineVersion |FindMapResult |ClientRangeType |KvDataTypes |GameLogHook |NominateResult |MapChange |MenuStyle |MenuAction |MenuSource |MenuHandler |VoteHandler |Protobuf |RegexError |SDKHookType |UseType |SDKHookCB |SDKCallType |SDKLibrary |SDKFuncConfSource |SDKType |SDKPassMethod |EntityOutput |RoundState |AmbientSHook |NormalSHook |TEHook |RayType |TraceEntityFilter |ListenOverride |SortOrder |SortType |SortFunc1D |SortFunc2D |SortFuncADTArray |TraceEntityEnumerator |Plugin |SharedPlugin |Extension |APLRes |FeatureType |FeatureStatus |NumberType |Address |SMCResult |SMCError |SMC_ParseStart |SMC_NewSection |SMC_KeyValue |SMC_EndSection |SMC_ParseEnd |SMC_RawLine |TFClassType |TFTeam |TFCond |TFHoliday |TFObjectType |TFObjectMode |TFResourceType |Timer |TopMenuAction |TopMenuObjectType |TopMenuPosition |TopMenuObject |TopMenuHandler |UserMsg |UserMessageType |MsgHook |MsgPostHook |GameData '
-  # 1.6 syntax storage types
-  storage_types_oldsyntax: '\b(any|_|bool|String|Handle|Float|String|Action|Function)\b'
-
-  # All support constants
-  # Required for the enum highlighting fix
-  all_constants: '\b({{admin_constants}}|{{adminmenu_constants}}|{{banning_constants}}|{{clientprefs_constants}}|{{clients_constants}}|{{commandfilters_constants}}|{{console_constants}}|{{convars_constants}}|{{core_constants}}|{{cstrike_constants}}|{{dbi_constants}}|{{entity_constants}}|{{entityps_constants}}|{{events_constants}}|{{files_constants}}|{{float_constants}}|{{functions_constants}}|{{halflife_constants}}|{{handles_constants}}|{{keyvalues_constants}}|{{lang_constants}}|{{mapchooser_constants}}|{{menus_constants}}|{{protobuf_constants}}|{{regex_constants}}|{{sdkhooks_constants}}|{{sdktools_constants}}|{{sdktools_engine_constants}}|{{sdktools_gamerules_constants}}|{{sdktools_hooks_constants}}|{{sdktools_sound_constants}}|{{sdktools_stringtables_constants}}|{{sdktools_testocks_constants}}|{{sdktools_trace_constants}}|{{sdktools_voice_constants}}|{{sorting_constants}}|{{testing_constants}}|{{textparse_constants}}|{{tf2_constants}}|{{tf2stocks_constants}}|{{timers_constants}}|{{topmenus_constants}}|{{usermessages_constants}}|{{version_constants}})\b'
-
-  # Miscellaneous
-  keywords_control: '\b(break|return|continue)\b'
-  keywords_control_conditional: '\b(if|else|for|while|do|switch|case|default)\b'
-  keywords_control_other: '\b(delete|new)\b'
-  variable_declarations: '\b(const|static)\b'
-  variable_declarations_oldsyntax: '\b(new|decl)\b'
-  boolean_values: '\b(true|false|null)\b'
-  visibility: '\b(public|private|stock|native|typeset|typedef|methodmap|property|enum|struct|forward|function)\b'
-  operators: '((?<=\#)(define|undef|if|else|elseif|endif|endinput|pragma|include|tryinclude|assert|emit|error))|defined|then\b'
-
-  # Include file contents, organized by include.
-
-  # admin.inc
-  admin_constants: '\b(Admin_Reservation|Admin_Generic|Admin_Kick|Admin_Ban|Admin_Unban|Admin_Slay|Admin_Changemap|Admin_Convars|Admin_Config|Admin_Chat|Admin_Vote|Admin_Password|Admin_RCON|Admin_Cheats|Admin_Root|Admin_Custom1|Admin_Custom2|Admin_Custom3|Admin_Custom4|Admin_Custom5|Admin_Custom6|AdminFlags_TOTAL|ADMFLAG_RESERVATION|ADMFLAG_GENERIC|ADMFLAG_KICK|ADMFLAG_BAN|ADMFLAG_UNBAN|ADMFLAG_SLAY|ADMFLAG_CHANGEMAP|ADMFLAG_CONVARS|ADMFLAG_CONFIG|ADMFLAG_CHAT|ADMFLAG_VOTE|ADMFLAG_PASSWORD|ADMFLAG_RCON|ADMFLAG_CHEATS|ADMFLAG_ROOT|ADMFLAG_CUSTOM1|ADMFLAG_CUSTOM2|ADMFLAG_CUSTOM3|ADMFLAG_CUSTOM4|ADMFLAG_CUSTOM5|ADMFLAG_CUSTOM6|AUTHMETHOD_STEAM|AUTHMETHOD_IP|AUTHMETHOD_NAME|Override_Command|Override_CommandGroup|Command_Deny|Command_Allow|INVALID_GROUP_ID|INVALID_ADMIN_ID|Access_Real|Access_Effective|AdminCache_Overrides|AdminCache_Groups|AdminCache_Admins)\b'
-  admin_functions: '\b(OnRebuildAdminCache|DumpAdminCache|AddCommandOverride|GetCommandOverride|UnsetCommandOverride|CreateAdmGroup|FindAdmGroup|SetAdmGroupAddFlag|GetAdmGroupAddFlag|GetAdmGroupAddFlags|SetAdmGroupImmuneFrom|GetAdmGroupImmuneCount|GetAdmGroupImmuneFrom|AddAdmGroupCmdOverride|GetAdmGroupCmdOverride|RegisterAuthIdentType|CreateAdmin|GetAdminUsername|BindAdminIdentity|SetAdminFlag|GetAdminFlag|GetAdminFlags|AdminInheritGroup|GetAdminGroupCount|GetAdminGroup|SetAdminPassword|GetAdminPassword|FindAdminByIdentity|RemoveAdmin|FlagBitsToBitArray|FlagBitArrayToBits|FlagArrayToBits|FlagBitsToArray|FindFlagByName|FindFlagByChar|FindFlagChar|ReadFlagString|CanAdminTarget|CreateAuthMethod|SetAdmGroupImmunityLevel|GetAdmGroupImmunityLevel|SetAdminImmunityLevel|GetAdminImmunityLevel|FlagToBit|BitToFlag)\b'
-  admin_methods: '\b(GetUsername|BindIdentity|SetFlag|HasFlag|GetFlags|InheritGroup|GetGroup|SetPassword|GetPassword|CanTarget|ImmunityLevel|GetGroupImmunity|AddGroupImmunity)\b'
-  admin_properties: '\b(GroupCount|ImmunityLevel|GroupImmunitiesCount)\b'
-
-  # adminmenu.inc
-  adminmenu_constants: '\b(ADMINMENU_PLAYERCOMMANDS|ADMINMENU_SERVERCOMMANDS|ADMINMENU_VOTINGCOMMANDS)\b'
-  adminmenu_functions: '\b(OnAdminMenuCreated|OnAdminMenuReady|GetAdminTopMenu|AddTargetsToMenu|AddTargetsToMenu2|RedisplayAdminMenu|__pl_adminmenu|__pl_adminmenu_SetNTVOptional)\b'
-
-  # adt.inc is empty
-
-  # adt_array.inc
-  adt_array_functions: '\b(ByteCountToCells|CreateArray|ClearArray|CloneArray|ResizeArray|GetArraySize|PushArrayCell|PushArrayString|PushArrayArray|GetArrayCell|GetArrayString|GetArrayArray|SetArrayCell|SetArrayString|SetArrayArray|ShiftArrayUp|RemoveFromArray|SwapArrayItems|FindStringInArray|FindValueInArray|GetArrayBlockSize)\b'
-  adt_array_methods: '\b(Clear|Clone|Resize|Push|PushString|Get|GetString|GetArray|Set|SetString|SetArray|ShiftUp|Erase|SwapAt|FindString|FindValue|Sort|SortCustom)\b'
-  adt_array_properties: '\b(Length|BlockSize)\b'
-
-  # adt_stack.inc
-  adt_stack_functions: '\b(CreateStack|PushStackCell|PushStackString|PushStackArray|PopStackCell|PopStackString|PopStackArray|IsStackEmpty|PopStack|GetStackBlockSize)\b'
-  adt_stack_methods: '\b(PushArray|Pop|PopString|PopArray)\b'
-  adt_stack_properties: '\b(Empty)\b'
-
-  # adt_trie.inc
-  adt_trie_functions: '\b(CreateTrie|SetTrieValue|SetTrieArray|SetTrieString|GetTrieValue|GetTrieArray|GetTrieString|RemoveFromTrie|ClearTrie|GetTrieSize|CreateTrieSnapshot|TrieSnapshotLength|TrieSnapshotKeyBufferSize|GetTrieSnapshotKey)\b'
-  adt_trie_methods: '\b(SetValue|GetValue|Remove|Snapshot|KeyBufferSize|GetKey)\b'
-  adt_trie_properties: '\b(Size)\b'
-
-  # banning.inc
-  banning_constants: '\b(BANFLAG_AUTO|BANFLAG_IP|BANFLAG_AUTHID|BANFLAG_NOKICK)\b'
-  banning_functions: '\b(OnBanClient|OnBanIdentity|OnRemoveBan|BanClient|BanIdentity|RemoveBan)\b'
-
-  # basecomm.inc
-  basecomm_functions: '\b(BaseComm_OnClientMute|BaseComm_OnClientGag|BaseComm_IsClientGagged|BaseComm_IsClientMuted|BaseComm_SetClientGag|BaseComm_SetClientMute|__pl_basecomm|__pl_basecomm_SetNTVOptional)\b'
-
-  # bitbuffer.inc
-  bitbuffer_functions: '\b(BfWriteBool|BfWriteByte|BfWriteChar|BfWriteShort|BfWriteWord|BfWriteNum|BfWriteFloat|BfWriteString|BfWriteEntity|BfWriteAngle|BfWriteCoord|BfWriteVecCoord|BfWriteVecNormal|BfWriteAngles|BfReadBool|BfReadByte|BfReadChar|BfReadShort|BfReadWord|BfReadNum|BfReadFloat|BfReadString|BfReadEntity|BfReadAngle|BfReadCoord|BfReadVecCoord|BfReadVecNormal|BfReadAngles|BfGetNumBytesLeft)\b'
-  bitbuffer_methods: '\b(WriteBool|WriteByte|WriteChar|WriteShort|WriteWord|WriteNum|WriteFloat|WriteString|WriteEntity|WriteAngle|WriteCoord|WriteVecCoord|WriteVecNormal|WriteAngles|ReadBool|ReadByte|ReadChar|ReadShort|ReadWord|ReadNum|ReadFloat|ReadString|ReadEntity|ReadAngle|ReadCoord|ReadVecCoord|ReadVecNormal|ReadAngles|BytesLeft)\b'
-
-  # clientprefs.inc
-  clientprefs_constants: '\b(CookieAccess_Public|CookieAccess_Protected|CookieAccess_Private|CookieMenu_YesNo|CookieMenu_YesNo_Int|CookieMenu_OnOff|CookieMenu_OnOff_Int|CookieMenuAction_DisplayOption|CookieMenuAction_SelectOption)\b'
-  clientprefs_functions: '\b(RegClientCookie|FindClientCookie|SetClientCookie|GetClientCookie|SetAuthIdCookie|AreClientCookiesCached|OnClientCookiesCached|SetCookiePrefabMenu|SetCookieMenuItem|ShowCookieMenu|GetCookieIterator|ReadCookieIterator|GetCookieAccess|GetClientCookieTime|__ext_cprefs|__ext_cprefs_SetNTVOptional)\b'
-  clientprefs_methods: '\b(SetByAuthId|SetPrefabMenu)\b'
-  clientprefs_properties: '\b(AccessLevel)\b'
-
-  # clients.inc
-  clients_constants: '\b(MAXPLAYERS|MAX_NAME_LENGTH|MaxClients|NetFlow_Outgoing|NetFlow_Incoming|NetFlow_Both|AuthId_Engine|AuthId_Steam2|AuthId_Steam3|AuthId_SteamID64)\b'
-  clients_functions: '\b(OnClientConnect|OnClientConnected|OnClientPutInServer|OnClientDisconnect|OnClientDisconnect_Post|OnClientCommand|OnClientCommandKeyValues|OnClientCommandKeyValues_Post|OnClientSettingsChanged|OnClientAuthorized|OnClientPreAdminCheck|OnClientPostAdminFilter|OnClientPostAdminCheck|GetMaxHumanPlayers|GetClientCount|GetClientName|GetClientIP|GetClientAuthId|GetSteamAccountID|GetClientUserId|IsClientConnected|IsClientInGame|IsClientInKickQueue|IsClientAuthorized|IsFakeClient|IsClientSourceTV|IsClientReplay|IsClientObserver|IsPlayerAlive|GetClientInfo|GetClientTeam|SetUserAdmin|GetUserAdmin|AddUserFlags|RemoveUserFlags|SetUserFlagBits|GetUserFlagBits|CanUserTarget|RunAdminCacheChecks|NotifyPostAdminCheck|CreateFakeClient|SetFakeClientConVar|GetClientHealth|GetClientModel|GetClientWeapon|GetClientMaxs|GetClientMins|GetClientAbsAngles|GetClientAbsOrigin|GetClientArmor|GetClientDeaths|GetClientFrags|GetClientDataRate|IsClientTimingOut|GetClientTime|GetClientLatency|GetClientAvgLatency|GetClientAvgLoss|GetClientAvgChoke|GetClientAvgData|GetClientAvgPackets|GetClientOfUserId|KickClient|KickClientEx|ChangeClientTeam|GetClientSerial|GetClientFromSerial)\b'
-
-  # commandfilters.inc
-  commandfilters_constants: '\b(MAX_TARGET_LENGTH|COMMAND_FILTER_ALIVE|COMMAND_FILTER_DEAD|COMMAND_FILTER_CONNECTED|COMMAND_FILTER_NO_IMMUNITY|COMMAND_FILTER_NO_MULTI|COMMAND_FILTER_NO_BOTS|COMMAND_TARGET_NONE|COMMAND_TARGET_NOT_ALIVE|COMMAND_TARGET_NOT_DEAD|COMMAND_TARGET_NOT_IN_GAME|COMMAND_TARGET_IMMUNE|COMMAND_TARGET_EMPTY_FILTER|COMMAND_TARGET_NOT_HUMAN|COMMAND_TARGET_AMBIGUOUS)\b'
-  commandfilters_functions: '\b(ProcessTargetString|ReplyToTargetError|AddMultiTargetFilter|RemoveMultiTargetFilter)\b'
-
-  commandline_functions: '\b(GetCommandLine|GetCommandLineParam|GetCommandLineParamInt|GetCommandLineParamFloat|FindCommandLineParam)\b'
-
-  # console.inc
-  console_constants: '\b(INVALID_FCVAR_FLAGS|QUERYCOOKIE_FAILED|SM_REPLY_TO_CONSOLE|SM_REPLY_TO_CHAT|FCVAR_NONE|FCVAR_UNREGISTERED|FCVAR_DEVELOPMENTONLY|FCVAR_GAMEDLL|FCVAR_CLIENTDLL|FCVAR_MATERIAL_SYSTEM|FCVAR_HIDDEN|FCVAR_PROTECTED|FCVAR_SPONLY|FCVAR_ARCHIVE|FCVAR_NOTIFY|FCVAR_USERINFO|FCVAR_PRINTABLEONLY|FCVAR_UNLOGGED|FCVAR_NEVER_AS_STRING|FCVAR_REPLICATED|FCVAR_CHEAT|FCVAR_SS|FCVAR_DEMO|FCVAR_DONTRECORD|FCVAR_SS_ADDED|FCVAR_RELEASE|FCVAR_RELOAD_MATERIALS|FCVAR_RELOAD_TEXTURES|FCVAR_NOT_CONNECTED|FCVAR_MATERIAL_SYSTEM_THREAD|FCVAR_ARCHIVE_XBOX|FCVAR_ARCHIVE_GAMECONSOLE|FCVAR_ACCESSIBLE_FROM_THREADS|FCVAR_SERVER_CAN_EXECUTE|FCVAR_SERVER_CANNOT_QUERY|FCVAR_CLIENTCMD_CAN_EXECUTE|FEATURECAP_COMMANDLISTENER)\b'
-  console_functions: '\b(ServerCommand|ServerCommandEx|InsertServerCommand|ServerExecute|ClientCommand|FakeClientCommand|FakeClientCommandEx|FakeClientCommandKeyValues|PrintToServer|PrintToConsole|PrintToConsoleAll|ReplyToCommand|GetCmdReplySource|SetCmdReplySource|IsChatTrigger|ShowActivity2|ShowActivity|ShowActivityEx|FormatActivitySource|RegServerCmd|RegConsoleCmd|RegAdminCmd|GetCmdArgs|GetCmdArg|GetCmdArgString|GetCommandIterator|ReadCommandIterator|CheckCommandAccess|CheckAccess|GetCommandFlags|SetCommandFlags|FindFirstConCommand|FindNextConCommand|AddServerTag|RemoveServerTag|AddCommandListener|RemoveCommandListener|CommandExists|OnClientSayCommand|OnClientSayCommand_Post)\b'
-  console_methods: '\b(Next|GetDescription|GetName|)\b'
-
-  # convars.inc
-  convars_constants: '\b(ConVarBound_Upper|ConVarBound_Lower|ConVarQuery_Okay|ConVarQuery_NotFound|ConVarQuery_NotValid|ConVarQuery_Protected)\b'
-  convars_functions: '\b(CreateConVar|FindConVar|HookConVarChange|UnhookConVarChange|GetConVarBool|SetConVarBool|GetConVarInt|SetConVarInt|GetConVarFloat|SetConVarFloat|GetConVarString|SetConVarString|ResetConVar|GetConVarDefault|GetConVarFlags|SetConVarFlags|GetConVarBounds|SetConVarBounds|GetConVarName|SendConVarValue|QueryClientConVar|IsValidConVarChar)\b'
-  convars_methods: '\b(SetBool|SetInt(?:64)?|SetFloat|RestoreDefault|GetDefault|GetBounds|SetBounds|GetName|ReplicateToClient|AddChangeHook|RemoveChangeHook)\b'
-  convars_properties: '\b(BoolValue|IntValue|FloatValue|Flags)\b'
-
-  # core.inc
-  core_constants: '\b(SOURCEMOD_PLUGINAPI_VERSION|Plugin_Continue|Plugin_Changed|Plugin_Handled|Plugin_Stop|Identity_Core|Identity_Extension|Identity_Plugin|Plugin_Running|Plugin_Paused|Plugin_Error|Plugin_Loaded|Plugin_Failed|Plugin_Created|Plugin_Uncompiled|Plugin_BadLoad|Plugin_Evicted|PlInfo_Name|PlInfo_Author|PlInfo_Description|PlInfo_Version|PlInfo_URL|NULL_VECTOR|NULL_STRING|AUTOLOAD_EXTENSIONS|REQUIRE_EXTENSIONS|REQUIRE_PLUGIN|__DATE__|__TIME__)\b'
-  core_functions: '\b(IsNullVector|IsNullString|__ext_core|VerifyCoreVersion|MarkNativeAsOptional|__ext_core_SetNTVOptional|__version|)\b'
-
-  # cstrike.inc
-  # Now supports all the new Battle Royale stuff!
-  cstrike_constants: '\b(CS_TEAM_NONE|CS_TEAM_SPECTATOR|CS_TEAM_T|CS_TEAM_CT|CS_SLOT_PRIMARY|CS_SLOT_SECONDARY|CS_SLOT_KNIFE|CS_SLOT_GRENADE|CS_SLOT_C4|CS_DMG_HEADSHOT|CSRoundEnd_TargetBombed|CSRoundEnd_VIPEscaped|CSRoundEnd_VIPKilled|CSRoundEnd_TerroristsEscaped|CSRoundEnd_CTStoppedEscape|CSRoundEnd_TerroristsStopped|CSRoundEnd_BombDefused|CSRoundEnd_CTWin|CSRoundEnd_TerroristWin|CSRoundEnd_Draw|CSRoundEnd_HostagesRescued|CSRoundEnd_TargetSaved|CSRoundEnd_HostagesNotRescued|CSRoundEnd_TerroristsNotEscaped|CSRoundEnd_VIPNotEscaped|CSRoundEnd_GameStart|CSRoundEnd_TerroristsSurrender|CSRoundEnd_CTSurrender|CSRoundEnd_TerroristsPlanted|CSRoundEnd_CTsReachedHostage|CSWeapon_NONE|CSWeapon_P228|CSWeapon_GLOCK|CSWeapon_SCOUT|CSWeapon_HEGRENADE|CSWeapon_XM1014|CSWeapon_C4|CSWeapon_MAC10|CSWeapon_AUG|CSWeapon_SMOKEGRENADE|CSWeapon_ELITE|CSWeapon_FIVESEVEN|CSWeapon_UMP45|CSWeapon_SG550|CSWeapon_GALIL|CSWeapon_FAMAS|CSWeapon_USP|CSWeapon_AWP|CSWeapon_MP5NAVY|CSWeapon_M249|CSWeapon_M3|CSWeapon_M4A1|CSWeapon_TMP|CSWeapon_G3SG1|CSWeapon_FLASHBANG|CSWeapon_DEAGLE|CSWeapon_SG552|CSWeapon_AK47|CSWeapon_KNIFE|CSWeapon_P90|CSWeapon_SHIELD|CSWeapon_KEVLAR|CSWeapon_ASSAULTSUIT|CSWeapon_NIGHTVISION|CSWeapon_GALILAR|CSWeapon_BIZON|CSWeapon_MAG7|CSWeapon_NEGEV|CSWeapon_SAWEDOFF|CSWeapon_TEC9|CSWeapon_TASER|CSWeapon_HKP2000|CSWeapon_MP7|CSWeapon_MP9|CSWeapon_NOVA|CSWeapon_P250|CSWeapon_SCAR17|CSWeapon_SCAR20|CSWeapon_SG556|CSWeapon_SSG08|CSWeapon_KNIFE_GG|CSWeapon_MOLOTOV|CSWeapon_DECOY|CSWeapon_INCGRENADE|CSWeapon_DEFUSER|CSWeapon_HEAVYASSAULTSUIT|CSWeapon_CUTTERS|CSWeapon_HEALTHSHOT|CSWeapon_KNIFE_T|CSWeapon_M4A1_SILENCER|CSWeapon_USP_SILENCER|CSWeapon_CZ75A|CSWeapon_REVOLVER|CSWeapon_TAGGRENADE|CSWeapon_FISTS|CSWeapon_BREACHCHARGE|CSWeapon_TABLET|CSWeapon_MELEE|CSWeapon_AXE|CSWeapon_HAMMER|CSWeapon_SPANNER|CSWeapon_KNIFE_GHOST|CSWeapon_FIREBOMB|CSWeapon_DIVERSION|CSWeapon_FRAGGRENADE|CSWeapon_SNOWBALL|CSWeapon_MAX_WEAPONS_NO_KNIFES|CSWeapon_BAYONET|CSWeapon_KNIFE_FLIP|CSWeapon_KNIFE_GUT|CSWeapon_KNIFE_KARAMBIT|CSWeapon_KNIFE_M9_BAYONET|CSWeapon_KNIFE_TATICAL|CSWeapon_KNIFE_FALCHION|CSWeapon_KNIFE_SURVIVAL_BOWIE|CSWeapon_KNIFE_BUTTERFLY|CSWeapon_KNIFE_PUSH|CSWeapon_KNIFE_URSUS|CSWeapon_KNIFE_GYPSY_JACKKNIFE|CSWeapon_KNIFE_STILETTO|CSWeapon_KNIFE_WIDOWMAKER|CSWeapon_MAX_WEAPONS)\b'
-  cstrike_functions: '\b(CS_OnBuyCommand|CS_OnCSWeaponDrop|CS_OnGetWeaponPrice|CS_OnTerminateRound|CS_RespawnPlayer|CS_SwitchTeam|CS_DropWeapon|CS_TerminateRound|CS_GetTranslatedWeaponAlias|CS_GetWeaponPrice|CS_GetClientClanTag|CS_SetClientClanTag|CS_GetTeamScore|CS_SetTeamScore|CS_GetMVPCount|CS_SetMVPCount|CS_GetClientContributionScore|CS_SetClientContributionScore|CS_GetClientAssists|CS_SetClientAssists|CS_AliasToWeaponID|CS_WeaponIDToAlias|CS_IsValidWeaponID|CS_UpdateClientModel|CS_ItemDefIndexToID|CS_WeaponIDToItemDefIndex|__ext_cstrike|__ext_cstrike_SetNTVOptional)\b'
-
-  # datapack.inc
-  datapack_functions: '\b(CreateDataPack|WritePackCell|WritePackFloat|WritePackString|WritePackFunction|ReadPackCell|ReadPackFloat|ReadPackString|ReadPackFunction|ResetPack|GetPackPosition|SetPackPosition|IsPackReadable)\b'
-  datapack_methods: '\b(WriteCell|WriteFunction|ReadCell|ReadFunction|Reset|IsReadable)\b'
-  datapack_properties: '\b(Position)\b'
-
-  # dbi.inc
-  dbi_constants: '\b(DBVal_Error|DBVal_TypeMismatch|DBVal_Null|DBVal_Data|DBBind_Int|DBBind_Float|DBBind_String|DBPrio_High|DBPrio_Normal|DBPrio_Low|INVALID_FUNCTION)\b'
-  dbi_functions: '\b(SQL_Connect|SQL_DefConnect|SQL_ConnectCustom|SQLite_UseDatabase|SQL_CheckConfig|SQL_GetDriver|SQL_ReadDriver|SQL_GetDriverIdent|SQL_GetDriverProduct|SQL_SetCharset|SQL_GetAffectedRows|SQL_GetInsertId|SQL_GetError|SQL_EscapeString|SQL_FormatQuery|SQL_FastQuery|SQL_Query|SQL_PrepareQuery|SQL_FetchMoreResults|SQL_HasResultSet|SQL_GetRowCount|SQL_GetFieldCount|SQL_FieldNumToName|SQL_FieldNameToNum|SQL_FetchRow|SQL_MoreRows|SQL_Rewind|SQL_FetchString|SQL_FetchFloat|SQL_FetchInt|SQL_IsFieldNull|SQL_FetchSize|SQL_BindParamInt|SQL_BindParamFloat|SQL_BindParamString|SQL_Execute|SQL_LockDatabase|SQL_UnlockDatabase|SQL_IsSameConnection|SQL_TConnect|SQL_TQuery|SQL_CreateTransaction|SQL_AddQuery|SQL_ExecuteTransaction)\b'
-  dbi_methods: '\b(Find|GetIdentifier|GetProduct|FetchMoreResults|FieldNumToName|FieldNameToNum|FetchRow|Rewind|FetchString|FetchFloat|FetchInt|IsFieldNull|FetchSize|AddQuery|BindInt|BindFloat|BindString|Connect|SetCharset|Escape|Format|IsSameConnection|Query|Execute)\b'
-  dbi_properties: '\b(Driver|HasResults|RowCount|FieldCount|AffectedRows|InsertId|MoreRows)\b'
-
-  # entity.inc
-  entity_constants: '\b(Prop_Send|Prop_Data|FL_EDICT_CHANGED|FL_EDICT_FREE|FL_EDICT_FULL|FL_EDICT_FULLCHECK|FL_EDICT_ALWAYS|FL_EDICT_DONTSEND|FL_EDICT_PVSCHECK|FL_EDICT_PENDING_DORMANT_CHECK|FL_EDICT_DIRTY_PVS_INFORMATION|FL_FULL_EDICT_CHANGED|PropField_Unsupported|PropField_Integer|PropField_Float|PropField_Entity|PropField_Vector|PropField_String|PropField_String_T|PropField_Variant)\b'
-  entity_functions: '\b(GetMaxEntities|GetEntityCount|IsValidEntity|IsValidEdict|IsEntNetworkable|CreateEdict|RemoveEdict|RemoveEntity|GetEdictFlags|SetEdictFlags|GetEdictClassname|GetEntityNetClass|ChangeEdictState|GetEntData|SetEntData|GetEntDataFloat|SetEntDataFloat|GetEntDataEnt2|SetEntDataEnt2|GetEntDataVector|SetEntDataVector|GetEntDataString|SetEntDataString|FindSendPropInfo|FindDataMapInfo|GetEntSendPropOffs|HasEntProp|GetEntProp|SetEntProp|GetEntPropFloat|SetEntPropFloat|GetEntPropEnt|SetEntPropEnt|GetEntPropVector|SetEntPropVector|GetEntPropString|SetEntPropString|GetEntPropArraySize|GetEntDataArray|SetEntDataArray|GetEntityAddress|GetEntityClassname)\b'
-
-  # entity_prop_stocks.inc
-  entityps_constants: '\b(MOVETYPE_NONE|MOVETYPE_ISOMETRIC|MOVETYPE_WALK|MOVETYPE_STEP|MOVETYPE_FLY|MOVETYPE_FLYGRAVITY|MOVETYPE_VPHYSICS|MOVETYPE_PUSH|MOVETYPE_NOCLIP|MOVETYPE_LADDER|MOVETYPE_OBSERVER|MOVETYPE_CUSTOM|RENDER_NORMAL|RENDER_TRANSCOLOR|RENDER_TRANSTEXTURE|RENDER_GLOW|RENDER_TRANSALPHA|RENDER_TRANSADD|RENDER_ENVIRONMENTAL|RENDER_TRANSADDFRAMEBLEND|RENDER_TRANSALPHAADD|RENDER_WORLDGLOW|RENDER_NONE|RENDERFX_NONE|RENDERFX_PULSE_SLOW|RENDERFX_PULSE_FAST|RENDERFX_PULSE_SLOW_WIDE|RENDERFX_PULSE_FAST_WIDE|RENDERFX_FADE_SLOW|RENDERFX_FADE_FAST|RENDERFX_SOLID_SLOW|RENDERFX_SOLID_FAST|RENDERFX_STROBE_SLOW|RENDERFX_STROBE_FAST|RENDERFX_STROBE_FASTER|RENDERFX_FLICKER_SLOW|RENDERFX_FLICKER_FAST|RENDERFX_NO_DISSIPATION|RENDERFX_DISTORT|RENDERFX_HOLOGRAM|RENDERFX_EXPLODE|RENDERFX_GLOWSHELL|RENDERFX_CLAMP_MIN_SCALE|RENDERFX_ENV_RAIN|RENDERFX_ENV_SNOW|RENDERFX_SPOTLIGHT|RENDERFX_RAGDOLL|RENDERFX_PULSE_FAST_WIDER|RENDERFX_MAX|IN_ATTACK|IN_JUMP|IN_DUCK|IN_FORWARD|IN_BACK|IN_USE|IN_CANCEL|IN_LEFT|IN_RIGHT|IN_MOVELEFT|IN_MOVERIGHT|IN_ATTACK2|IN_RUN|IN_RELOAD|IN_ALT1|IN_ALT2|IN_SCORE|IN_SPEED|IN_WALK|IN_ZOOM|IN_WEAPON1|IN_WEAPON2|IN_BULLRUSH|IN_GRENADE1|IN_GRENADE2|IN_ATTACK3|FL_ONGROUND|FL_DUCKING|FL_WATERJUMP|FL_ONTRAIN|FL_INRAIN|FL_FROZEN|FL_ATCONTROLS|FL_CLIENT|FL_FAKECLIENT|PLAYER_FLAG_BITS|FL_INWATER|FL_FLY|FL_SWIM|FL_CONVEYOR|FL_NPC|FL_GODMODE|FL_NOTARGET|FL_AIMTARGET|FL_PARTIALGROUND|FL_STATICPROP|FL_GRAPHED|FL_GRENADE|FL_STEPMOVEMENT|FL_DONTTOUCH|FL_BASEVELOCITY|FL_WORLDBRUSH|FL_OBJECT|FL_KILLME|FL_ONFIRE|FL_DISSOLVING|FL_TRANSRAGDOLL|FL_UNBLOCKABLE_BY_PLAYER|FL_FREEZING|FL_EP2V_UNKNOWN1)\b'
-  entityps_functions: '\b(GetEntityFlags|SetEntityFlags|GetEntityMoveType|SetEntityMoveType|GetEntityRenderMode|SetEntityRenderMode|GetEntityRenderFx|SetEntityRenderFx|GetEntityRenderColor|SetEntityRenderColor|GetEntityGravity|SetEntityGravity|SetEntityHealth|GetClientButtons)\b'
-
-  # events.inc
-  events_constants: '\b(EventHookMode_Pre|EventHookMode_Post|EventHookMode_PostNoCopy)\b'
-  events_functions: '\b(HookEvent|HookEventEx|UnhookEvent|CreateEvent|FireEvent|CancelCreatedEvent|GetEventBool|SetEventBool|GetEventInt|SetEventInt|GetEventFloat|SetEventFloat|GetEventString|SetEventString|GetEventName|SetEventBroadcast)\b'
-  events_methods: '\b(Fire|FireToClient|Cancel|GetBool|GetInt|GetFloat)\b'
-  events_properties: '\b(BroadcastDisabled)\b'
-
-  # files.inc
-  files_constants: '\b(FileType_Unknown|FileType_Directory|FileType_File|FileTime_LastAccess|FileTime_Created|FileTime_LastChange|PLATFORM_MAX_PATH|SEEK_SET|SEEK_CUR|SEEK_END|Path_SM|FPERM_U_READ|FPERM_U_WRITE|FPERM_U_EXEC|FPERM_G_READ|FPERM_G_WRITE|FPERM_G_EXEC|FPERM_O_READ|FPERM_O_WRITE|FPERM_O_EXEC)\b'
-  files_functions: '\b(BuildPath|OpenDirectory|ReadDirEntry|OpenFile|DeleteFile|ReadFileLine|ReadFile|ReadFileString|WriteFile|WriteFileString|WriteFileLine|ReadFileCell|WriteFileCell|IsEndOfFile|FileSeek|FilePosition|FileExists|RenameFile|DirExists|FileSize|FlushFile|RemoveDir|CreateDirectory|SetFilePermissions|GetFileTime|LogToOpenFile|LogToOpenFileEx)\b'
-  files_methods: '\b(GetNext|Close|ReadLine|Read|Write|WriteLine|ReadInt(?:8|16|32|64)?|ReadUint(?:8|16|32|64)?|WriteInt(?:8|16|32|64)?|EndOfFile|Seek)\b'
-
-  # float.inc
-  float_constants: '\b(FLOAT_PI)\b'
-  float_functions: '\b(FloatFraction|RoundToZero|RoundToCeil|RoundToFloor|RoundToNearest|FloatCompare|SquareRoot|Pow|Exponential|Logarithm|Sine|Cosine|Tangent|FloatAbs|ArcTangent|ArcCosine|ArcSine|ArcTangent2|RoundFloat|__FLOAT_(MUL|DIV|ADD|SUB|GT|GE|LT|LE|EQ|NE|NOT)__|DegToRad|RadToDeg|GetURandomInt|GetURandomFloat|SetURandomSeed|SetURandomSeedSimple)\b'
-  float_operators: '\b(operator(?:\+\+|\-\-|\>\=|\<\=|\!\=|\=\=|\-|\*|\/|\+|\!|\>|\<|\%))\B'
-
-  # functions.inc
-  functions_constants: '\b(SP_PARAMFLAG_BYREF|Param_Any|Param_Cell|Param_Float|Param_String|Param_Array|Param_VarArgs|Param_CellByRef|Param_FloatByRef|ET_Ignore|ET_Single|ET_Event|ET_Hook|SM_PARAM_COPYBACK|SM_PARAM_STRING_UTF8|SM_PARAM_STRING_COPY|SM_PARAM_STRING_BINARY|SP_ERROR_NONE|SP_ERROR_FILE_FORMAT|SP_ERROR_DECOMPRESSOR|SP_ERROR_HEAPLOW|SP_ERROR_PARAM|SP_ERROR_INVALID_ADDRESS|SP_ERROR_NOT_FOUND|SP_ERROR_INDEX|SP_ERROR_STACKLOW|SP_ERROR_NOTDEBUGGING|SP_ERROR_INVALID_INSTRUCTION|SP_ERROR_MEMACCESS|SP_ERROR_STACKMIN|SP_ERROR_HEAPMIN|SP_ERROR_DIVIDE_BY_ZERO|SP_ERROR_ARRAY_BOUNDS|SP_ERROR_INSTRUCTION_PARAM|SP_ERROR_STACKLEAK|SP_ERROR_HEAPLEAK|SP_ERROR_ARRAY_TOO_BIG|SP_ERROR_TRACKER_BOUNDS|SP_ERROR_INVALID_NATIVE|SP_ERROR_PARAMS_MAX|SP_ERROR_NATIVE|SP_ERROR_NOT_RUNNABLE|SP_ERROR_ABORTED)\b'
-  functions_functions: '\b(GetFunctionByName|CreateGlobalForward|CreateForward|GetForwardFunctionCount|AddToForward|RemoveFromForward|RemoveAllFromForward|Call_StartForward|Call_StartFunction|Call_PushCell|Call_PushCellRef|Call_PushFloat|Call_PushFloatRef|Call_PushArray|Call_PushArrayEx|Call_PushNullVector|Call_PushString|Call_PushStringEx|Call_PushNullString|Call_Finish|Call_Cancel|CreateNative|ThrowNativeError|GetNativeStringLength|GetNativeString|SetNativeString|GetNativeCell|GetNativeFunction|GetNativeCellRef|SetNativeCellRef|GetNativeArray|SetNativeArray|IsNativeParamNullVector|IsNativeParamNullString|FormatNativeString|RequestFrame)\b'
-  functions_methods: '\b(StartCall|AddFunction|RemoveFunction|RemoveAllFunctions)\b'
-  functions_properties: '\b(FunctionCount)\b'
-
-  # geoip.inc
-  geoip_functions: '\b(GeoipCode2|GeoipCode3|GeoipCountry|__ext_geoip|__ext_geoip_SetNTVOptional)\b'
-
-  # halflife.inc
-  halflife_constants: '\b(SOURCE_SDK_UNKNOWN|SOURCE_SDK_ORIGINAL|SOURCE_SDK_DARKMESSIAH|SOURCE_SDK_EPISODE1|SOURCE_SDK_EPISODE2|SOURCE_SDK_BLOODYGOODTIME|SOURCE_SDK_EYE|SOURCE_SDK_CSS|SOURCE_SDK_EPISODE2VALVE|SOURCE_SDK_LEFT4DEAD|SOURCE_SDK_LEFT4DEAD2|SOURCE_SDK_ALIENSWARM|SOURCE_SDK_CSGO|SOURCE_SDK_DOTA|MOTDPANEL_TYPE_TEXT|MOTDPANEL_TYPE_INDEX|MOTDPANEL_TYPE_URL|MOTDPANEL_TYPE_FILE|DialogType_Msg|DialogType_Menu|DialogType_Text|DialogType_Entry|DialogType_AskConnect|Engine_Unknown|Engine_Original|Engine_SourceSDK2006|Engine_SourceSDK2007|Engine_Left4Dead|Engine_DarkMessiah|Engine_Left4Dead2|Engine_AlienSwarm|Engine_BloodyGoodTime|Engine_EYE|Engine_Portal2|Engine_CSGO|Engine_CSS|Engine_DOTA|Engine_HL2DM|Engine_DODS|Engine_TF2|Engine_NuclearDawn|Engine_SDK2013|Engine_Blade|Engine_Insurgency|Engine_Contagion|Engine_BlackMesa|Engine_DOI|FindMap_Found|FindMap_NotFound|FindMap_FuzzyMatch|FindMap_NonCanonical|FindMap_PossiblyAvailable|INVALID_ENT_REFERENCE|RangeType_Visibility|RangeType_Audibility)\b'
-  halflife_functions: '\b(LogToGame|SetRandomSeed|GetRandomFloat|GetRandomInt|IsMapValid|FindMap|GetMapDisplayName|IsDedicatedServer|GetEngineTime|GetGameTime|GetGameTickCount|GetGameFrameTime|GetGameDescription|GetGameFolderName|GetCurrentMap|PrecacheModel|PrecacheSentenceFile|PrecacheDecal|PrecacheGeneric|IsModelPrecached|IsDecalPrecached|IsGenericPrecached|PrecacheSound|IsSoundPrecached|CreateDialog|GetEngineVersion|PrintToChat|PrintToChatAll|PrintCenterText|PrintCenterTextAll|PrintHintText|PrintHintTextToAll|ShowVGUIPanel|CreateHudSynchronizer|SetHudTextParams|SetHudTextParamsEx|ShowSyncHudText|ClearSyncHud|ShowHudText|ShowMOTDPanel|DisplayAskConnectBox|EntIndexToEntRef|EntRefToEntIndex|MakeCompatEntRef|GetClientsInRange|GetServerAuthId|GetServerSteamAccountId)\b'
-
-  # handles.inc
-  handles_constants: '\b(INVALID_HANDLE)\b'
-  handles_functions: '\b(CloseHandle|CloneHandle)\b'
-
-  # helpers.inc
-  helpers_functions: '\b(FindPluginByFile|FindTarget)\b'
-
-  # keyvalues.inc
-  keyvalues_constants: '\b(KvData_None|KvData_String|KvData_Int|KvData_Float|KvData_Ptr|KvData_WString|KvData_Color|KvData_UInt64|KvData_NUMTYPES)\b'
-  keyvalues_functions: '\b(CreateKeyValues|KvSetString|KvSetNum|KvSetUInt64|KvSetFloat|KvSetColor|KvSetVector|KvGetString|KvGetNum|KvGetFloat|KvGetColor|KvGetUInt64|KvGetVector|KvJumpToKey|KvJumpToKeySymbol|KvGotoFirstSubKey|KvGotoNextKey|KvSavePosition|KvDeleteKey|KvDeleteThis|KvGoBack|KvRewind|KvGetSectionName|KvSetSectionName|KvGetDataType|KeyValuesToFile|FileToKeyValues|StringToKeyValues|KvSetEscapeSequences|KvNodesInStack|KvCopySubkeys|KvFindKeyById|KvGetNameSymbol|KvGetSectionSymbol)\b'
-  keyvalues_methods: '\b(ExportToFile|ExportToString|ImportFromFile|ImportFromString|Import|SetNum|SetUInt64|SetColor|SetColor4|SetVector|GetNum|GetColor|GetColor4|GetUInt64|GetVector|JumpToKey|JumpToKeySymbol|GotoFirstSubKey|GotoNextKey|SavePosition|GoBack|DeleteKey|DeleteThis|GetSectionName|SetSectionName|GetDataType|SetEscapeSequences|NodesInStack|FindKeyById|GetNameSymbol|GetSectionSymbol)\b'
-  keyvalues_properties: '\b(ExportLength)\b'
-
-  # lang.inc
-  lang_constants: '\b(LANG_SERVER)\b'
-  lang_functions: '\b(LoadTranslations|SetGlobalTransTarget|GetClientLanguage|GetServerLanguage|GetLanguageCount|GetLanguageInfo|SetClientLanguage|GetLanguageByCode|GetLanguageByName|TranslationPhraseExists|IsTranslatedForLanguage)\b'
-
-  # logging.inc
-  logging_functions: '\b(LogMessage|LogToFile|LogToFileEx|LogAction|LogError|OnLogAction|AddGameLogHook|RemoveGameLogHook)\b'
-
-  # mapchooser.inc
-  mapchooser_constants: '\b(Nominate_Added|Nominate_Replaced|Nominate_AlreadyInVote|Nominate_InvalidMap|Nominate_VoteFull|MapChange_Instant|MapChange_RoundEnd|MapChange_MapEnd)\b'
-  mapchooser_functions: '\b(NominateMap|RemoveNominationByMap|RemoveNominationByOwner|GetExcludeMapList|GetNominatedMapList|CanMapChooserStartVote|InitiateMapChooserVote|HasEndOfMapVoteFinished|EndOfMapVoteEnabled|OnNominationRemoved|OnMapVoteStarted|__pl_mapchooser|__pl_mapchooser_SetNTVOptional)\b'
-
-  # menus.inc
-  menus_constants: '\b(MenuStyle_Default|MenuStyle_Valve|MenuStyle_Radio|MenuAction_Start|MenuAction_Display|MenuAction_Select|MenuAction_Cancel|MenuAction_End|MenuAction_VoteEnd|MenuAction_VoteStart|MenuAction_VoteCancel|MenuAction_DrawItem|MenuAction_DisplayItem|MENU_ACTIONS_DEFAULT|MENU_ACTIONS_ALL|MENU_NO_PAGINATION|MENU_TIME_FOREVER|ITEMDRAW_DEFAULT|ITEMDRAW_DISABLED|ITEMDRAW_RAWLINE|ITEMDRAW_NOTEXT|ITEMDRAW_SPACER|ITEMDRAW_IGNORE|ITEMDRAW_CONTROL|MENUFLAG_BUTTON_EXIT|MENUFLAG_BUTTON_EXITBACK|MENUFLAG_NO_SOUND|MENUFLAG_BUTTON_NOVOTE|VOTEINFO_CLIENT_INDEX|VOTEINFO_CLIENT_ITEM|VOTEINFO_ITEM_INDEX|VOTEINFO_ITEM_VOTES|VOTEFLAG_NO_REVOTES|MenuCancel_Disconnected|MenuCancel_Interrupted|MenuCancel_Exit|MenuCancel_NoDisplay|MenuCancel_Timeout|MenuCancel_ExitBack|VoteCancel_Generic|VoteCancel_NoVotes|MenuEnd_Selected|MenuEnd_VotingDone|MenuEnd_VotingCancelled|MenuEnd_Cancelled|MenuEnd_Exit|MenuEnd_ExitBack|MenuSource_None|MenuSource_External|MenuSource_Normal|MenuSource_RawPanel)\b'
-  menus_functions: '\b(CreateMenu|DisplayMenu|DisplayMenuAtItem|AddMenuItem|InsertMenuItem|RemoveMenuItem|RemoveAllMenuItems|GetMenuItem|GetMenuSelectionPosition|GetMenuItemCount|SetMenuPagination|GetMenuPagination|GetMenuStyle|SetMenuTitle|GetMenuTitle|CreatePanelFromMenu|GetMenuExitButton|SetMenuExitButton|GetMenuExitBackButton|SetMenuExitBackButton|SetMenuNoVoteButton|CancelMenu|GetMenuOptionFlags|SetMenuOptionFlags|IsVoteInProgress|CancelVote|VoteMenu|VoteMenuToAll|SetVoteResultCallback|CheckVoteDelay|IsClientInVotePool|RedrawClientVoteMenu|GetMenuStyleHandle|CreatePanel|CreateMenuEx|GetClientMenu|CancelClientMenu|GetMaxPageItems|GetPanelStyle|SetPanelTitle|DrawPanelItem|DrawPanelText|CanPanelDrawFlags|SetPanelKeys|SendPanelToClient|GetPanelTextRemaining|GetPanelCurrentKey|SetPanelCurrentKey|RedrawMenuItem|InternalShowMenu|GetMenuVoteInfo|IsNewVoteAllowed)\b'
-  menus_methods: '\b(SetTitle|DrawItem|DrawText|CanDrawFlags|SetKeys|Send|Display|DisplayAt|AddItem|InsertItem|RemoveItem|RemoveAllItems|GetItem|GetTitle|ToPanel|DisplayVote|DisplayVoteToAll)\b'
-  menus_properties: '\b(Pagination|OptionFlags|ExitButton|ExitBackButton|NoVoteButton|VoteResultCallback|ItemCount|Style|Selection|TextRemaining|CurrentKey)\b'
-
-  # nextmap.inc
-  nextmap_functions: '\b(SetNextMap|GetNextMap|ForceChangeLevel|GetMapHistorySize|GetMapHistory)\b'
-
-  # profiler.inc
-  profiler_functions: '\b(CreateProfiler|StartProfiling|StopProfiling|GetProfilerTime|EnterProfilingEvent|LeaveProfilingEvent|IsProfilingActive)\b'
-  profiler_methods: '\b(Start|Stop)\b'
-  profiler_properties: '\b(Time)\b'
-
-  # protobuf.inc
-  protobuf_constants: '\b(PB_FIELD_NOT_REPEATED)\b'
-  protobuf_functions: '\b(PbReadInt|PbReadFloat|PbReadBool|PbReadString|PbReadColor|PbReadAngle|PbReadVector|PbReadVector2D|PbGetRepeatedFieldCount|PbSetInt|PbSetFloat|PbSetBool|PbSetString|PbSetColor|PbSetAngle|PbSetVector|PbSetVector2D|PbAddInt|PbAddFloat|PbAddBool|PbAddString|PbAddColor|PbAddAngle|PbAddVector|PbAddVector2D|PbRemoveRepeatedFieldValue|PbReadMessage|PbReadRepeatedMessage|PbAddMessage)\b'
-  protobuf_methods: '\b(ReadInt|ReadColor|ReadVector|ReadVector2D|GetRepeatedFieldCount|HasField|SetAngle|SetVector2D|AddInt(?:64)?|AddFloat|AddBool|AddString|AddColor|AddAngle|AddVector|AddVector2D|RemoveRepeatedFieldValue|ReadMessage|ReadRepeatedMessage|AddMessage)\b'
-
-  # regex.inc
-  regex_constants: '\b(PCRE_CASELESS|PCRE_MULTILINE|PCRE_DOTALL|PCRE_EXTENDED|PCRE_ANCHORED|PCRE_DOLLAR_ENDONLY|PCRE_UNGREEDY|PCRE_NOTEMPTY|PCRE_UTF8|PCRE_NO_UTF8_CHECK|PCRE_UCP|REGEX_ERROR_NONE|REGEX_ERROR_ASSERT|REGEX_ERROR_BADBR|REGEX_ERROR_BADPAT|REGEX_ERROR_BADRPT|REGEX_ERROR_EBRACE|REGEX_ERROR_EBRACK|REGEX_ERROR_ECOLLATE|REGEX_ERROR_ECTYPE|REGEX_ERROR_EESCAPE|REGEX_ERROR_EMPTY|REGEX_ERROR_EPAREN|REGEX_ERROR_ERANGE|REGEX_ERROR_ESIZE|REGEX_ERROR_ESPACE|REGEX_ERROR_ESUBREG|REGEX_ERROR_INVARG|REGEX_ERROR_NOMATCH|REGEX_ERROR_NULL|REGEX_ERROR_BADOPTION|REGEX_ERROR_BADMAGIC|REGEX_ERROR_UNKNOWN_OPCODE|REGEX_ERROR_NOMEMORY|REGEX_ERROR_NOSUBSTRING|REGEX_ERROR_MATCHLIMIT|REGEX_ERROR_CALLOUT|REGEX_ERROR_BADUTF8|REGEX_ERROR_BADUTF8_OFFSET|REGEX_ERROR_PARTIAL|REGEX_ERROR_BADPARTIAL|REGEX_ERROR_INTERNAL|REGEX_ERROR_BADCOUNT|REGEX_ERROR_DFA_UITEM|REGEX_ERROR_DFA_UCOND|REGEX_ERROR_DFA_UMLIMIT|REGEX_ERROR_DFA_WSSIZE|REGEX_ERROR_DFA_RECURSE|REGEX_ERROR_RECURSIONLIMIT|REGEX_ERROR_NULLWSLIMIT|REGEX_ERROR_BADNEWLINE|REGEX_ERROR_BADOFFSET|REGEX_ERROR_SHORTUTF8|REGEX_ERROR_RECURSELOOP|REGEX_ERROR_JIT_STACKLIMIT|REGEX_ERROR_BADMODE|REGEX_ERROR_BADENDIANNESS|REGEX_ERROR_DFA_BADRESTART|REGEX_ERROR_JIT_BADOPTION|REGEX_ERROR_BADLENGTH)\b'
-  regex_functions: '\b(CompileRegex|MatchRegex|GetRegexSubString|SimpleRegexMatch|__ext_regex_SetNTVOptional)\b'
-  regex_methods: '\b(Match|MatchAll|GetSubString|MatchCount|CaptureCount|MatchOffset)\b'
-
-  # sdkhooks.inc
-  sdkhooks_constants: '\b(DMG_GENERIC|DMG_CRUSH|DMG_BULLET|DMG_SLASH|DMG_BURN|DMG_VEHICLE|DMG_FALL|DMG_BLAST|DMG_CLUB|DMG_SHOCK|DMG_SONIC|DMG_ENERGYBEAM|DMG_PREVENT_PHYSICS_FORCE|DMG_NEVERGIB|DMG_ALWAYSGIB|DMG_DROWN|DMG_PARALYZE|DMG_NERVEGAS|DMG_POISON|DMG_RADIATION|DMG_DROWNRECOVER|DMG_ACID|DMG_SLOWBURN|DMG_REMOVENORAGDOLL|DMG_PHYSGUN|DMG_PLASMA|DMG_AIRBOAT|DMG_DISSOLVE|DMG_BLAST_SURFACE|DMG_DIRECT|DMG_BUCKSHOT|DMG_CRIT|DMG_RADIUS_MAX|DMG_NOCLOSEDISTANCEMOD|DMG_HALF_FALLOFF|DMG_USEDISTANCEMOD|DMG_IGNITE|DMG_USE_HITLOCATIONS|SDKHook_EndTouch|SDKHook_FireBulletsPost|SDKHook_OnTakeDamage|SDKHook_OnTakeDamagePost|SDKHook_PreThink|SDKHook_PostThink|SDKHook_SetTransmit|SDKHook_Spawn|SDKHook_StartTouch|SDKHook_Think|SDKHook_Touch|SDKHook_TraceAttack|SDKHook_TraceAttackPost|SDKHook_WeaponCanSwitchTo|SDKHook_WeaponCanUse|SDKHook_WeaponDrop|SDKHook_WeaponEquip|SDKHook_WeaponSwitch|SDKHook_ShouldCollide|SDKHook_PreThinkPost|SDKHook_PostThinkPost|SDKHook_ThinkPost|SDKHook_EndTouchPost|SDKHook_GroundEntChangedPost|SDKHook_SpawnPost|SDKHook_StartTouchPost|SDKHook_TouchPost|SDKHook_VPhysicsUpdate|SDKHook_VPhysicsUpdatePost|SDKHook_WeaponCanSwitchToPost|SDKHook_WeaponCanUsePost|SDKHook_WeaponDropPost|SDKHook_WeaponEquipPost|SDKHook_WeaponSwitchPost|SDKHook_Use|SDKHook_UsePost|SDKHook_Reload|SDKHook_ReloadPost|SDKHook_GetMaxHealth|SDKHook_Blocked|SDKHook_BlockedPost|SDKHook_OnTakeDamageAlive|SDKHook_OnTakeDamageAlivePost|SDKHook_CanBeAutobalanced|Use_Off|Use_On|Use_Set|Use_Toggle)\b'
-  sdkhooks_functions: '\b(OnEntityCreated|OnEntityDestroyed|OnGetGameDescription|OnLevelInit|SDKHook|SDKHookEx|SDKUnhook|SDKHooks_TakeDamage|SDKHooks_DropWeapon|__ext_sdkhooks)\b'
-
-  # sdktools.inc
-  sdktools_constants: '\b(SDKTOOLS_DISABLE_SOUNDAPI|SDKCall_Static|SDKCall_Entity|SDKCall_Player|SDKCall_GameRules|SDKCall_EntityList|SDKCall_Raw|SDKLibrary_Server|SDKLibrary_Engine|SDKConf_Virtual|SDKConf_Signature|SDKConf_Address|SDKType_CBaseEntity|SDKType_CBasePlayer|SDKType_Vector|SDKType_QAngle|SDKType_PlainOldData|SDKType_Float|SDKType_Edict|SDKType_String|SDKType_Bool|SDKPass_Pointer|SDKPass_Plain|SDKPass_ByValue|SDKPass_ByRef|VDECODE_FLAG_ALLOWNULL|VDECODE_FLAG_ALLOWNOTINGAME|VDECODE_FLAG_ALLOWWORLD|VDECODE_FLAG_BYREF|VENCODE_FLAG_COPYBACK)\b'
-  sdktools_functions: '\b(StartPrepSDKCall|PrepSDKCall_SetVirtual|PrepSDKCall_SetSignature|PrepSDKCall_SetAddress|PrepSDKCall_SetFromConf|PrepSDKCall_SetReturnInfo|PrepSDKCall_AddParameter|EndPrepSDKCall|SDKCall|GetPlayerResourceEntity|__ext_sdktools)\b'
-
-  # sdktools_client.inc
-  sdktools_client_functions: '\b(InactivateClient|ReconnectClient)\b'
-
-  # sdktools_engine.inc
-  sdktools_engine_constants: '\b(MAX_LIGHTSTYLES)\b'
-  sdktools_engine_functions: '\b(SetClientViewEntity|SetLightStyle|GetClientEyePosition)\b'
-
-  # sdktools_entinput.inc
-  sdktools_entinput_functions: '\b(AcceptEntityInput)\b'
-
-  # sdktools_entoutput.inc
-  sdktools_entoutput_functions: '\b(HookEntityOutput|UnhookEntityOutput|HookSingleEntityOutput|UnhookSingleEntityOutput|FireEntityOutput)\b'
-
-  # sdktools_functions.inc
-  sdktools_functions_functions: '\b(RemovePlayerItem|GivePlayerItem|GetPlayerWeaponSlot|IgniteEntity|ExtinguishEntity|TeleportEntity|ForcePlayerSuicide|SlapPlayer|FindEntityByClassname|GetClientEyeAngles|CreateEntityByName|DispatchSpawn|DispatchKeyValue|DispatchKeyValueFloat|DispatchKeyValueVector|GetClientAimTarget|GetTeamCount|GetTeamName|GetTeamScore|SetTeamScore|GetTeamClientCount|GetTeamEntity|SetEntityModel|GetPlayerDecalFile|GetPlayerJingleFile|GetServerNetStats|EquipPlayerWeapon|ActivateEntity|SetClientInfo|SetClientName|GivePlayerAmmo)\b'
-
-  # sdktools_gamerules.inc
-  sdktools_gamerules_constants: '\b(RoundState_Init|RoundState_Pregame|RoundState_StartGame|RoundState_Preround|RoundState_RoundRunning|RoundState_TeamWin|RoundState_Restart|RoundState_Stalemate|RoundState_GameOver|RoundState_Bonus|RoundState_BetweenRounds)\b'
-  sdktools_gamerules_functions: '\b(GameRules_GetProp|GameRules_SetProp|GameRules_GetPropFloat|GameRules_SetPropFloat|GameRules_GetPropEnt|GameRules_SetPropEnt|GameRules_GetPropVector|GameRules_SetPropVector|GameRules_GetPropString|GameRules_SetPropString|GameRules_GetRoundState)\b'
-
-  # sdktools_hooks.inc
-  sdktools_hooks_constants: '\b(FEATURECAP_PLAYERRUNCMD_11PARAMS)\b'
-  sdktools_hooks_functions: '\b(OnPlayerRunCmd|OnPlayerRunCmdPost|OnFileSend|OnFileReceive)\b'
-
-  # sdktools_sound.inc
-  sdktools_sound_constants: '\b(SOUND_FROM_PLAYER|SOUND_FROM_LOCAL_PLAYER|SOUND_FROM_WORLD|SNDCHAN_REPLACE|SNDCHAN_AUTO|SNDCHAN_WEAPON|SNDCHAN_VOICE|SNDCHAN_ITEM|SNDCHAN_BODY|SNDCHAN_STREAM|SNDCHAN_STATIC|SNDCHAN_VOICE_BASE|SNDCHAN_USER_BASE|SND_NOFLAGS|SND_CHANGEVOL|SND_CHANGEPITCH|SND_STOP|SND_SPAWNING|SND_DELAY|SND_STOPLOOPING|SND_SPEAKER|SND_SHOULDPAUSE|SNDLEVEL_NONE|SNDLEVEL_RUSTLE|SNDLEVEL_WHISPER|SNDLEVEL_LIBRARY|SNDLEVEL_FRIDGE|SNDLEVEL_HOME|SNDLEVEL_CONVO|SNDLEVEL_DRYER|SNDLEVEL_DISHWASHER|SNDLEVEL_CAR|SNDLEVEL_NORMAL|SNDLEVEL_TRAFFIC|SNDLEVEL_MINIBIKE|SNDLEVEL_SCREAMING|SNDLEVEL_TRAIN|SNDLEVEL_HELICOPTER|SNDLEVEL_SNOWMOBILE|SNDLEVEL_AIRCRAFT|SNDLEVEL_RAIDSIREN|SNDLEVEL_GUNFIRE|SNDLEVEL_ROCKET|SNDVOL_NORMAL|SNDPITCH_NORMAL|SNDPITCH_LOW|SNDPITCH_HIGH|SNDATTN_NONE|SNDATTN_NORMAL|SNDATTN_STATIC|SNDATTN_RICOCHET|SNDATTN_IDLE)\b'
-  sdktools_sound_functions: '\b(PrefetchSound|EmitAmbientSound|FadeClientVolume|StopSound|EmitSound|EmitSoundEntry|EmitSentence|GetDistGainFromSoundLevel|AddAmbientSoundHook|AddNormalSoundHook|RemoveAmbientSoundHook|RemoveNormalSoundHook|EmitSoundToClient|EmitSoundToAll|ATTN_TO_SNDLEVEL|GetGameSoundParams|EmitGameSound|EmitAmbientGameSound|EmitGameSoundToClient|EmitGameSoundToAll|PrecacheScriptSound)\b'
-
-  # sdktools_stocks.inc
-  sdktools_stocks_functions: '\b(FindTeamByName)\b'
-
-  # sdktools_stringtables.inc
-  sdktools_stringtables_constants: '\b(INVALID_STRING_TABLE|INVALID_STRING_INDEX)\b'
-  sdktools_stringtables_functions: '\b(FindStringTable|GetNumStringTables|GetStringTableNumStrings|GetStringTableMaxStrings|GetStringTableName|FindStringIndex|ReadStringTable|GetStringTableDataLength|GetStringTableData|SetStringTableData|AddToStringTable|LockStringTables|AddFileToDownloadsTable)\b'
-
-  # sdktools_tempents.inc
-  sdktools_tempents_functions: '\b(AddTempEntHook|RemoveTempEntHook|TE_Start|TE_IsValidProp|TE_WriteNum|TE_ReadNum|TE_WriteFloat|TE_ReadFloat|TE_WriteVector|TE_ReadVector|TE_WriteAngles|TE_WriteFloatArray|TE_Send|TE_WriteEncodedEnt|TE_SendToAll|TE_SendToClient|TE_SendToAllInRange)\b'
-
-  # sdktools_tempents_stocks.inc
-  sdktools_testocks_constants: '\b(TE_EXPLFLAG_NONE|TE_EXPLFLAG_NOADDITIVE|TE_EXPLFLAG_NODLIGHTS|TE_EXPLFLAG_NOSOUND|TE_EXPLFLAG_NOPARTICLES|TE_EXPLFLAG_DRAWALPHA|TE_EXPLFLAG_ROTATE|TE_EXPLFLAG_NOFIREBALL|TE_EXPLFLAG_NOFIREBALLSMOKE|FBEAM_STARTENTITY|FBEAM_ENDENTITY|FBEAM_FADEIN|FBEAM_FADEOUT|FBEAM_SINENOISE|FBEAM_SOLID|FBEAM_SHADEIN|FBEAM_SHADEOUT|FBEAM_ONLYNOISEONCE|FBEAM_NOTILE|FBEAM_USE_HITBOXES|FBEAM_STARTVISIBLE|FBEAM_ENDVISIBLE|FBEAM_ISACTIVE|FBEAM_FOREVER|FBEAM_HALOBEAM)\b'
-  sdktools_testocks_functions: '\b(TE_SetupSparks|TE_SetupSmoke|TE_SetupDust|TE_SetupMuzzleFlash|TE_SetupMetalSparks|TE_SetupEnergySplash|TE_SetupArmorRicochet|TE_SetupGlowSprite|TE_SetupExplosion|TE_SetupBloodSprite|TE_SetupBeamRingPoint|TE_SetupBeamPoints|TE_SetupBeamLaser|TE_SetupBeamRing|TE_SetupBeamFollow)\b'
-
-  # sdktools_trace.inc
-  sdktools_trace_constants: '\b(CONTENTS_EMPTY|CONTENTS_SOLID|CONTENTS_WINDOW|CONTENTS_AUX|CONTENTS_GRATE|CONTENTS_SLIME|CONTENTS_WATER|CONTENTS_MIST|CONTENTS_OPAQUE|LAST_VISIBLE_CONTENTS|ALL_VISIBLE_CONTENTS|CONTENTS_TESTFOGVOLUME|CONTENTS_UNUSED5|CONTENTS_UNUSED6|CONTENTS_TEAM1|CONTENTS_TEAM2|CONTENTS_IGNORE_NODRAW_OPAQUE|CONTENTS_MOVEABLE|CONTENTS_AREAPORTAL|CONTENTS_PLAYERCLIP|CONTENTS_MONSTERCLIP|CONTENTS_CURRENT_0|CONTENTS_CURRENT_90|CONTENTS_CURRENT_180|CONTENTS_CURRENT_270|CONTENTS_CURRENT_UP|CONTENTS_CURRENT_DOWN|CONTENTS_ORIGIN|CONTENTS_MONSTER|CONTENTS_DEBRIS|CONTENTS_DETAIL|CONTENTS_TRANSLUCENT|CONTENTS_LADDER|CONTENTS_HITBOX|MASK_ALL|MASK_SOLID|MASK_PLAYERSOLID|MASK_NPCSOLID|MASK_WATER|MASK_OPAQUE|MASK_OPAQUE_AND_NPCS|MASK_VISIBLE|MASK_VISIBLE_AND_NPCS|MASK_SHOT|MASK_SHOT_HULL|MASK_SHOT_PORTAL|MASK_SOLID_BRUSHONLY|MASK_PLAYERSOLID_BRUSHONLY|MASK_NPCSOLID_BRUSHONLY|MASK_NPCWORLDSTATIC|MASK_SPLITAREAPORTAL|SURF_LIGHT|SURF_SKY2D|SURF_SKY|SURF_WARP|SURF_TRANS|SURF_NOPORTAL|SURF_TRIGGER|SURF_NODRAW|SURF_HINT|SURF_SKIP|SURF_NOLIGHT|SURF_BUMPLIGHT|SURF_NOSHADOWS|SURF_NODECALS|SURF_NOCHOP|SURF_HITBOX|PARTITION_SOLID_EDICTS|PARTITION_TRIGGER_EDICTS|PARTITION_STATIC_PROPS|PARTITION_NON_STATIC_EDICTS|DISPSURF_FLAG_SURFACE|DISPSURF_FLAG_WALKABLE|DISPSURF_FLAG_BUILDABLE|DISPSURF_FLAG_SURFPROP1|DISPSURF_FLAG_SURFPROP2|RayType_EndPoint|RayType_Infinite)\b'
-  sdktools_trace_functions: '\b(TR_GetPointContents|TR_GetPointContentsEnt|TR_TraceRay|TR_TraceHull|TR_EnumerateEntities|TR_EnumerateEntitiesHull|TR_TraceRayFilter|TR_TraceHullFilter|TR_ClipRayToEntity|TR_ClipRayHullToEntity|TR_ClipCurrentRayToEntity|TR_TraceRayEx|TR_TraceHullEx|TR_TraceRayFilterEx|TR_TraceHullFilterEx|TR_ClipRayToEntityEx|TR_ClipRayHullToEntityEx|TR_ClipCurrentRayToEntityEx|TR_GetFraction|TR_GetFractionLeftSolid|TR_GetStartPosition|TR_GetEndPosition|TR_GetEntityIndex|TR_GetDisplacementFlags|TR_GetSurfaceName|TR_GetSurfaceProps|TR_GetSurfaceFlags|TR_GetPhysicsBone|TR_AllSolid|TR_AllSolid|TR_StartSolid|TR_DidHit|TR_GetHitGroup|TR_GetPlaneNormal|TR_PointOutsideWorld)\b'
-
-  # sdktools_variant_t.inc
-  sdktools_variant_functions: '\b(SetVariantBool|SetVariantString|SetVariantInt|SetVariantFloat|SetVariantVector3D|SetVariantPosVector3D|SetVariantColor|SetVariantEntity)\b'
-
-  # sdktools_voice.inc
-  sdktools_voice_constants: '\b(VOICE_NORMAL|VOICE_MUTED|VOICE_SPEAKALL|VOICE_LISTENALL|VOICE_TEAM|VOICE_LISTENTEAM|Listen_Default|Listen_No|Listen_Yes)\b'
-  sdktools_voice_functions: '\b(SetClientListeningFlags|GetClientListeningFlags|SetListenOverride|GetListenOverride|IsClientMuted)\b'
-
-  # sorting.inc
-  sorting_constants: '\b(Sort_Ascending|Sort_Descending|Sort_Random|Sort_Integer|Sort_Float|Sort_String)\b'
-  sorting_functions: '\b(SortIntegers|SortFloats|SortStrings|SortCustom1D|SortCustom2D|SortADTArray|SortADTArrayCustom)\b'
-
-  # sourcemod.inc
-  sourcemod_constants: '\b(APLRes_Success|APLRes_Failure|APLRes_SilentFailure|MAPLIST_FLAG_MAPSFOLDER|MAPLIST_FLAG_CLEARARRAY|MAPLIST_FLAG_NO_DEFAULT|FeatureType_Native|FeatureType_Capability|FeatureStatus_Available|FeatureStatus_Unavailable|FeatureStatus_Unknown|NumberType_Int8|NumberType_Int16|NumberType_Int32|Address_Null|REQUIRE_PLUGIN|REQUIRE_EXTENSIONS|TEMP_REQUIRE_EXTENSIONS)\b'
-  sourcemod_functions: '\b(OnPluginStart|AskPluginLoad2|OnPluginEnd|OnPluginPauseChange|OnGameFrame|OnMapStart|OnMapEnd|OnConfigsExecuted|OnAutoConfigsBuffered|OnAllPluginsLoaded|GetMyHandle|GetPluginIterator|MorePlugins|ReadPlugin|GetPluginStatus|GetPluginFilename|IsPluginDebugging|GetPluginInfo|FindPluginByNumber|SetFailState|ThrowError|LogStackTrace|GetTime|FormatTime|LoadGameConfigFile|GameConfGetOffset|GameConfGetKeyValue|GameConfGetAddress|GetSysTickCount|AutoExecConfig|RegPluginLibrary|LibraryExists|GetExtensionFileStatus|OnLibraryAdded|OnLibraryRemoved|ReadMapList|SetMapListCompatBind|OnClientFloodCheck|OnClientFloodResult|CanTestFeatures|GetFeatureStatus|RequireFeature|LoadFromAddress|StoreToAddress)\b'
-  sourcemod_methods: '\b(GetOffset|GetKeyValue|GetAddress|Next|Reset|GetFunctionName|GetFilePath)\b'
-  sourcemod_properties: '\b(LineNumber)\b'
-
-  # string.inc
-  string_functions: '\b(strlen|StrContains|strcmp|strncmp|StrEqual|strcopy|Format|FormatEx|VFormat|StringToInt|StringToIntEx|IntToString|StringToFloat|StringToFloatEx|FloatToString|BreakString|TrimString|SplitString|ReplaceString|ReplaceStringEx|GetCharBytes|IsCharAlpha|IsCharNumeric|IsCharSpace|IsCharMB|IsCharUpper|IsCharLower|StripQuotes|CharToUpper|CharToLower|FindCharInString|StrCat|ExplodeString|ImplodeStrings)\b'
-
-  # testing.inc
-  testing_constants: '\b(TestNumber|TestContext)\b'
-  testing_functions: '\b(SetTestContext|AssertEq|AssertFalse|AssertTrue)\b'
-
-  # textparse.inc
-  textparse_constants: '\b(SMCParse_Continue|SMCParse_Halt|SMCParse_HaltFail|SMCError_Okay|SMCError_StreamOpen|SMCError_StreamError|SMCError_Custom|SMCError_InvalidSection1|SMCError_InvalidSection2|SMCError_InvalidSection3|SMCError_InvalidSection4|SMCError_InvalidSection5|SMCError_InvalidTokens|SMCError_TokenOverflow|SMCError_InvalidProperty1)\b'
-  textparse_functions: '\b(SMC_CreateParser|SMC_ParseFile|SMC_GetErrorString|SMC_SetParseStart|SMC_SetParseEnd|SMC_SetReaders|SMC_SetRawLine)\b'
-  textparse_methods: '\b(ParseFile|GetErrorString)\b'
-  textparse_properties: '\b(OnStart|OnEnd|OnEnterSection|OnLeaveSection|OnKeyValue|OnRawLine)\b'
-
-  # tf2.inc
-  tf2_constants: '\b(TF_STUNFLAG_SLOWDOWN|TF_STUNFLAG_BONKSTUCK|TF_STUNFLAG_LIMITMOVEMENT|TF_STUNFLAG_CHEERSOUND|TF_STUNFLAG_NOSOUNDOREFFECT|TF_STUNFLAG_THIRDPERSON|TF_STUNFLAG_GHOSTEFFECT|TF_STUNFLAG_SOUND|TF_STUNFLAGS_LOSERSTATE|TF_STUNFLAGS_GHOSTSCARE|TF_STUNFLAGS_SMALLBONK|TF_STUNFLAGS_NORMALBONK|TF_STUNFLAGS_BIGBONK|TFClass_Unknown|TFClass_Scout|TFClass_Sniper|TFClass_Soldier|TFClass_DemoMan|TFClass_Medic|TFClass_Heavy|TFClass_Pyro|TFClass_Spy|TFClass_Engineer|TFTeam_Unassigned|TFTeam_Spectator|TFTeam_Red|TFTeam_Blue|TFCond_Slowed|TFCond_Slowed|TFCond_Zoomed|TFCond_Disguising|TFCond_Disguised|TFCond_Cloaked|TFCond_Ubercharged|TFCond_TeleportedGlow|TFCond_Taunting|TFCond_UberchargeFading|TFCond_Unknown1|TFCond_CloakFlicker|TFCond_Teleporting|TFCond_Kritzkrieged|TFCond_Unknown2|TFCond_TmpDamageBonus|TFCond_DeadRingered|TFCond_Bonked|TFCond_Dazed|TFCond_Buffed|TFCond_Charging|TFCond_DemoBuff|TFCond_CritCola|TFCond_InHealRadius|TFCond_Healing|TFCond_OnFire|TFCond_Overhealed|TFCond_Jarated|TFCond_Bleeding|TFCond_DefenseBuffed|TFCond_Milked|TFCond_MegaHeal|TFCond_RegenBuffed|TFCond_MarkedForDeath|TFCond_NoHealingDamageBuff|TFCond_SpeedBuffAlly|TFCond_HalloweenCritCandy|TFCond_CritCanteen|TFCond_CritDemoCharge|TFCond_CritHype|TFCond_CritOnFirstBlood|TFCond_CritOnWin|TFCond_CritOnFlagCapture|TFCond_CritOnKill|TFCond_RestrictToMelee|TFCond_DefenseBuffNoCritBlock|TFCond_Reprogrammed|TFCond_CritMmmph|TFCond_DefenseBuffMmmph|TFCond_FocusBuff|TFCond_DisguiseRemoved|TFCond_MarkedForDeathSilent|TFCond_DisguisedAsDispenser|TFCond_Sapped|TFCond_UberchargedHidden|TFCond_UberchargedCanteen|TFCond_HalloweenBombHead|TFCond_HalloweenThriller|TFCond_RadiusHealOnDamage|TFCond_CritOnDamage|TFCond_UberchargedOnTakeDamage|TFCond_UberBulletResist|TFCond_UberBlastResist|TFCond_UberFireResist|TFCond_SmallBulletResist|TFCond_SmallBlastResist|TFCond_SmallFireResist|TFCond_Stealthed|TFCond_MedigunDebuff|TFCond_StealthedUserBuffFade|TFCond_BulletImmune|TFCond_BlastImmune|TFCond_FireImmune|TFCond_PreventDeath|TFCond_MVMBotRadiowave|TFCond_HalloweenSpeedBoost|TFCond_HalloweenQuickHeal|TFCond_HalloweenGiant|TFCond_HalloweenTiny|TFCond_HalloweenInHell|TFCond_HalloweenGhostMode|TFCond_MiniCritOnKill|TFCond_DodgeChance|TFCond_ObscuredSmoke|TFCond_Parachute|TFCond_BlastJumping|TFCond_HalloweenKart|TFCond_HalloweenKartDash|TFCond_BalloonHead|TFCond_MeleeOnly|TFCond_SwimmingCurse|TFCond_HalloweenKartNoTurn|TFCond_FreezeInput|TFCond_HalloweenKartCage|TFCond_HasRune|TFCond_RuneStrength|TFCond_RuneHaste|TFCond_RuneRegen|TFCond_RuneResist|TFCond_RuneVampire|TFCond_RuneWarlock|TFCond_RunePrecision|TFCond_RuneAgility|TFCond_GrapplingHook|TFCond_GrapplingHookSafeFall|TFCond_GrapplingHookLatched|TFCond_GrapplingHookBleeding|TFCond_AfterburnImmune|TFCond_RuneKnockout|TFCond_RuneImbalance|TFCond_CritRuneTemp|TFCond_PasstimeInterception|TFCond_SwimmingNoEffects|TFCond_EyeaductUnderworld|TFCond_KingRune|TFCond_PlagueRune|TFCond_SupernovaRune|TFCond_Plague|TFCond_KingAura|TFCond_SpawnOutline|TFCond_KnockedIntoAir|TFCond_CompetitiveWinner|TFCond_CompetitiveLoser|TFCond_HealingDebuff|TFCond_PasstimePenaltyDebuff|TFCond_GrappledToPlayer|TFCond_GrappledByPlayer|TFCond_ParachuteDeployed|TFCond_Gas|TFCond_BurningPyro|TFCond_RocketPack|TFCond_LostFooting|TFCond_AirCurrent|TFCondDuration_Infinite|TFHoliday_Invalid|TFHoliday_Birthday|TFHoliday_Halloween|TFHoliday_Christmas|TFHoliday_EndOfTheLine|TFHoliday_CommunityUpdate|TFHoliday_ValentinesDay|TFHoliday_MeetThePyro|TFHoliday_FullMoon|TFHoliday_HalloweenOrFullMoon|TFHoliday_HalloweenOrFullMoonOrValentines|TFHoliday_AprilFools|TFObject_CartDispenser|TFObject_Dispenser|TFObject_Teleporter|TFObject_Sentry|TFObject_Sapper|TFObjectMode_None|TFObjectMode_Entrance|TFObjectMode_Exit)\b'
-  tf2_functions: '\b(TF2_IgnitePlayer|TF2_RespawnPlayer|TF2_RegeneratePlayer|TF2_AddCondition|TF2_RemoveCondition|TF2_SetPlayerPowerPlay|TF2_DisguisePlayer|TF2_RemovePlayerDisguise|TF2_StunPlayer|TF2_MakeBleed|TF2_GetClass|TF2_CalcIsAttackCritical|TF2_OnIsHolidayActive|TF2_IsHolidayActive|TF2_IsPlayerInDuel|TF2_RemoveWearable|TF2_OnConditionAdded|TF2_OnConditionRemoved|TF2_OnWaitingForPlayersStart|TF2_OnWaitingForPlayersEnd|TF2_OnPlayerTeleport|__ext_tf2|__ext_tf2_SetNTVOptional)\b'
-
-  # tf2_stocks.inc
-  tf2stocks_constants: '\b(TF_CONDFLAG_NONE|TF_CONDFLAG_SLOWED|TF_CONDFLAG_ZOOMED|TF_CONDFLAG_DISGUISING|TF_CONDFLAG_DISGUISED|TF_CONDFLAG_CLOAKED|TF_CONDFLAG_UBERCHARGED|TF_CONDFLAG_TELEPORTGLOW|TF_CONDFLAG_TAUNTING|TF_CONDFLAG_UBERCHARGEFADE|TF_CONDFLAG_CLOAKFLICKER|TF_CONDFLAG_TELEPORTING|TF_CONDFLAG_KRITZKRIEGED|TF_CONDFLAG_DEADRINGERED|TF_CONDFLAG_BONKED|TF_CONDFLAG_DAZED|TF_CONDFLAG_BUFFED|TF_CONDFLAG_CHARGING|TF_CONDFLAG_DEMOBUFF|TF_CONDFLAG_CRITCOLA|TF_CONDFLAG_INHEALRADIUS|TF_CONDFLAG_HEALING|TF_CONDFLAG_ONFIRE|TF_CONDFLAG_OVERHEALED|TF_CONDFLAG_JARATED|TF_CONDFLAG_BLEEDING|TF_CONDFLAG_DEFENSEBUFFED|TF_CONDFLAG_MILKED|TF_CONDFLAG_MEGAHEAL|TF_CONDFLAG_REGENBUFFED|TF_CONDFLAG_MARKEDFORDEATH|TF_DEATHFLAG_KILLERDOMINATION|TF_DEATHFLAG_ASSISTERDOMINATION|TF_DEATHFLAG_KILLERREVENGE|TF_DEATHFLAG_ASSISTERREVENGE|TF_DEATHFLAG_FIRSTBLOOD|TF_DEATHFLAG_DEADRINGER|TF_DEATHFLAG_INTERRUPTED|TF_DEATHFLAG_GIBBED|TF_DEATHFLAG_PURGATORY|TF_DEATHFLAG_MINIBOSS|TF_DEATHFLAG_AUSTRALIUM|TF_CUSTOM_HEADSHOT|TF_CUSTOM_BACKSTAB|TF_CUSTOM_BURNING|TF_CUSTOM_WRENCH_FIX|TF_CUSTOM_MINIGUN|TF_CUSTOM_SUICIDE|TF_CUSTOM_TAUNT_HADOUKEN|TF_CUSTOM_BURNING_FLARE|TF_CUSTOM_TAUNT_HIGH_NOON|TF_CUSTOM_TAUNT_GRAND_SLAM|TF_CUSTOM_PENETRATE_MY_TEAM|TF_CUSTOM_PENETRATE_ALL_PLAYERS|TF_CUSTOM_TAUNT_FENCING|TF_CUSTOM_PENETRATE_HEADSHOT|TF_CUSTOM_TAUNT_ARROW_STAB|TF_CUSTOM_TELEFRAG|TF_CUSTOM_BURNING_ARROW|TF_CUSTOM_FLYINGBURN|TF_CUSTOM_PUMPKIN_BOMB|TF_CUSTOM_DECAPITATION|TF_CUSTOM_TAUNT_GRENADE|TF_CUSTOM_BASEBALL|TF_CUSTOM_CHARGE_IMPACT|TF_CUSTOM_TAUNT_BARBARIAN_SWING|TF_CUSTOM_AIR_STICKY_BURST|TF_CUSTOM_DEFENSIVE_STICKY|TF_CUSTOM_PICKAXE|TF_CUSTOM_ROCKET_DIRECTHIT|TF_CUSTOM_TAUNT_UBERSLICE|TF_CUSTOM_PLAYER_SENTRY|TF_CUSTOM_STANDARD_STICKY|TF_CUSTOM_SHOTGUN_REVENGE_CRIT|TF_CUSTOM_TAUNT_ENGINEER_SMASH|TF_CUSTOM_BLEEDING|TF_CUSTOM_GOLD_WRENCH|TF_CUSTOM_CARRIED_BUILDING|TF_CUSTOM_COMBO_PUNCH|TF_CUSTOM_TAUNT_ENGINEER_ARM|TF_CUSTOM_FISH_KILL|TF_CUSTOM_TRIGGER_HURT|TF_CUSTOM_DECAPITATION_BOSS|TF_CUSTOM_STICKBOMB_EXPLOSION|TF_CUSTOM_AEGIS_ROUND|TF_CUSTOM_FLARE_EXPLOSION|TF_CUSTOM_BOOTS_STOMP|TF_CUSTOM_PLASMA|TF_CUSTOM_PLASMA_CHARGED|TF_CUSTOM_PLASMA_GIB|TF_CUSTOM_PRACTICE_STICKY|TF_CUSTOM_EYEBALL_ROCKET|TF_CUSTOM_HEADSHOT_DECAPITATION|TF_CUSTOM_TAUNT_ARMAGEDDON|TF_CUSTOM_FLARE_PELLET|TF_CUSTOM_CLEAVER|TF_CUSTOM_CLEAVER_CRIT|TF_CUSTOM_SAPPER_RECORDER_DEATH|TF_CUSTOM_MERASMUS_PLAYER_BOMB|TF_CUSTOM_MERASMUS_GRENADE|TF_CUSTOM_MERASMUS_ZAP|TF_CUSTOM_MERASMUS_DECAPITATION|TF_CUSTOM_CANNONBALL_PUSH|TF_CUSTOM_TAUNT_ALLCLASS_GUITAR_RIFF|TF_CUSTOM_THROWABLE|TF_CUSTOM_THROWABLE_KILL|TF_CUSTOM_SPELL_TELEPORT|TF_CUSTOM_SPELL_SKELETON|TF_CUSTOM_SPELL_MIRV|TF_CUSTOM_SPELL_METEOR|TF_CUSTOM_SPELL_LIGHTNING|TF_CUSTOM_SPELL_FIREBALL|TF_CUSTOM_SPELL_MONOCULUS|TF_CUSTOM_SPELL_BLASTJUMP|TF_CUSTOM_SPELL_BATS|TF_CUSTOM_SPELL_TINY|TF_CUSTOM_KART|TF_CUSTOM_GIANT_HAMMER|TF_CUSTOM_RUNE_REFLECT|TF_CUSTOM_DRAGONS_FURY_IGNITE|TF_CUSTOM_DRAGONS_FURY_BONUS_BURNING|TF_CUSTOM_SLAP_KILL|TF_CUSTOM_CROC|TF_CUSTOM_TAUNTATK_GASBLAST|TF_CUSTOM_AXTINGUISHER_BOOSTED|TF_WEAPON_NONE|TF_WEAPON_BAT|TF_WEAPON_BAT_WOOD|TF_WEAPON_BOTTLE|TF_WEAPON_FIREAXE|TF_WEAPON_CLUB|TF_WEAPON_CROWBAR|TF_WEAPON_KNIFE|TF_WEAPON_FISTS|TF_WEAPON_SHOVEL|TF_WEAPON_WRENCH|TF_WEAPON_BONESAW|TF_WEAPON_SHOTGUN_PRIMARY|TF_WEAPON_SHOTGUN_SOLDIER|TF_WEAPON_SHOTGUN_HWG|TF_WEAPON_SHOTGUN_PYRO|TF_WEAPON_SCATTERGUN|TF_WEAPON_SNIPERRIFLE|TF_WEAPON_MINIGUN|TF_WEAPON_SMG|TF_WEAPON_SYRINGEGUN_MEDIC|TF_WEAPON_TRANQ|TF_WEAPON_ROCKETLAUNCHER|TF_WEAPON_GRENADELAUNCHER|TF_WEAPON_PIPEBOMBLAUNCHER|TF_WEAPON_FLAMETHROWER|TF_WEAPON_GRENADE_NORMAL|TF_WEAPON_GRENADE_CONCUSSION|TF_WEAPON_GRENADE_NAIL|TF_WEAPON_GRENADE_MIRV|TF_WEAPON_GRENADE_MIRV_DEMOMAN|TF_WEAPON_GRENADE_NAPALM|TF_WEAPON_GRENADE_GAS|TF_WEAPON_GRENADE_EMP|TF_WEAPON_GRENADE_CALTROP|TF_WEAPON_GRENADE_PIPEBOMB|TF_WEAPON_GRENADE_SMOKE_BOMB|TF_WEAPON_GRENADE_HEAL|TF_WEAPON_GRENADE_STUNBALL|TF_WEAPON_GRENADE_JAR|TF_WEAPON_GRENADE_JAR_MILK|TF_WEAPON_PISTOL|TF_WEAPON_PISTOL_SCOUT|TF_WEAPON_REVOLVER|TF_WEAPON_NAILGUN|TF_WEAPON_PDA|TF_WEAPON_PDA_ENGINEER_BUILD|TF_WEAPON_PDA_ENGINEER_DESTROY|TF_WEAPON_PDA_SPY|TF_WEAPON_BUILDER|TF_WEAPON_MEDIGUN|TF_WEAPON_GRENADE_MIRVBOMB|TF_WEAPON_FLAMETHROWER_ROCKET|TF_WEAPON_GRENADE_DEMOMAN|TF_WEAPON_SENTRY_BULLET|TF_WEAPON_SENTRY_ROCKET|TF_WEAPON_DISPENSER|TF_WEAPON_INVIS|TF_WEAPON_FLAREGUN|TF_WEAPON_LUNCHBOX|TF_WEAPON_JAR|TF_WEAPON_COMPOUND_BOW|TF_WEAPON_BUFF_ITEM|TF_WEAPON_PUMPKIN_BOMB|TF_WEAPON_SWORD|TF_WEAPON_DIRECTHIT|TF_WEAPON_LIFELINE|TF_WEAPON_LASER_POINTER|TF_WEAPON_DISPENSER_GUN|TF_WEAPON_SENTRY_REVENGE|TF_WEAPON_JAR_MILK|TF_WEAPON_HANDGUN_SCOUT_PRIMARY|TF_WEAPON_BAT_FISH|TF_WEAPON_CROSSBOW|TF_WEAPON_STICKBOMB|TF_WEAPON_HANDGUN_SCOUT_SEC|TF_WEAPON_SODA_POPPER|TF_WEAPON_SNIPERRIFLE_DECAP|TF_WEAPON_RAYGUN|TF_WEAPON_PARTICLE_CANNON|TF_WEAPON_MECHANICAL_ARM|TF_WEAPON_DRG_POMSON|TF_WEAPON_BAT_GIFTWRAP|TF_WEAPON_GRENADE_ORNAMENT|TF_WEAPON_RAYGUN_REVENGE|TF_WEAPON_PEP_BRAWLER_BLASTER|TF_WEAPON_CLEAVER|TF_WEAPON_GRENADE_CLEAVER|TF_WEAPON_STICKY_BALL_LAUNCHER|TF_WEAPON_GRENADE_STICKY_BALL|TF_WEAPON_SHOTGUN_BUILDING_RESCUE|TF_WEAPON_CANNON|TF_WEAPON_THROWABLE|TF_WEAPON_GRENADE_THROWABLE|TF_WEAPON_PDA_SPY_BUILD|TF_WEAPON_GRENADE_WATERBALLOON|TF_WEAPON_HARVESTER_SAW|TF_WEAPON_SPELLBOOK|TF_WEAPON_SPELLBOOK_PROJECTILE|TF_WEAPON_SNIPERRIFLE_CLASSIC|TF_WEAPON_PARACHUTE|TF_WEAPON_GRAPPLINGHOOK|TF_WEAPON_PASSTIME_GUN|TF_WEAPON_CHARGED_SMG|TF_WEAPON_BREAKABLE_SIGN|TF_WEAPON_ROCKETPACK|TF_WEAPON_SLAP|TF_WEAPON_JAR_GAS|TF_WEAPON_GRENADE_JAR_GAS|TF_WEAPON_FLAME_BALL|TFWeaponSlot_Primary|TFWeaponSlot_Secondary|TFWeaponSlot_Melee|TFWeaponSlot_Grenade|TFWeaponSlot_Building|TFWeaponSlot_PDA|TFWeaponSlot_Item1|TFWeaponSlot_Item2|TF_FLAGEVENT_PICKEDUP|TF_FLAGEVENT_CAPTURED|TF_FLAGEVENT_DEFENDED|TF_FLAGEVENT_DROPPED|TF_FLAGEVENT_RETURNED|TFResource_Ping|TFResource_Score|TFResource_Deaths|TFResource_TotalScore|TFResource_Captures|TFResource_Defenses|TFResource_Dominations|TFResource_Revenge|TFResource_BuildingsDestroyed|TFResource_Headshots|TFResource_Backstabs|TFResource_HealPoints|TFResource_Invulns|TFResource_Teleports|TFResource_ResupplyPoints|TFResource_KillAssists|TFResource_MaxHealth|TFResource_PlayerClass|TFResourceNames)\b'
-  tf2stocks_functions: '\b(TF2_GetClientTeam|TF2_ChangeClientTeam|TF2_GetPlayerClass|TF2_SetPlayerClass|TF2_RemoveWeaponSlot|TF2_RemoveAllWeapons|TF2_IsPlayerInCondition|TF2_GetObjectType|TF2_GetObjectMode)\b'
-
-  # timers.inc
-  timers_constants: '\b(TIMER_REPEAT|TIMER_FLAG_NO_MAPCHANGE|TIMER_HNDL_CLOSE|TIMER_DATA_HNDL_CLOSE)\b'
-  timers_functions: '\b(CreateTimer|KillTimer|TriggerTimer|GetTickedTime|GetMapTimeLeft|GetMapTimeLimit|ExtendMapTimeLimit|GetTickInterval|OnMapTimeLeftChanged|IsServerProcessing|CreateDataTimer)\b'
-
-  # topmenus.inc
-  topmenus_constants: '\b(TopMenuAction_DisplayOption|TopMenuAction_DisplayTitle|TopMenuAction_SelectOption|TopMenuAction_DrawOption|TopMenuAction_RemoveObject|TopMenuObject_Category|TopMenuObject_Item|TopMenuPosition_Start|TopMenuPosition_LastRoot|TopMenuPosition_LastCategory|INVALID_TOPMENUOBJECT)\b'
-  topmenus_functions: '\b(CreateTopMenu|LoadTopMenuConfig|AddToTopMenu|GetTopMenuInfoString|GetTopMenuObjName|RemoveFromTopMenu|DisplayTopMenu|DisplayTopMenuCategory|FindTopMenuCategory|SetTopMenuTitleCaching|__ext_topmenus|__ext_topmenus_SetNTVOptional)\b'
-  topmenus_methods: '\b(FromHandle|LoadConfig|AddCategory|GetInfoString|GetObjName|DisplayCategory|FindCategory)\b'
-  topmenus_properties: '\b(CacheTitles)\b'
-
-  # usermessages.inc
-  usermessages_constants: '\b(INVALID_MESSAGE_ID|UM_BitBuf|UM_Protobuf|USERMSG_RELIABLE|USERMSG_INITMSG|USERMSG_BLOCKHOOKS)\b'
-  usermessages_functions: '\b(GetUserMessageType|UserMessageToProtobuf|UserMessageToBfWrite|UserMessageToBfRead|GetUserMessageId|GetUserMessageName|StartMessage|StartMessageEx|EndMessage|HookUserMessage|UnhookUserMessage|StartMessageAll|StartMessageOne)\b'
-
-  # vector.inc
-  vector_functions: '\b(GetVectorLength|GetVectorDistance|GetVectorDotProduct|GetVectorCrossProduct|NormalizeVector|GetAngleVectors|GetVectorAngles|GetVectorVectors|AddVectors|SubtractVectors|ScaleVector|NegateVector|MakeVectorFromPoints)\b'
-
-  # version.inc/version_auto.inc
-  version_constants: '\b(SOURCEMOD_V_TAG|SOURCEMOD_V_REV|SOURCEMOD_V_CSET|SOURCEMOD_V_MAJOR|SOURCEMOD_V_MINOR|SOURCEMOD_V_RELEASE|SOURCEMOD_VERSION)\b'
-
-  ALL_CONSTANTS: '{{admin_constants}}|{{adminmenu_constants}}|{{banning_constants}}|{{clientprefs_constants}}|{{clients_constants}}|{{commandfilters_constants}}|{{console_constants}}|{{convars_constants}}|{{core_constants}}|{{cstrike_constants}}|{{dbi_constants}}|{{entity_constants}}|{{entityps_constants}}|{{events_constants}}|{{files_constants}}|{{float_constants}}|{{functions_constants}}|{{halflife_constants}}|{{handles_constants}}|{{keyvalues_constants}}|{{lang_constants}}|{{mapchooser_constants}}|{{menus_constants}}|{{protobuf_constants}}|{{regex_constants}}|{{sdkhooks_constants}}|{{sdktools_constants}}|{{sdktools_engine_constants}}|{{sdktools_gamerules_constants}}|{{sdktools_hooks_constants}}|{{sdktools_sound_constants}}|{{sdktools_stringtables_constants}}|{{sdktools_testocks_constants}}|{{sdktools_trace_constants}}|{{sdktools_voice_constants}}|{{sorting_constants}}|{{sourcemod_constants}}|{{testing_constants}}|{{textparse_constants}}|{{tf2_constants}}|{{tf2stocks_constants}}|{{timers_constants}}|{{topmenus_constants}}|{{usermessages_constants}}|{{version_constants}}'
-  ALL_FUNCTIONS: '{{admin_functions}}|{{adminmenu_functions}}|{{adt_array_functions}}|{{adt_stack_functions}}|{{adt_trie_functions}}|{{banning_functions}}|{{basecomm_functions}}|{{bitbuffer_functions}}|{{clientprefs_functions}}|{{clients_functions}}|{{commandfilters_functions}}|{{commandline_functions}}|{{console_functions}}|{{convars_functions}}|{{core_functions}}|{{cstrike_functions}}|{{datapack_functions}}|{{dbi_functions}}|{{entity_functions}}|{{entityps_functions}}|{{events_functions}}|{{files_functions}}|{{float_functions}}|{{float_operators}}|{{functions_functions}}|{{geoip_functions}}|{{halflife_functions}}|{{handles_functions}}|{{helpers_functions}}|{{keyvalues_functions}}|{{lang_functions}}|{{logging_functions}}|{{mapchooser_functions}}|{{menus_functions}}|{{nextmap_functions}}|{{profiler_functions}}|{{protobuf_functions}}|{{regex_functions}}|{{sdkhooks_functions}}|{{sdktools_functions}}|{{sdktools_client_functions}}|{{sdktools_engine_functions}}|{{sdktools_entinput_functions}}|{{sdktools_entoutput_functions}}|{{sdktools_functions_functions}}|{{sdktools_gamerules_functions}}|{{sdktools_hooks_functions}}|{{sdktools_sound_functions}}|{{sdktools_stocks_functions}}|{{sdktools_stringtables_functions}}|{{sdktools_tempents_functions}}|{{sdktools_testocks_functions}}|{{sdktools_trace_functions}}|{{sdktools_variant_functions}}|{{sdktools_voice_functions}}|{{sorting_functions}}|{{sourcemod_functions}}|{{string_functions}}|{{testing_functions}}|{{textparse_functions}}|{{tf2_functions}}|{{tf2stocks_functions}}|{{timers_functions}}|{{topmenus_functions}}|{{usermessages_functions}}|{{vector_functions}}'
-  ALL_METHODS: '{{admin_methods}}|{{adt_array_methods}}|{{adt_stack_methods}}|{{adt_trie_methods}}|{{bitbuffer_methods}}|{{clientprefs_methods}}|{{console_methods}}|{{convars_methods}}|{{datapack_methods}}|{{dbi_methods}}|{{events_methods}}|{{files_methods}}|{{functions_methods}}|{{keyvalues_methods}}|{{menus_methods}}|{{profiler_methods}}|{{protobuf_methods}}|{{regex_methods}}|{{sourcemod_methods}}|{{textparse_methods}}|{{topmenus_methods}}'
-  ALL_PROPERTIES: '{{admin_properties}}|{{adt_array_properties}}|{{adt_stack_properties}}|{{adt_trie_properties}}|{{clientprefs_properties}}|{{convars_properties}}|{{datapack_properties}}|{{dbi_properties}}|{{events_properties}}|{{functions_properties}}|{{keyvalues_properties}}|{{menus_properties}}|{{profiler_properties}}|{{sourcemod_properties}}|{{textparse_properties}}|{{topmenus_properties}}'
-  # Insert custom include definitions below this line
-
-
-  # Deprecated functions/constants from stock SM include files
-  deprecated: '\b(ImmunityType|Immunity_Default|Immunity_Global|SetAdmGroupImmunity|GetAdmGroupImmunity|GetClientAuthString|IsPlayerInGame|FCVAR_PLUGIN|FCVAR_LAUNCHER|GetEntDataEnt|SetEntDataEnt|FindSendPropOffs|FindDataMapOffs|FloatMul|FloatDiv|FloatAdd|FloatSub|GuessSDKVersion|IsValidHandle|FormatUserLogText|SearchForClients|LoadMaps|SQL_ConnectEx|SQL_QuoteString|GetMaxClients|GetSoundDuration|SetClientListening|GetClientListening|StrCompare|StrCopy|StrBreak|TFCond_NoTaunting_DEPRECATED|TFHoliday_SpyVsEngyWar|TF2_GetResourceEntity|TF2_OnGetHoliday|TF2_GetPlayerResourceData|TF2_SetPlayerResourceData|TF2_GetPlayerConditionFlags|AskPluginLoad|OnServerCfg)\b'
-# END: Variables
-
-# BEGIN: Contexts
-contexts:
-  main:
-    - include: includes
-    - include: storage
-    - include: variable
-    - include: punctuation
-    - include: fixes
-    - include: 1point6
-    - include: numbers
-    - include: comments
-    - include: strings
-    - include: pragmatics
-    - include: enums
-    - include: keywords
-    - include: storage_types
-    - include: deprecations
-    - include: functions
-    - include: constants
-    - include: misc
-
-  includes:
-    - match: '(property)[ \t]+({{support_types}}|{{storage_types}})[ \t]+({{ALL_PROPERTIES}})'
-      captures:
-        1: storage.modifier
-        2: storage.type
-        3: variable.other.member
-
-  misc:
-    - match: '\b(sizeof|float)(?=\()'
-      scope: support.function
-
-  storage:
-    - match: '{{visibility}}|{{variable_declarations}}'
-      scope: storage.modifier
-
-  variable:
-    - match: \bthis\b
-      scope: variable.language
-
-  punctuation:
-    - match: \[
-      scope: punctuation.section.brackets.begin
-    - match: \]
-      scope: punctuation.section.brackets.end
-    - match: \(
-      scope: punctuation.section.parens.begin
-    - match: \)
-      scope: punctuation.section.parens.end
-    - match: \{
-      scope: punctuation.section.braces.begin
-    - match: \}
-      scope: punctuation.section.braces.end
-    - match: \;
-      scope: punctuation.terminator
-    - match: (\.|\:\:)
-      scope: punctuation.accessor
-    - match: \,|\.{3}
-      scope: punctuation.separator
-    - match: \#
-      scope: punctuation.definition.generic
-
-  fixes:
-    # Storage type/Methodmap constructor conflict fix
-  #  - match: '{{stmc_conflict_fix}}(?=\()'
-    # Why not try this instead?
-    - match: '\b({{support_types}}|{{storage_types}})\b(?=\()'
-      scope: storage.type
-
-  1point6:
-    # 1.6 variable declarations
-    - match: '{{variable_declarations_oldsyntax}}'
-      scope: invalid.deprecated
-
-  numbers:
-    - match: '\b{{binary_numerals}}\b|\b{{hex_numerals}}\b|{{numerals}}'
-      scope: constant.numeric
-
-  comments:
-    # Comment documentation highlighting
-    # Captures anything between /** and */
-    # Captures variables defined as in the example below;
-    # /**
-    #  * Returns angles from a vector.
-    #  *
-    #  * @param vec   Vector.
-    #  * @param angle   Angle buffer.
-    #  */
-    - match: '(^|.)(?=\/\*\*)'
-      captures:
-        0: punctuation.definition.comment
-      push:
-        - meta_scope: comment.block
-        - match: '(?<=\*/)'
-          captures:
-            0: punctuation.definition.comment
-          pop: true
-        - match: '(@(?:return|noreturn|note|section|endsection|error))'
-          scope: keyword.operator
-
-        # Just a fun thing I did that affects the license portion at the
-        # top of the base SourceMod .inc files/plugins.
-        # Feel free to uncomment the lines below if you want to.
-        # Don't edit the spacing or this whole thing will break.
-        # Just delete each '#'. That's it.
-        #- match: '(Source)(Mod|Pawn|Modder)|(AlliedModders)(?:\W)(LLC)'
-        #  captures:
-        #    1: constant.numeric
-        #    2: keyword.control
-        #    3: constant.numeric
-        #    4: keyword.control
-        - match: '(@param)(?:\s+)([A-Za-z_@.][A-Za-z0-9_@.]*+|...)'
-          captures:
-            1: keyword.operator
-            2: variable.parameter
-        - match: '(@deprecated)'
-          scope: invalid.deprecated
-          push:
-            - match: '^\s*(?=\*\s*(?:@|$))|.*(?=\*/)'
-              captures:
-                1: keyword.operator
-                2: keyword.operator
-                3: variable.parameter
-                4: invalid.deprecated
-              pop: true
-
-    # Single-line comments
-    - match: '\/\/.*'
-      scope: comment
-
-    # Single-line comment documentation highlighting
-    # Since methodmaps in .inc files use single-line comments
-    # for their documentation, this second block of commentdoc
-    # highlighting is needed.
-    - match: '(?:\s+)(\/\/)(?:\s+)(?:(?:(@param)(?:\s+)([A-Za-z_@.][A-Za-z0-9_@.]*+|...)|(@deprecated)|(@(?:return|noreturn|note|section|endsection|error))))(?:\s+)(.+)'
-      captures:
-        1: comment
-        2: keyword.operator
-        3: variable.parameter
-        4: invalid.deprecated
-        5: keyword.operator
-        6: comment
-
-    # Multi-line comments
-    - match: '(/\*)'
-      captures:
-        1: comment
-      push:
-        - meta_scope: comment.block
-        - match: '(\*/)'
-          captures:
-            1: comment
-          pop: true
-
-  strings:
-    - match: (?<!\\)\"
-      push:
-        - meta_scope: string
-        - match: (?<!\\)\"|\\\\"
-          pop: true
-        - match: '{{constant_placeholder}}'
-          scope: constant.other.placeholder
-        - match: '{{constant_character_escape}}'
-          scope: constant.character.escape
-    - match: (?<!\\)\'
-      push:
-        - meta_scope: string
-        - match: (?<!\\)\'|\\\\'
-          pop: true
-        - match: '{{constant_placeholder}}'
-          scope: constant.other.placeholder
-        - match: '{{constant_character_escape}}'
-          scope: constant.character.escape
-
-  pragmatics:
-    - match: '(?<=\#)(pragma)(?:\s+)(?:(codepage|ctrlchar|dynamic|newdecls|rational|semicolon|tabsize|unused)|(deprecated))(?:\s+)(.*)(\/\/.*)?'
-      captures:
-        1: punctuation.definition.generic
-        2: variable.parameter.function
-        3: invalid.deprecated
-        4: constant
-        5: comment
-
-  enums:
-    # Enum highlighting
-    # Handles various enum cases
-    # Also handles preventing 1.6 var decls from being highlighted as invalid
-    - match: '\b(enum)\b(?:(?:\s+|)(struct|)(?:\s+|)\b({{storage_types}}|{{storage_types_oldsyntax}}|{{support_types}})\b)'
-      captures:
-        1: keyword.control
-        2: keyword.control
-        3: storage.type
-
-  keywords:
-    - match: '(?<=#)(include|tryinclude) (<|\")(.+)(>|\")'
-      scope: support.other.variable
-      captures:
-        1: keyword
-        2: punctuation.definition.generic.begin
-        3: string
-        4: punctuation.definition.generic.end
-    # [1.7] Methodmap constructor 'new' usage fix
-    - match: '(?<=\=)(?:\s+|)\b(new)\b'
-      captures:
-        1: keyword.control.other
-    # [1.6] for loop 'new' usage detection
-    - match: '(?<=for)(?=(?:\s\()(new))'
-      captures:
-        1: invalid.deprecated
-    - match: '(?:\>)(?:\s+|)(?:\()(?:\s+|)\b(new)\b'
-      captures:
-        1: keyword.control.conditional
-    - match: '{{keywords_control}}'
-      scope: keyword.control
-    - match: '{{keywords_control_conditional}}'
-      scope: keyword.control.conditional
-    - match: '{{keywords_control_other}}'
-      scope: keyword.control.other
-    - match: '{{operators}}'
-      scope: keyword.operator
-    - match: '{{boolean_values}}'
-      scope: constant.language
-    - match: '\?|:(?!:)'
-      scope: keyword.operator.conditional
-    - match: '(\+|\-|\*|\%|(?<=\w| |\d)\/)'
-      scope: keyword.operator.arithmetic
-    - match: '(&&|\|\=?|\!\=?|\=\=|<=?|>=?)'
-      scope: keyword.operator.logical
-    - match: '\='
-      scope: keyword.operator.assignment
-    - match: '(&|\||~|<<|>>)'
-      scope: keyword.operator.bitwise
-
-  storage_types:
-    # Highlight 1.6 usage as deprecated
-    - match: '({{storage_types}}|{{storage_types_oldsyntax}}|{{support_types}})(:)'
-      scope: invalid.deprecated
-    - match: '{{storage_types}}|{{support_types}}'
-      scope: storage.type
-
-  deprecations:
-    - match: '{{deprecated}}'
-      scope: invalid.deprecated
-
-  functions:
-    # Include file function names
-    # SM Functions
-    - match: '({{ALL_FUNCTIONS}})(?=\()'
-      scope: support.function
-    # MethodMaps
-    - match: '(?<=\.|{{storage_types_lookbehind}}|{{support_types_lookbehind}})({{ALL_METHODS}})(?=\()'
-      scope: support.function
-    # Properties
-    - match: '(?<=\.)({{ALL_PROPERTIES}})(\b)'
-      scope: variable.other.member
-
-    # Static methodmap functions
-    - match: '(?:(Cookie).(Find))\('
-      captures:
-        1: storage.type
-        2: support.function
-    - match: '(?:(Database).(Connect))\('
-      captures:
-        1: storage.type
-        2: support.function
-    # Insert custom include functions/methodmap functions below this line
-
-  constants:
-    # Include file constant variables
-    - match: '\b({{ALL_CONSTANTS}})\b'
-      scope: support.constant
-
-    # Insert custom include constants below this line
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>author</key>
+	<string>seanwooj</string>
+	<key>colorSpaceName</key>
+	<string>sRGB</string>
+	<key>gutterSettings</key>
+	<dict>
+		<key>background</key>
+		<string>#49483E</string>
+		<key>divider</key>
+		<string>#75715E</string>
+		<key>foreground</key>
+		<string>#75715E</string>
+	</dict>
+	<key>name</key>
+	<string>Feel Good</string>
+	<key>semanticClass</key>
+	<string>theme.dark.monokai</string>
+	<key>settings</key>
+	<array>
+		<dict>
+			<key>settings</key>
+			<dict>
+				<key>background</key>
+				<string>#2c3e50</string>
+				<key>brackets</key>
+				<string>#ffffff</string>
+				<key>caret</key>
+				<string>#F8F8F0</string>
+				<key>foreground</key>
+				<string>#fafaff</string>
+				<key>invisibles</key>
+				<string>#49483E</string>
+				<key>lineHighlight</key>
+				<string>#49483E</string>
+				<key>selection</key>
+				<string>#49483E</string>
+			</dict>
+		</dict>
+
+		<dict>
+			<key>name</key>
+			<string>Comment</string>
+			<key>scope</key>
+			<string>comment</string>
+			<key>settings</key>
+			<dict>
+				<key>foreground</key>
+				<string>#5b727f</string>
+			</dict>
+		</dict>
+
+		<dict>
+			<key>name</key>
+			<string>String</string>
+			<key>scope</key>
+			<string>string</string>
+			<key>settings</key>
+			<dict>
+				<key>foreground</key>
+				<string>#ffaaaa</string>
+			</dict>
+		</dict>
+
+		<dict>
+			<key>name</key>
+			<string>Constant</string>
+			<key>scope</key>
+			<string>constant</string>
+			<key>settings</key>
+			<dict>
+				<key>foreground</key>
+				<string>#74b8f9</string>
+			</dict>
+		</dict>
+
+		<dict>
+			<key>name</key>
+			<string>Number</string>
+			<key>scope</key>
+			<string>constant.numeric</string>
+			<key>settings</key>
+			<dict>
+				<key>foreground</key>
+				<string>#74b8f9</string>
+			</dict>
+		</dict>
+
+		<dict>
+			<key>name</key>
+			<string>Built-in constant</string>
+			<key>scope</key>
+			<string>constant.language</string>
+			<key>settings</key>
+			<dict>
+				<key>fontStyle</key>
+				<string>italic</string>
+				<key>foreground</key>
+				<string>#7fc0fa</string>
+			</dict>
+		</dict>
+
+		<dict>
+			<key>name</key>
+			<string>User-defined constant</string>
+			<key>scope</key>
+			<string>constant.character, constant.other</string>
+			<key>settings</key>
+			<dict>
+				<key>foreground</key>
+				<string>#97cefc</string>
+			</dict>
+		</dict>
+
+		<dict>
+			<key>name</key>
+			<string>User-defined constant</string>
+			<key>scope</key>
+			<string>constant.character.escape</string>
+			<key>settings</key>
+			<dict>
+				<key>foreground</key>
+				<string>#76a9d3</string>
+			</dict>
+		</dict>
+
+		<dict>
+			<key>name</key>
+			<string>Variable</string>
+			<key>scope</key>
+			<string>variable</string>
+			<key>settings</key>
+			<dict>
+				<key>fontStyle</key>
+				<string>bold</string>
+				<key>foreground</key>
+				<string>#1fc6ab</string>
+			</dict>
+		</dict>
+
+		<dict>
+			<key>name</key>
+			<string>Keyword</string>
+			<key>scope</key>
+			<string>keyword</string>
+			<key>settings</key>
+			<dict>
+				<key>foreground</key>
+				<string>#ff624a</string>
+			</dict>
+		</dict>
+
+		<dict>
+			<key>name</key>
+			<string>Keyword Control</string>
+			<key>scope</key>
+			<string>keyword.control</string>
+			<key>settings</key>
+			<dict>
+				<key>foreground</key>
+				<string>#ff624a</string>
+			</dict>
+		</dict>
+
+		<dict>
+			<key>name</key>
+			<string>Keyword</string>
+			<key>scope</key>
+			<string>keyword.control.conditional</string>
+			<key>settings</key>
+			<dict>
+				<key>foreground</key>
+				<string>#ff624a</string>
+			</dict>
+		</dict>
+
+		<dict>
+			<key>name</key>
+			<string>Keyword Control Other</string>
+			<key>scope</key>
+			<string>keyword.control.other</string>
+			<key>settings</key>
+			<dict>
+				<key>foreground</key>
+				<string>#54afff</string>
+			</dict>
+		</dict>
+
+		<dict>
+			<key>name</key>
+			<string>Punctuation Accessor</string>
+			<key>scope</key>
+			<string>punctuation.accessor</string>
+			<key>settings</key>
+			<dict>
+				<key>foreground</key>
+				<string>#e80202</string>
+			</dict>
+		</dict>
+
+		<dict>
+			<key>name</key>
+			<string>Punctuation Separator</string>
+			<key>scope</key>
+			<string>punctuation.separator</string>
+			<key>settings</key>
+			<dict>
+				<key>foreground</key>
+				<string>#9fcbf2</string>
+			</dict>
+		</dict>
+
+		<dict>
+			<key>name</key>
+			<string>Punctuation Terminator</string>
+			<key>scope</key>
+			<string>punctuation.terminator</string>
+			<key>settings</key>
+			<dict>
+				<key>foreground</key>
+				<string>#21bfff</string>
+			</dict>
+		</dict>
+
+		<dict>
+			<key>name</key>
+			<string>Punctuation definition</string>
+			<key>scope</key>
+			<string>punctuation.definition.generic</string>
+			<key>settings</key>
+			<dict>
+				<key>foreground</key>
+				<string>#ff624a</string>
+			</dict>
+		</dict>
+
+		<dict>
+			<key>name</key>
+			<string>Keyword Operatir Bitwise</string>
+			<key>scope</key>
+			<string>keyword.operator.bitwise</string>
+			<key>settings</key>
+			<dict>
+				<key>foreground</key>
+				<string>#e80202</string>
+			</dict>
+		</dict>
+
+		<dict>
+			<key>name</key>
+			<string>Keyword Operator Logical</string>
+			<key>scope</key>
+			<string>keyword.operator.logical</string>
+			<key>settings</key>
+			<dict>
+				<key>foreground</key>
+				<string>#e80202</string>
+			</dict>
+		</dict>
+
+		<dict>
+			<key>name</key>
+			<string>Storage</string>
+			<key>scope</key>
+			<string>storage</string>
+			<key>settings</key>
+			<dict>
+				<key>fontStyle</key>
+				<string></string>
+				<key>foreground</key>
+				<string>#54afff</string>
+			</dict>
+		</dict>
+
+		<dict>
+			<key>name</key>
+			<string>Storage type</string>
+			<key>scope</key>
+			<string>storage.type</string>
+			<key>settings</key>
+			<dict>
+				<key>fontStyle</key>
+				<string>bold italic</string>
+				<key>foreground</key>
+				<string>#39dbdb</string>
+			</dict>
+		</dict>
+
+		<dict>
+			<key>name</key>
+			<string>Class name</string>
+			<key>scope</key>
+			<string>entity.name.class</string>
+			<key>settings</key>
+			<dict>
+				<key>fontStyle</key>
+				<string>underline</string>
+				<key>foreground</key>
+				<string>#73e286</string>
+			</dict>
+		</dict>
+
+		<dict>
+			<key>name</key>
+			<string>Inherited class</string>
+			<key>scope</key>
+			<string>entity.other.inherited-class</string>
+			<key>settings</key>
+			<dict>
+				<key>fontStyle</key>
+				<string>italic underline</string>
+				<key>foreground</key>
+				<string>#7ee691</string>
+			</dict>
+		</dict>
+
+		<dict>
+			<key>name</key>
+			<string>Function name</string>
+			<key>scope</key>
+			<string>entity.name.function</string>
+			<key>settings</key>
+			<dict>
+				<key>fontStyle</key>
+				<string></string>
+				<key>foreground</key>
+				<string>#1dbfa2</string>
+			</dict>
+		</dict>
+
+		<dict>
+			<key>name</key>
+			<string>Function argument</string>
+			<key>scope</key>
+			<string>variable.parameter</string>
+			<key>settings</key>
+			<dict>
+				<key>fontStyle</key>
+				<string>italic</string>
+				<key>foreground</key>
+				<string>#fcc048</string>
+			</dict>
+		</dict>
+
+		<dict>
+			<key>name</key>
+			<string>Tag name</string>
+			<key>scope</key>
+			<string>entity.name.tag</string>
+			<key>settings</key>
+			<dict>
+				<key>fontStyle</key>
+				<string></string>
+				<key>foreground</key>
+				<string>#ff785f</string>
+			</dict>
+		</dict>
+
+		<dict>
+			<key>name</key>
+			<string>Tag attribute</string>
+			<key>scope</key>
+			<string>entity.other.attribute-name</string>
+			<key>settings</key>
+			<dict>
+				<key>fontStyle</key>
+				<string></string>
+				<key>foreground</key>
+				<string>#89e99c</string>
+			</dict>
+		</dict>
+
+		<dict>
+			<key>name</key>
+			<string>Library General</string>
+			<key>scope</key>
+			<string>support</string>
+			<key>settings</key>
+			<dict>
+				<key>foreground</key>
+				<string>#bbdaf2</string>
+			</dict>
+		</dict>
+		
+		<dict>
+			<key>name</key>
+			<string>Library function</string>
+			<key>scope</key>
+			<string>support.function</string>
+			<key>settings</key>
+			<dict>
+				<key>fontStyle</key>
+				<string>bold</string>
+				<key>foreground</key>
+				<string>#c2c5f9</string>
+			</dict>
+		</dict>
+
+		<dict>
+			<key>name</key>
+			<string>Library constant</string>
+			<key>scope</key>
+			<string>support.constant</string>
+			<key>settings</key>
+			<dict>
+				<key>fontStyle</key>
+				<string>bold italic</string>
+				<key>foreground</key>
+				<string>#dd96e0</string>
+			</dict>
+		</dict>
+
+		<dict>
+			<key>name</key>
+			<string>Library class/type</string>
+			<key>scope</key>
+			<string>support.type, support.class</string>
+			<key>settings</key>
+			<dict>
+				<key>fontStyle</key>
+				<string>italic</string>
+				<key>foreground</key>
+				<string>#66D9EF</string>
+			</dict>
+		</dict>
+
+		<dict>
+			<key>name</key>
+			<string>Library variable</string>
+			<key>scope</key>
+			<string>support.other.variable</string>
+			<key>settings</key>
+			<dict>
+				<key>fontStyle</key>
+				<string>bold</string>
+				<key>foreground</key>
+				<string>#ffffff</string>
+			</dict>
+		</dict>
+
+		<dict>
+			<key>name</key>
+			<string>Invalid</string>
+			<key>scope</key>
+			<string>invalid</string>
+			<key>settings</key>
+			<dict>
+				<key>background</key>
+				<string>#F92672</string>
+				<key>fontStyle</key>
+				<string></string>
+				<key>foreground</key>
+				<string>#F8F8F0</string>
+			</dict>
+		</dict>
+
+		<dict>
+			<key>name</key>
+			<string>Invalid deprecated</string>
+			<key>scope</key>
+			<string>invalid.deprecated</string>
+			<key>settings</key>
+			<dict>
+				<key>background</key>
+				<string>#AE81FF</string>
+				<key>foreground</key>
+				<string>#F8F8F0</string>
+			</dict>
+		</dict>
+
+		<dict>
+		  <key>name</key>
+		  <string>Bracket Tag</string>
+		  <key>scope</key>
+		  <string>brackethighlighter.default</string>
+		  <key>settings</key>
+		  <dict>
+		    <key>background</key>
+		    <string>#d1d1d1</string>
+		    <key>foreground</key>
+		    <string>#f4f5f7</string>
+		  </dict>
+		</dict>
+
+		<dict>
+			<key>name</key>
+			<string>Punctuation Section Brace</string>
+			<key>scope</key>
+			<string>punctuation.section.braces</string>
+			<key>settings</key>
+			<dict>
+				<key>fontStyle</key>
+				<string>bold</string>
+				<key>foreground</key>
+				<string>#ccdfff</string>
+			</dict>
+		</dict>
+
+		<dict>
+			<key>name</key>
+			<string>Punctuation Section Parens</string>
+			<key>scope</key>
+			<string>punctuation.section.parens</string>
+			<key>settings</key>
+			<dict>
+				<key>fontStyle</key>
+				<string>bold</string>
+				<key>foreground</key>
+				<string>#96b1d3</string>
+			</dict>
+		</dict>
+
+		<dict>
+			<key>name</key>
+			<string>Punctuation Section Brackets</string>
+			<key>scope</key>
+			<string>punctuation.section.brackets</string>
+			<key>settings</key>
+			<dict>
+				<key>foreground</key>
+				<string>#6f8fb7</string>
+			</dict>
+		</dict>
+
+		<dict>
+			<key>scope</key>
+			<string>col_gutter</string>
+			<key>settings</key>
+			<dict>
+				<key>background</key>
+				<string>#000000</string>
+				<key>foreground</key>
+				<string>#ffffff</string>
+			</dict>
+		</dict>
+
+		<dict>
+			<key>scope</key>
+			<string>col_66D9EFFF</string>
+			<key>settings</key>
+			<dict>
+				<key>background</key>
+				<string>#66D9EFFF</string>
+				<key>foreground</key>
+				<string>#393939FF</string>
+			</dict>
+		</dict>
+
+		<dict>
+			<key>scope</key>
+			<string>col_1D1D1DFF</string>
+			<key>settings</key>
+			<dict>
+				<key>background</key>
+				<string>#1D1D1DFF</string>
+				<key>foreground</key>
+				<string>#9D9D9DFF</string>
+			</dict>
+		</dict>
+
+		<dict>
+			<key>scope</key>
+			<string>col_3A3A3AFF</string>
+			<key>settings</key>
+			<dict>
+				<key>background</key>
+				<string>#3A3A3AFF</string>
+				<key>foreground</key>
+				<string>#BABABAFF</string>
+			</dict>
+		</dict>
+
+		<dict>
+			<key>scope</key>
+			<string>col_FFAAAAFF</string>
+			<key>settings</key>
+			<dict>
+				<key>background</key>
+				<string>#FFAAAAFF</string>
+				<key>foreground</key>
+				<string>#434343FF</string>
+			</dict>
+		</dict>
+
+		<dict>
+			<key>scope</key>
+			<string>col_FF00FFFF</string>
+			<key>settings</key>
+			<dict>
+				<key>background</key>
+				<string>#FF00FFFF</string>
+				<key>foreground</key>
+				<string>#E9E9E9FF</string>
+			</dict>
+		</dict>
+
+		<dict>
+			<key>scope</key>
+			<string>col_B9B9B9FF</string>
+			<key>settings</key>
+			<dict>
+				<key>background</key>
+				<string>#B9B9B9FF</string>
+				<key>foreground</key>
+				<string>#393939FF</string>
+			</dict>
+		</dict>
+
+		<dict>
+			<key>scope</key>
+			<string>col_FAFAFFFF</string>
+			<key>settings</key>
+			<dict>
+				<key>background</key>
+				<string>#FAFAFFFF</string>
+				<key>foreground</key>
+				<string>#7A7A7AFF</string>
+			</dict>
+		</dict>
+
+		<dict>
+			<key>scope</key>
+			<string>col_89E99CFF</string>
+			<key>settings</key>
+			<dict>
+				<key>background</key>
+				<string>#89E99CFF</string>
+				<key>foreground</key>
+				<string>#434343FF</string>
+			</dict>
+		</dict>
+
+		<dict>
+			<key>scope</key>
+			<string>col_75715EFF</string>
+			<key>settings</key>
+			<dict>
+				<key>background</key>
+				<string>#75715EFF</string>
+				<key>foreground</key>
+				<string>#F0F0F0FF</string>
+			</dict>
+		</dict>
+
+		<dict>
+			<key>scope</key>
+			<string>col_73E286FF</string>
+			<key>settings</key>
+			<dict>
+				<key>background</key>
+				<string>#73E286FF</string>
+				<key>foreground</key>
+				<string>#363636FF</string>
+			</dict>
+		</dict>
+
+		<dict>
+			<key>scope</key>
+			<string>col_444444FF</string>
+			<key>settings</key>
+			<dict>
+				<key>background</key>
+				<string>#444444FF</string>
+				<key>foreground</key>
+				<string>#C4C4C4FF</string>
+			</dict>
+		</dict>
+
+		<dict>
+			<key>scope</key>
+			<string>col_ECECECFF</string>
+			<key>settings</key>
+			<dict>
+				<key>background</key>
+				<string>#ECECECFF</string>
+				<key>foreground</key>
+				<string>#6C6C6CFF</string>
+			</dict>
+		</dict>
+
+		<dict>
+			<key>scope</key>
+			<string>col_7EE691FF</string>
+			<key>settings</key>
+			<dict>
+				<key>background</key>
+				<string>#7EE691FF</string>
+				<key>foreground</key>
+				<string>#3D3D3DFF</string>
+			</dict>
+		</dict>
+
+		<dict>
+			<key>scope</key>
+			<string>col_8AC7FAFF</string>
+			<key>settings</key>
+			<dict>
+				<key>background</key>
+				<string>#8AC7FAFF</string>
+				<key>foreground</key>
+				<string>#3A3A3AFF</string>
+			</dict>
+		</dict>
+
+		<dict>
+			<key>scope</key>
+			<string>col_FFFFFFFF</string>
+			<key>settings</key>
+			<dict>
+				<key>background</key>
+				<string>#FFFFFFFF</string>
+				<key>foreground</key>
+				<string>#7F7F7FFF</string>
+			</dict>
+		</dict>
+
+		<dict>
+			<key>scope</key>
+			<string>col_101010FF</string>
+			<key>settings</key>
+			<dict>
+				<key>background</key>
+				<string>#101010FF</string>
+				<key>foreground</key>
+				<string>#909090FF</string>
+			</dict>
+		</dict>
+
+		<dict>
+			<key>scope</key>
+			<string>col_F8F8F0FF</string>
+			<key>settings</key>
+			<dict>
+				<key>background</key>
+				<string>#F8F8F0FF</string>
+				<key>foreground</key>
+				<string>#777777FF</string>
+			</dict>
+		</dict>
+
+		<dict>
+			<key>scope</key>
+			<string>col_2B2B2BFF</string>
+			<key>settings</key>
+			<dict>
+				<key>background</key>
+				<string>#2B2B2BFF</string>
+				<key>foreground</key>
+				<string>#ABABABFF</string>
+			</dict>
+		</dict>
+
+		<dict>
+			<key>scope</key>
+			<string>col_777777FF</string>
+			<key>settings</key>
+			<dict>
+				<key>background</key>
+				<string>#777777FF</string>
+				<key>foreground</key>
+				<string>#F7F7F7FF</string>
+			</dict>
+		</dict>
+
+		<dict>
+			<key>scope</key>
+			<string>col_7F7F7FFF</string>
+			<key>settings</key>
+			<dict>
+				<key>background</key>
+				<string>#7F7F7FFF</string>
+				<key>foreground</key>
+				<string>#FFFFFFFF</string>
+			</dict>
+		</dict>
+
+		<dict>
+			<key>scope</key>
+			<string>col_1DBFA2FF</string>
+			<key>settings</key>
+			<dict>
+				<key>background</key>
+				<string>#1DBFA2FF</string>
+				<key>foreground</key>
+				<string>#0B0B0BFF</string>
+			</dict>
+		</dict>
+
+		<dict>
+			<key>scope</key>
+			<string>col_74B8F9FF</string>
+			<key>settings</key>
+			<dict>
+				<key>background</key>
+				<string>#74B8F9FF</string>
+				<key>foreground</key>
+				<string>#2B2B2BFF</string>
+			</dict>
+		</dict>
+
+		<dict>
+			<key>scope</key>
+			<string>col_FF624AFF</string>
+			<key>settings</key>
+			<dict>
+				<key>background</key>
+				<string>#FF624AFF</string>
+				<key>foreground</key>
+				<string>#0E0E0EFF</string>
+			</dict>
+		</dict>
+
+		<dict>
+			<key>scope</key>
+			<string>col_393939FF</string>
+			<key>settings</key>
+			<dict>
+				<key>background</key>
+				<string>#393939FF</string>
+				<key>foreground</key>
+				<string>#B9B9B9FF</string>
+			</dict>
+		</dict>
+
+		<dict>
+			<key>scope</key>
+			<string>col_0E0E0EFF</string>
+			<key>settings</key>
+			<dict>
+				<key>background</key>
+				<string>#0E0E0EFF</string>
+				<key>foreground</key>
+				<string>#8E8E8EFF</string>
+			</dict>
+		</dict>
+
+		<dict>
+			<key>scope</key>
+			<string>col_808080FF</string>
+			<key>settings</key>
+			<dict>
+				<key>background</key>
+				<string>#808080FF</string>
+				<key>foreground</key>
+				<string>#000000FF</string>
+			</dict>
+		</dict>
+
+		<dict>
+			<key>scope</key>
+			<string>col_E9E9E9FF</string>
+			<key>settings</key>
+			<dict>
+				<key>background</key>
+				<string>#E9E9E9FF</string>
+				<key>foreground</key>
+				<string>#696969FF</string>
+			</dict>
+		</dict>
+
+		<dict>
+			<key>scope</key>
+			<string>col_3D3D3DFF</string>
+			<key>settings</key>
+			<dict>
+				<key>background</key>
+				<string>#3D3D3DFF</string>
+				<key>foreground</key>
+				<string>#BDBDBDFF</string>
+			</dict>
+		</dict>
+
+		<dict>
+			<key>scope</key>
+			<string>col_AE81FFFF</string>
+			<key>settings</key>
+			<dict>
+				<key>background</key>
+				<string>#AE81FFFF</string>
+				<key>foreground</key>
+				<string>#1C1C1CFF</string>
+			</dict>
+		</dict>
+
+		<dict>
+			<key>scope</key>
+			<string>col_F92672FF</string>
+			<key>settings</key>
+			<dict>
+				<key>background</key>
+				<string>#F92672FF</string>
+				<key>foreground</key>
+				<string>#EDEDEDFF</string>
+			</dict>
+		</dict>
+
+		<dict>
+			<key>scope</key>
+			<string>col_333333FF</string>
+			<key>settings</key>
+			<dict>
+				<key>background</key>
+				<string>#333333FF</string>
+				<key>foreground</key>
+				<string>#B3B3B3FF</string>
+			</dict>
+		</dict>
+
+		<dict>
+			<key>scope</key>
+			<string>col_49483EFF</string>
+			<key>settings</key>
+			<dict>
+				<key>background</key>
+				<string>#49483EFF</string>
+				<key>foreground</key>
+				<string>#C7C7C7FF</string>
+			</dict>
+		</dict>
+
+		<dict>
+			<key>scope</key>
+			<string>col_000000FF</string>
+			<key>settings</key>
+			<dict>
+				<key>background</key>
+				<string>#000000FF</string>
+				<key>foreground</key>
+				<string>#808080FF</string>
+			</dict>
+		</dict>
+
+		<dict>
+			<key>scope</key>
+			<string>col_434343FF</string>
+			<key>settings</key>
+			<dict>
+				<key>background</key>
+				<string>#434343FF</string>
+				<key>foreground</key>
+				<string>#C3C3C3FF</string>
+			</dict>
+		</dict>
+
+		<dict>
+			<key>scope</key>
+			<string>col_F0F0F0FF</string>
+			<key>settings</key>
+			<dict>
+				<key>background</key>
+				<string>#F0F0F0FF</string>
+				<key>foreground</key>
+				<string>#707070FF</string>
+			</dict>
+		</dict>
+
+		<dict>
+			<key>scope</key>
+			<string>col_FF6D54FF</string>
+			<key>settings</key>
+			<dict>
+				<key>background</key>
+				<string>#FF6D54FF</string>
+				<key>foreground</key>
+				<string>#151515FF</string>
+			</dict>
+		</dict>
+
+		<dict>
+			<key>scope</key>
+			<string>col_7FC0FAFF</string>
+			<key>settings</key>
+			<dict>
+				<key>background</key>
+				<string>#7FC0FAFF</string>
+				<key>foreground</key>
+				<string>#333333FF</string>
+			</dict>
+		</dict>
+
+		<dict>
+			<key>scope</key>
+			<string>col_FF785FFF</string>
+			<key>settings</key>
+			<dict>
+				<key>background</key>
+				<string>#FF785FFF</string>
+				<key>foreground</key>
+				<string>#1D1D1DFF</string>
+			</dict>
+		</dict>
+
+		<dict>
+			<key>scope</key>
+			<string>col_1C1C1CFF</string>
+			<key>settings</key>
+			<dict>
+				<key>background</key>
+				<string>#1C1C1CFF</string>
+				<key>foreground</key>
+				<string>#9C9C9CFF</string>
+			</dict>
+		</dict>
+
+		<dict>
+			<key>scope</key>
+			<string>col_151515FF</string>
+			<key>settings</key>
+			<dict>
+				<key>background</key>
+				<string>#151515FF</string>
+				<key>foreground</key>
+				<string>#959595FF</string>
+			</dict>
+		</dict>
+
+		<dict>
+			<key>scope</key>
+			<string>col_1FC6ABFF</string>
+			<key>settings</key>
+			<dict>
+				<key>background</key>
+				<string>#1FC6ABFF</string>
+				<key>foreground</key>
+				<string>#101010FF</string>
+			</dict>
+		</dict>
+
+		<dict>
+			<key>scope</key>
+			<string>col_5B727FFF</string>
+			<key>settings</key>
+			<dict>
+				<key>background</key>
+				<string>#5B727FFF</string>
+				<key>foreground</key>
+				<string>#ECECECFF</string>
+			</dict>
+		</dict>
+
+		<dict>
+			<key>scope</key>
+			<string>col_363636FF</string>
+			<key>settings</key>
+			<dict>
+				<key>background</key>
+				<string>#363636FF</string>
+				<key>foreground</key>
+				<string>#B6B6B6FF</string>
+			</dict>
+		</dict>
+
+		<dict>
+			<key>scope</key>
+			<string>col_FCC048FF</string>
+			<key>settings</key>
+			<dict>
+				<key>background</key>
+				<string>#FCC048FF</string>
+				<key>foreground</key>
+				<string>#444444FF</string>
+			</dict>
+		</dict>
+
+		<dict>
+			<key>scope</key>
+			<string>col_2B3D4FFF</string>
+			<key>settings</key>
+			<dict>
+				<key>background</key>
+				<string>#2B3D4FFF</string>
+				<key>foreground</key>
+				<string>#B9B9B9FF</string>
+			</dict>
+		</dict>
+
+		<dict>
+			<key>scope</key>
+			<string>col_0B0B0BFF</string>
+			<key>settings</key>
+			<dict>
+				<key>background</key>
+				<string>#0B0B0BFF</string>
+				<key>foreground</key>
+				<string>#8B8B8BFF</string>
+			</dict>
+		</dict>
+
+		<dict>
+			<key>scope</key>
+			<string>col_EDEDEDFF</string>
+			<key>settings</key>
+			<dict>
+				<key>background</key>
+				<string>#EDEDEDFF</string>
+				<key>foreground</key>
+				<string>#6D6D6DFF</string>
+			</dict>
+		</dict>
+
+		<dict>
+			<key>scope</key>
+			<string>col_7A7A7AFF</string>
+			<key>settings</key>
+			<dict>
+				<key>background</key>
+				<string>#7A7A7AFF</string>
+				<key>foreground</key>
+				<string>#FAFAFAFF</string>
+			</dict>
+		</dict>
+
+		<dict>
+			<key>scope</key>
+			<string>col_C7C7C7FF</string>
+			<key>settings</key>
+			<dict>
+				<key>background</key>
+				<string>#C7C7C7FF</string>
+				<key>foreground</key>
+				<string>#474747FF</string>
+			</dict>
+		</dict>
+
+		<dict>
+			<key>scope</key>
+			<string>col_C3C3C3FF</string>
+			<key>settings</key>
+			<dict>
+				<key>background</key>
+				<string>#C3C3C3FF</string>
+				<key>foreground</key>
+				<string>#434343FF</string>
+			</dict>
+		</dict>
+
+		<dict>
+			<key>scope</key>
+			<string>col_909090FF</string>
+			<key>settings</key>
+			<dict>
+				<key>background</key>
+				<string>#909090FF</string>
+				<key>foreground</key>
+				<string>#101010FF</string>
+			</dict>
+		</dict>
+
+		<dict>
+			<key>scope</key>
+			<string>col_9C9C9CFF</string>
+			<key>settings</key>
+			<dict>
+				<key>background</key>
+				<string>#9C9C9CFF</string>
+				<key>foreground</key>
+				<string>#1C1C1CFF</string>
+			</dict>
+		</dict>
+
+		<dict>
+			<key>scope</key>
+			<string>col_8B8B8BFF</string>
+			<key>settings</key>
+			<dict>
+				<key>background</key>
+				<string>#8B8B8BFF</string>
+				<key>foreground</key>
+				<string>#0B0B0BFF</string>
+			</dict>
+		</dict>
+
+		<dict>
+			<key>scope</key>
+			<string>col_959595FF</string>
+			<key>settings</key>
+			<dict>
+				<key>background</key>
+				<string>#959595FF</string>
+				<key>foreground</key>
+				<string>#151515FF</string>
+			</dict>
+		</dict>
+
+		<dict>
+			<key>scope</key>
+			<string>col_C4C4C4FF</string>
+			<key>settings</key>
+			<dict>
+				<key>background</key>
+				<string>#C4C4C4FF</string>
+				<key>foreground</key>
+				<string>#444444FF</string>
+			</dict>
+		</dict>
+
+		<dict>
+			<key>scope</key>
+			<string>col_B6B6B6FF</string>
+			<key>settings</key>
+			<dict>
+				<key>background</key>
+				<string>#B6B6B6FF</string>
+				<key>foreground</key>
+				<string>#363636FF</string>
+			</dict>
+		</dict>
+
+		<dict>
+			<key>scope</key>
+			<string>col_8E8E8EFF</string>
+			<key>settings</key>
+			<dict>
+				<key>background</key>
+				<string>#8E8E8EFF</string>
+				<key>foreground</key>
+				<string>#0E0E0EFF</string>
+			</dict>
+		</dict>
+
+		<dict>
+			<key>scope</key>
+			<string>col_9D9D9DFF</string>
+			<key>settings</key>
+			<dict>
+				<key>background</key>
+				<string>#9D9D9DFF</string>
+				<key>foreground</key>
+				<string>#1D1D1DFF</string>
+			</dict>
+		</dict>
+
+		<dict>
+			<key>scope</key>
+			<string>col_FAFAFAFF</string>
+			<key>settings</key>
+			<dict>
+				<key>background</key>
+				<string>#FAFAFAFF</string>
+				<key>foreground</key>
+				<string>#7A7A7AFF</string>
+			</dict>
+		</dict>
+
+		<dict>
+			<key>scope</key>
+			<string>col_BABABAFF</string>
+			<key>settings</key>
+			<dict>
+				<key>background</key>
+				<string>#BABABAFF</string>
+				<key>foreground</key>
+				<string>#3A3A3AFF</string>
+			</dict>
+		</dict>
+
+		<dict>
+			<key>scope</key>
+			<string>col_474747FF</string>
+			<key>settings</key>
+			<dict>
+				<key>background</key>
+				<string>#474747FF</string>
+				<key>foreground</key>
+				<string>#C7C7C7FF</string>
+			</dict>
+		</dict>
+
+		<dict>
+			<key>scope</key>
+			<string>col_BDBDBDFF</string>
+			<key>settings</key>
+			<dict>
+				<key>background</key>
+				<string>#BDBDBDFF</string>
+				<key>foreground</key>
+				<string>#3D3D3DFF</string>
+			</dict>
+		</dict>
+
+		<dict>
+			<key>scope</key>
+			<string>col_6D6D6DFF</string>
+			<key>settings</key>
+			<dict>
+				<key>background</key>
+				<string>#6D6D6DFF</string>
+				<key>foreground</key>
+				<string>#EDEDEDFF</string>
+			</dict>
+		</dict>
+
+		<dict>
+			<key>scope</key>
+			<string>col_707070FF</string>
+			<key>settings</key>
+			<dict>
+				<key>background</key>
+				<string>#707070FF</string>
+				<key>foreground</key>
+				<string>#F0F0F0FF</string>
+			</dict>
+		</dict>
+
+		<dict>
+			<key>scope</key>
+			<string>col_696969FF</string>
+			<key>settings</key>
+			<dict>
+				<key>background</key>
+				<string>#696969FF</string>
+				<key>foreground</key>
+				<string>#E9E9E9FF</string>
+			</dict>
+		</dict>
+
+		<dict>
+			<key>scope</key>
+			<string>col_ABABABFF</string>
+			<key>settings</key>
+			<dict>
+				<key>background</key>
+				<string>#ABABABFF</string>
+				<key>foreground</key>
+				<string>#2B2B2BFF</string>
+			</dict>
+		</dict>
+
+		<dict>
+			<key>scope</key>
+			<string>col_B3B3B3FF</string>
+			<key>settings</key>
+			<dict>
+				<key>background</key>
+				<string>#B3B3B3FF</string>
+				<key>foreground</key>
+				<string>#333333FF</string>
+			</dict>
+		</dict>
+
+		<dict>
+			<key>scope</key>
+			<string>col_F7F7F7FF</string>
+			<key>settings</key>
+			<dict>
+				<key>background</key>
+				<string>#F7F7F7FF</string>
+				<key>foreground</key>
+				<string>#777777FF</string>
+			</dict>
+		</dict>
+
+		<dict>
+			<key>scope</key>
+			<string>col_6C6C6CFF</string>
+			<key>settings</key>
+			<dict>
+				<key>background</key>
+				<string>#6C6C6CFF</string>
+				<key>foreground</key>
+				<string>#ECECECFF</string>
+			</dict>
+		</dict>
+
+		<dict>
+			<key>scope</key>
+			<string>col_FF0000FF</string>
+			<key>settings</key>
+			<dict>
+				<key>background</key>
+				<string>#FF0000FF</string>
+				<key>foreground</key>
+				<string>#CCCCCCFF</string>
+			</dict>
+		</dict>
+
+		<dict>
+			<key>scope</key>
+			<string>col_CCCCCCFF</string>
+			<key>settings</key>
+			<dict>
+				<key>background</key>
+				<string>#CCCCCCFF</string>
+				<key>foreground</key>
+				<string>#4C4C4CFF</string>
+			</dict>
+		</dict>
+
+		<dict>
+			<key>scope</key>
+			<string>col_4C4C4CFF</string>
+			<key>settings</key>
+			<dict>
+				<key>background</key>
+				<string>#4C4C4CFF</string>
+				<key>foreground</key>
+				<string>#CCCCCCFF</string>
+			</dict>
+		</dict>
+
+		<dict>
+			<key>scope</key>
+			<string>col_EB175EFF</string>
+			<key>settings</key>
+			<dict>
+				<key>background</key>
+				<string>#EB175EFF</string>
+				<key>foreground</key>
+				<string>#DEDEDEFF</string>
+			</dict>
+		</dict>
+
+		<dict>
+			<key>scope</key>
+			<string>col_18181BFF</string>
+			<key>settings</key>
+			<dict>
+				<key>background</key>
+				<string>#18181BFF</string>
+				<key>foreground</key>
+				<string>#989898FF</string>
+			</dict>
+		</dict>
+
+		<dict>
+			<key>scope</key>
+			<string>col_2A2A2AFF</string>
+			<key>settings</key>
+			<dict>
+				<key>background</key>
+				<string>#2A2A2AFF</string>
+				<key>foreground</key>
+				<string>#AAAAAAFF</string>
+			</dict>
+		</dict>
+
+		<dict>
+			<key>scope</key>
+			<string>col_8D4CA1FF</string>
+			<key>settings</key>
+			<dict>
+				<key>background</key>
+				<string>#8D4CA1FF</string>
+				<key>foreground</key>
+				<string>#E9E9E9FF</string>
+			</dict>
+		</dict>
+
+		<dict>
+			<key>scope</key>
+			<string>col_3B3A32FF</string>
+			<key>settings</key>
+			<dict>
+				<key>background</key>
+				<string>#3B3A32FF</string>
+				<key>foreground</key>
+				<string>#B9B9B9FF</string>
+			</dict>
+		</dict>
+
+		<dict>
+			<key>scope</key>
+			<string>col_3B3B3BFF</string>
+			<key>settings</key>
+			<dict>
+				<key>background</key>
+				<string>#3B3B3BFF</string>
+				<key>foreground</key>
+				<string>#BBBBBBFF</string>
+			</dict>
+		</dict>
+
+		<dict>
+			<key>scope</key>
+			<string>col_0D0D0DFF</string>
+			<key>settings</key>
+			<dict>
+				<key>background</key>
+				<string>#0D0D0DFF</string>
+				<key>foreground</key>
+				<string>#8D8D8DFF</string>
+			</dict>
+		</dict>
+
+		<dict>
+			<key>scope</key>
+			<string>col_A6E22EFF</string>
+			<key>settings</key>
+			<dict>
+				<key>background</key>
+				<string>#A6E22EFF</string>
+				<key>foreground</key>
+				<string>#3B3B3BFF</string>
+			</dict>
+		</dict>
+
+		<dict>
+			<key>scope</key>
+			<string>col_CCE8D3FF</string>
+			<key>settings</key>
+			<dict>
+				<key>background</key>
+				<string>#CCE8D3FF</string>
+				<key>foreground</key>
+				<string>#5D5D5DFF</string>
+			</dict>
+		</dict>
+
+		<dict>
+			<key>scope</key>
+			<string>col_A5CCD9FF</string>
+			<key>settings</key>
+			<dict>
+				<key>background</key>
+				<string>#A5CCD9FF</string>
+				<key>foreground</key>
+				<string>#414141FF</string>
+			</dict>
+		</dict>
+
+		<dict>
+			<key>scope</key>
+			<string>col_DADADAFF</string>
+			<key>settings</key>
+			<dict>
+				<key>background</key>
+				<string>#DADADAFF</string>
+				<key>foreground</key>
+				<string>#5A5A5AFF</string>
+			</dict>
+		</dict>
+
+		<dict>
+			<key>scope</key>
+			<string>col_303840FF</string>
+			<key>settings</key>
+			<dict>
+				<key>background</key>
+				<string>#303840FF</string>
+				<key>foreground</key>
+				<string>#B6B6B6FF</string>
+			</dict>
+		</dict>
+
+		<dict>
+			<key>scope</key>
+			<string>col_94D7A6FF</string>
+			<key>settings</key>
+			<dict>
+				<key>background</key>
+				<string>#94D7A6FF</string>
+				<key>foreground</key>
+				<string>#3D3D3DFF</string>
+			</dict>
+		</dict>
+
+		<dict>
+			<key>scope</key>
+			<string>col_989898FF</string>
+			<key>settings</key>
+			<dict>
+				<key>background</key>
+				<string>#989898FF</string>
+				<key>foreground</key>
+				<string>#181818FF</string>
+			</dict>
+		</dict>
+
+		<dict>
+			<key>scope</key>
+			<string>col_5D5D5DFF</string>
+			<key>settings</key>
+			<dict>
+				<key>background</key>
+				<string>#5D5D5DFF</string>
+				<key>foreground</key>
+				<string>#DDDDDDFF</string>
+			</dict>
+		</dict>
+
+		<dict>
+			<key>scope</key>
+			<string>col_787878FF</string>
+			<key>settings</key>
+			<dict>
+				<key>background</key>
+				<string>#787878FF</string>
+				<key>foreground</key>
+				<string>#F8F8F8FF</string>
+			</dict>
+		</dict>
+
+		<dict>
+			<key>scope</key>
+			<string>col_39686BFF</string>
+			<key>settings</key>
+			<dict>
+				<key>background</key>
+				<string>#39686BFF</string>
+				<key>foreground</key>
+				<string>#DADADAFF</string>
+			</dict>
+		</dict>
+
+		<dict>
+			<key>scope</key>
+			<string>col_FD6A1DFF</string>
+			<key>settings</key>
+			<dict>
+				<key>background</key>
+				<string>#FD6A1DFF</string>
+				<key>foreground</key>
+				<string>#0D0D0DFF</string>
+			</dict>
+		</dict>
+
+		<dict>
+			<key>scope</key>
+			<string>col_414141FF</string>
+			<key>settings</key>
+			<dict>
+				<key>background</key>
+				<string>#414141FF</string>
+				<key>foreground</key>
+				<string>#C1C1C1FF</string>
+			</dict>
+		</dict>
+
+		<dict>
+			<key>scope</key>
+			<string>col_636363FF</string>
+			<key>settings</key>
+			<dict>
+				<key>background</key>
+				<string>#636363FF</string>
+				<key>foreground</key>
+				<string>#E3E3E3FF</string>
+			</dict>
+		</dict>
+
+		<dict>
+			<key>scope</key>
+			<string>col_FFFBD9FF</string>
+			<key>settings</key>
+			<dict>
+				<key>background</key>
+				<string>#FFFBD9FF</string>
+				<key>foreground</key>
+				<string>#787878FF</string>
+			</dict>
+		</dict>
+
+		<dict>
+			<key>scope</key>
+			<string>col_70CFF6FF</string>
+			<key>settings</key>
+			<dict>
+				<key>background</key>
+				<string>#70CFF6FF</string>
+				<key>foreground</key>
+				<string>#373737FF</string>
+			</dict>
+		</dict>
+
+		<dict>
+			<key>scope</key>
+			<string>col_373737FF</string>
+			<key>settings</key>
+			<dict>
+				<key>background</key>
+				<string>#373737FF</string>
+				<key>foreground</key>
+				<string>#B7B7B7FF</string>
+			</dict>
+		</dict>
+
+		<dict>
+			<key>scope</key>
+			<string>col_B6A997FF</string>
+			<key>settings</key>
+			<dict>
+				<key>background</key>
+				<string>#B6A997FF</string>
+				<key>foreground</key>
+				<string>#2A2A2AFF</string>
+			</dict>
+		</dict>
+
+		<dict>
+			<key>scope</key>
+			<string>col_F7F06FFF</string>
+			<key>settings</key>
+			<dict>
+				<key>background</key>
+				<string>#F7F06FFF</string>
+				<key>foreground</key>
+				<string>#636363FF</string>
+			</dict>
+		</dict>
+
+		<dict>
+			<key>scope</key>
+			<string>col_DEDEDEFF</string>
+			<key>settings</key>
+			<dict>
+				<key>background</key>
+				<string>#DEDEDEFF</string>
+				<key>foreground</key>
+				<string>#5E5E5EFF</string>
+			</dict>
+		</dict>
+
+		<dict>
+			<key>scope</key>
+			<string>col_5A5A5AFF</string>
+			<key>settings</key>
+			<dict>
+				<key>background</key>
+				<string>#5A5A5AFF</string>
+				<key>foreground</key>
+				<string>#DADADAFF</string>
+			</dict>
+		</dict>
+
+		<dict>
+			<key>scope</key>
+			<string>col_BBBBBBFF</string>
+			<key>settings</key>
+			<dict>
+				<key>background</key>
+				<string>#BBBBBBFF</string>
+				<key>foreground</key>
+				<string>#3B3B3BFF</string>
+			</dict>
+		</dict>
+
+		<dict>
+			<key>scope</key>
+			<string>col_C1C1C1FF</string>
+			<key>settings</key>
+			<dict>
+				<key>background</key>
+				<string>#C1C1C1FF</string>
+				<key>foreground</key>
+				<string>#414141FF</string>
+			</dict>
+		</dict>
+
+		<dict>
+			<key>scope</key>
+			<string>col_181818FF</string>
+			<key>settings</key>
+			<dict>
+				<key>background</key>
+				<string>#181818FF</string>
+				<key>foreground</key>
+				<string>#989898FF</string>
+			</dict>
+		</dict>
+
+		<dict>
+			<key>scope</key>
+			<string>col_AAAAAAFF</string>
+			<key>settings</key>
+			<dict>
+				<key>background</key>
+				<string>#AAAAAAFF</string>
+				<key>foreground</key>
+				<string>#2A2A2AFF</string>
+			</dict>
+		</dict>
+
+		<dict>
+			<key>scope</key>
+			<string>col_8D8D8DFF</string>
+			<key>settings</key>
+			<dict>
+				<key>background</key>
+				<string>#8D8D8DFF</string>
+				<key>foreground</key>
+				<string>#0D0D0DFF</string>
+			</dict>
+		</dict>
+
+		<dict>
+			<key>scope</key>
+			<string>col_DDDDDDFF</string>
+			<key>settings</key>
+			<dict>
+				<key>background</key>
+				<string>#DDDDDDFF</string>
+				<key>foreground</key>
+				<string>#5D5D5DFF</string>
+			</dict>
+		</dict>
+
+		<dict>
+			<key>scope</key>
+			<string>col_5E5E5EFF</string>
+			<key>settings</key>
+			<dict>
+				<key>background</key>
+				<string>#5E5E5EFF</string>
+				<key>foreground</key>
+				<string>#DEDEDEFF</string>
+			</dict>
+		</dict>
+
+		<dict>
+			<key>scope</key>
+			<string>col_E3E3E3FF</string>
+			<key>settings</key>
+			<dict>
+				<key>background</key>
+				<string>#E3E3E3FF</string>
+				<key>foreground</key>
+				<string>#636363FF</string>
+			</dict>
+		</dict>
+
+		<dict>
+			<key>scope</key>
+			<string>col_F8F8F8FF</string>
+			<key>settings</key>
+			<dict>
+				<key>background</key>
+				<string>#F8F8F8FF</string>
+				<key>foreground</key>
+				<string>#787878FF</string>
+			</dict>
+		</dict>
+
+		<dict>
+			<key>scope</key>
+			<string>col_B7B7B7FF</string>
+			<key>settings</key>
+			<dict>
+				<key>background</key>
+				<string>#B7B7B7FF</string>
+				<key>foreground</key>
+				<string>#373737FF</string>
+			</dict>
+		</dict>
+	</array>
+	<key>uuid</key>
+	<string>D8D5E82E-3D5B-46B5-B38E-8C841C21347D</string>
+</dict>
+</plist>
