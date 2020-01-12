@@ -3,4 +3,4 @@ Theme, syntax highlighter, bracket highlighter, whatever
 
 This stuff goes in AppData/Roaming/Sublime Text 3/
 
-![](https://i.imgur.com/ORPnkrH.png)
+<img src="https://i.imgur.com/ORPnkrH.png" width="500">
