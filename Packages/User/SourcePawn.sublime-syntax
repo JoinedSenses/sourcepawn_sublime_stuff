@@ -4,6 +4,10 @@ name: SourcePawn - 1.7+
 file_extensions: [sp, inc]
 scope: source.sp
 
+# Sublime SourcePawn Syntax Highlighter
+# Originally designed by 404UNF
+# Modified by JoinedSenses
+
 variables:
   numerals_binary: '\b0b[01]+\b'
   numerals_hex: '\b0x[0-9a-fA-F]{0,8}\b'
