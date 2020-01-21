@@ -1,9 +1,0 @@
-{
-	"bootstrapped": true,
-	// "include_directory": "G:\\Documents\\TF2\\sourcemod-1.10.0-git6380-windows\\addons\\sourcemod\\scripting\\include",
-	"include_directory": [
-		"G:\\Documents\\TF2\\sourcemod-1.10.0-git6380-windows\\addons\\sourcemod\\scripting\\include"
-		// ,"G:\\Documents\\TF2\\SourceMod 1.9.0-6245\\addons\\sourcemod\\scripting\\include"
-	],
-	"live_refresh_delay": 1.0
-}
