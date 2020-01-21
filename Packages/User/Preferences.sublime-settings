@@ -1,7 +1,7 @@
 {
-	"color_scheme": "Packages/Colorsublime - Themes/feel_good.tmTheme",
+	"color_scheme": "Packages/User/SaucePawn.sublime-color-scheme",
 	"font_face": "",
-	"font_size": 8,
+	"font_size": 9,
 	"ignored_packages":
 	[
 		"Vintage"
