@@ -541,7 +541,7 @@ contexts:
     - match: '\b(?:{{t_primitive}})\b'
       scope: storage.type
 
-    - match: \b(enum(?:[ \t]+struct)?)[ \t]+([\w_]+)
+    - match: \b(enum(?:[ \t]+struct)?)[ \t]+([\w_]+)?
       captures:
         1: storage.modifier
         2: storage.type
