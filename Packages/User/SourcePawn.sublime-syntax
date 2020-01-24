@@ -14,11 +14,9 @@ variables:
   numerals: '(?<![\w\]\)])\-?\b[0-9]+\.?[0-9]*\b'
 
   constant_placeholder: \%(c|\.?\d*d|\d*\.?\d*f|\d*\.?\d*i|s|L|N|t|T|u|\d*x|\d*X)
-  constant_character_escape: (?<!\\)\\x(0(7[\w\d]{6}|8[\w\d]{8}|\d|[A-F]\b)|10)|\\n|\\0
+  constant_character_escape: (?<!\\)\\x(0(7[A-Fa-f0-9]{6}|8[A-Fa-f0-9]{8}|\d|[A-F]\b)|10)|\\n|\\0
 
   # Storage types
-  t_oldsyntax: '\b(_|String|Float)\b'
-
   t_primitive: 'any|bool|char|float(?!\()|int|void'
 
   t_admin: 'AdmAccessMode|AdminCachePart|AdminFlag|ImmunityType|OverrideRule|OverrideType'
@@ -481,13 +479,10 @@ contexts:
           scope: constant.character.escape
 
   deprecations:
-    # [1.6] for loop 'new' usage detection
-    - match: (?<=for)(?=(?:\s*\()(new))
+    # Highlight 1.6 usage as deprecated
+    - match: '(?<!\?)[ \t]*(((?:new|decl)[ \t]+)?\b[a-zA-Z_][\w_]+[ \t]*:)(?=[ \t]*[\w_])'
       captures:
         1: invalid.deprecated
-    # Highlight 1.6 usage as deprecated
-    - match: '\b((?:new|decl)[ \t]+)?({{t_oldsyntax}}|{{t_primitive}}|{{types}}|{{classes}})\b(:)'
-      scope: invalid.deprecated
     # 1.6 variable declarations
     - match: \b(?:new|decl)\b
       scope: invalid.deprecated
@@ -570,10 +565,11 @@ contexts:
     - match: \b(public|stock|native|typeset|typedef|methodmap|property|enum|struct|forward|function|const|static)\b
       scope: storage.modifier
 
-    - match: \b(?<=[;,^\(])[ \t]*([\w_]+)[ \t]+(?:[\w_]+)[ \t]*([ \t]*[^$\[,);=]+)*
-      captures:
-        1: storage.type
-        2: invalid.illegal
+    - match: '(?<!#if|#defined)[ \t]*(\b[a-zA-Z_][\w_]*)(?<!return|new)(?=[ \t]*\[[ \t]*\][ \t]+[a-zA-Z_])'
+      scope: storage.type
+
+    - match: '(?<!#if|#defined)[ \t]*(\b[a-zA-Z_][\w_]*)(?<!return|new)[ \t]+(?=\b[a-zA-Z_][\w_]*[ \t]*(?:\[.*?\][ \t]*)?(?:[;,\)]|$))'
+      scope: storage.type
 
   punctuation:
     - match: \[
