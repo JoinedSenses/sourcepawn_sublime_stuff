@@ -565,10 +565,19 @@ contexts:
     - match: \b(public|stock|native|typeset|typedef|methodmap|property|enum|struct|forward|function|const|static)\b
       scope: storage.modifier
 
-    - match: '(?<!#if|#defined)[ \t]*(\b[a-zA-Z_][\w_]*)(?<!\breturn|\bnew)(?=[ \t]*\[[ \t]*\][ \t]+[a-zA-Z_])'
+    - match: \b([A-Za-z_][\w_]*)[ \t]*(\[)[ \t]*(\])[ \t]+(?:[A-Za-z_][\w_]*)[ \t]*(=)[ \t]*(new)[ \t]+(\1)(?=\[)
+      captures:
+        1: storage.type
+        2: punctuation.section.brackets.begin
+        3: punctuation.section.brackets.begin
+        4: keyword.operator.assignment
+        5: keyword.control.other
+        6: storage.type
+
+    - match: (?<!#if|#defined)[ \t]*(\b[a-zA-Z_][\w_]*)(?<!\breturn|\bnew)(?=[ \t]*\[[ \t]*\][ \t]+[a-zA-Z_])
       scope: storage.type
 
-    - match: '(?<!#if|#defined)[ \t]*(\b[a-zA-Z_][\w_]*)(?<!\breturn|\bnew)[ \t]+(?=\b[a-zA-Z_][\w_]*[ \t]*(?:\[.*?\][ \t]*)?(?:[;,\)]|$))'
+    - match: (?<!#if|#defined)[ \t]*(\b[a-zA-Z_][\w_]*)(?<!\breturn|\bnew)[ \t]+(?=\b[a-zA-Z_][\w_]*[ \t]*(?:\[.*?\][ \t]*)?(?:[;,\)]|$))
       scope: storage.type
 
   punctuation:
