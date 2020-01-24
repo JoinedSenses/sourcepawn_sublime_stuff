@@ -565,10 +565,10 @@ contexts:
     - match: \b(public|stock|native|typeset|typedef|methodmap|property|enum|struct|forward|function|const|static)\b
       scope: storage.modifier
 
-    - match: '(?<!#if|#defined)[ \t]*(\b[a-zA-Z_][\w_]*)(?<!return|new)(?=[ \t]*\[[ \t]*\][ \t]+[a-zA-Z_])'
+    - match: '(?<!#if|#defined)[ \t]*(\b[a-zA-Z_][\w_]*)(?<!\breturn|\bnew)(?=[ \t]*\[[ \t]*\][ \t]+[a-zA-Z_])'
       scope: storage.type
 
-    - match: '(?<!#if|#defined)[ \t]*(\b[a-zA-Z_][\w_]*)(?<!return|new)[ \t]+(?=\b[a-zA-Z_][\w_]*[ \t]*(?:\[.*?\][ \t]*)?(?:[;,\)]|$))'
+    - match: '(?<!#if|#defined)[ \t]*(\b[a-zA-Z_][\w_]*)(?<!\breturn|\bnew)[ \t]+(?=\b[a-zA-Z_][\w_]*[ \t]*(?:\[.*?\][ \t]*)?(?:[;,\)]|$))'
       scope: storage.type
 
   punctuation:
