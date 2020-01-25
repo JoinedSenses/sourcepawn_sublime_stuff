@@ -535,6 +535,11 @@ contexts:
       scope: support.constant
     - match: '\b(?:{{t_primitive}})\b'
       scope: storage.type
+    - match: \b(?:{{ALL_PROPERTIES}})\b
+      scope: variable.other.member
+
+    - match: \b(public|stock|native|typeset|typedef|methodmap|property|enum|struct|forward|function|const|static)\b
+      scope: storage.modifier
 
     - match: \b(enum(?:[ \t]+struct)?)[ \t]+([\w_]+)?
       captures:
@@ -562,9 +567,6 @@ contexts:
         1: storage.modifier
         2: storage.type
 
-    - match: \b(public|stock|native|typeset|typedef|methodmap|property|enum|struct|forward|function|const|static)\b
-      scope: storage.modifier
-
     - match: \b([A-Za-z_][\w_]*)[ \t]*(\[)[ \t]*(\])[ \t]+(?:[A-Za-z_][\w_]*)[ \t]*(=)[ \t]*(new)[ \t]+(\1)(?=\[)
       captures:
         1: storage.type
@@ -574,10 +576,10 @@ contexts:
         5: keyword.control.other
         6: storage.type
 
-    - match: (?<!#if|#defined)[ \t]*(\b[a-zA-Z_][\w_]*)(?<!\breturn|\bnew)(?=[ \t]*\[[ \t]*\][ \t]+[a-zA-Z_])
+    - match: (?<!#if|#defined)[ \t]*(\b[a-zA-Z_][\w_]*)(?<!\breturn|\bnew|\bconst|\bstatic)(?=[ \t]*\[[ \t]*\][ \t]+[a-zA-Z_])
       scope: storage.type
 
-    - match: (?<!#if|#defined)[ \t]*(\b[a-zA-Z_][\w_]*)(?<!\breturn|\bnew)[ \t]+(?=\b[a-zA-Z_][\w_]*[ \t]*(?:\[.*?\][ \t]*)?(?:[;,\)]|$))
+    - match: (?<!#if|#defined)[ \t]*(\b[a-zA-Z_][\w_]*)(?<!\breturn|\bnew|\bconst|\bstatic)[ \t]+(?=\b[a-zA-Z_][\w_]*[ \t]*(?:\[.*?\][ \t]*)?(?:[;,\)]|$))
       scope: storage.type
 
   punctuation:
