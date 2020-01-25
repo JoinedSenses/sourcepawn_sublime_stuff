@@ -453,8 +453,6 @@ contexts:
       scope: keyword.operator.conditional
     - match: (\+|\-|\*|\%|(?<=\w| |\d)\/)
       scope: keyword.operator.arithmetic
-    - match: (&&|\|\=?|\!\=?|\=\=|\<\=?|\>\=?)
-      scope: keyword.operator.logical
     - match: \=
       scope: keyword.operator.assignment
 
