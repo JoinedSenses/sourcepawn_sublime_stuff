@@ -574,10 +574,10 @@ contexts:
         5: keyword.control.other
         6: storage.type
 
-    - match: (?<!#if|#defined)[ \t]*(\b[a-zA-Z_][\w_]*)(?<!\breturn|\bnew|\bconst|\bstatic)(?=[ \t]*\[[ \t]*\][ \t]+[a-zA-Z_])
+    - match: (?<!#if|#defined)[ \t]*(\b[a-zA-Z_][\w_]*)(?<!\breturn|\bnew|\bconst|\bstatic|\bdelete)(?=[ \t]*\[[ \t]*\][ \t]+[a-zA-Z_])
       scope: storage.type
 
-    - match: (?<!#if|#defined)[ \t]*(\b[a-zA-Z_][\w_]*)(?<!\breturn|\bnew|\bconst|\bstatic)[ \t]+(?=\b[a-zA-Z_][\w_]*[ \t]*(?:\[.*?\][ \t]*)?(?:[;,\)]|$))
+    - match: (?<!#if|#defined)[ \t]*(\b[a-zA-Z_][\w_]*)(?<!\breturn|\bnew|\bconst|\bstatic|\bdelete)[ \t]+(?=\b[a-zA-Z_][\w_]*[ \t]*(?:\[.*?\][ \t]*)?(?:[;,\)]|$))
       scope: storage.type
 
   punctuation:
