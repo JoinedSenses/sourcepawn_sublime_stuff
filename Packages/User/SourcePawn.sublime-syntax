@@ -536,13 +536,13 @@ contexts:
     - match: \b(?:{{ALL_PROPERTIES}})\b
       scope: variable.other.member
 
-    - match: \b(public|stock|native|typeset|typedef|methodmap|property|enum|struct|forward|function|const|static)\b
-      scope: storage.modifier
-
     - match: \b(enum(?:[ \t]+struct)?)[ \t]+([\w_]+)?
       captures:
         1: storage.modifier
         2: storage.type
+
+    - match: \b(public|stock|native|typeset|typedef|methodmap|property|enum|struct|forward|function|const|static)\b
+      scope: storage.modifier
 
     - match: \b(methodmap)[ \t]+([\w_]+)(?:[ \t]*(<)[ \t]*([\w_]+)\b)?
       captures:
@@ -574,10 +574,10 @@ contexts:
         5: keyword.control.other
         6: storage.type
 
-    - match: (?<!#if|#defined)[ \t]*(\b[a-zA-Z_][\w_]*)(?<!\breturn|\bnew|\bconst|\bstatic|\bdelete)(?=[ \t]*\[[ \t]*\][ \t]+[a-zA-Z_])
+    - match: (?<!#if|#defined)[ \t]*(\b[a-zA-Z_][\w_]*)(?<!\breturn|\bnew|\bconst|\bstatic|\bdelete|\bstruct)(?=[ \t]*\[[ \t]*\][ \t]+[a-zA-Z_])
       scope: storage.type
 
-    - match: (?<!#if|#defined)[ \t]*(\b[a-zA-Z_][\w_]*)(?<!\breturn|\bnew|\bconst|\bstatic|\bdelete)[ \t]+(?=\b[a-zA-Z_][\w_]*[ \t]*(?:\[.*?\][ \t]*)?(?:[;,\)]|$))
+    - match: (?<!#if|#defined)[ \t]*(\b[a-zA-Z_][\w_]*)(?<!\breturn|\bnew|\bconst|\bstatic|\bdelete|\bstruct)[ \t]+(?=\b[a-zA-Z_][\w_]*[ \t]*(?:\[.*?\][ \t]*)?(?:[;,\)=]|$))
       scope: storage.type
 
   punctuation:
