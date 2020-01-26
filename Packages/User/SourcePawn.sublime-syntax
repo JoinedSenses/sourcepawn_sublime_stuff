@@ -525,11 +525,11 @@ contexts:
         2: support.function
 
   types:
-    - match: '{{classes}}'
+    - match: '({{classes}})(?=.*?)?'
       scope: support.class
     - match: '{{types}}'
       scope: support.type
-    - match: '\b({{ALL_CONSTANTS}})\b'
+    - match: '\b({{ALL_CONSTANTS}})\b(?=[ \t]+[a-zA-Z_])?'
       scope: support.constant
     - match: '\b(?:{{t_primitive}})\b'
       scope: storage.type
@@ -574,10 +574,19 @@ contexts:
         5: keyword.control.other
         6: storage.type
 
-    - match: (?<!#if|#defined)[ \t]*(\b[a-zA-Z_][\w_]*)(?<!\breturn|\bnew|\bconst|\bstatic|\bdelete|\bstruct)(?=[ \t]*\[[ \t]*\][ \t]+[a-zA-Z_])
-      scope: storage.type
+    - match: (?<!#if|#defined)[ \t]*(?:({{classes}})|({{types}})|\b([a-zA-Z_][\w_]*))(?<!\breturn|\bnew|\bconst|\bstatic|\bdelete|\bstruct|\bsizeof)(?=[ \t]*\[[ \t]*\][ \t]+[a-zA-Z_])
+      captures:
+        1: support.class
+        2: support.type
+        3: storage.type
 
-    - match: (?<!#if|#defined)[ \t]*(\b[a-zA-Z_][\w_]*)(?<!\breturn|\bnew|\bconst|\bstatic|\bdelete|\bstruct)[ \t]+(?=\b[a-zA-Z_][\w_]*[ \t]*(?:\[.*?\][ \t]*)?(?:[;,\)=]|$))
+    - match: (?<!#if|#defined)[ \t]*(?:({{classes}})|({{types}})|\b([a-zA-Z_][\w_]*))(?<!\breturn|\bnew|\bconst|\bstatic|\bdelete|\bstruct|\bsizeof)[ \t]+(?=\b[a-zA-Z_][\w_]*[ \t]*(?:\[.*?\][ \t]*)?(?:[;,\)=]|$))
+      captures:
+        1: support.class
+        2: support.type
+        3: storage.type
+
+    - match: \b[\w_]+[ \t]*(?=::[ \t]*[\w_])
       scope: storage.type
 
   punctuation:
