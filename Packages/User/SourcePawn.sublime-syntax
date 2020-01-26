@@ -478,7 +478,7 @@ contexts:
 
   deprecations:
     # Highlight 1.6 usage as deprecated
-    - match: '(?<!\?|case)(?:^|[ \t]+)(((?:new|decl)[ \t]+)?\b[a-zA-Z_][\w_]*(?<!\bdefault)\b[ \t]*:)(?=[ \t]*[\w_])'
+    - match: '(?<!\?|case)(?:^|[ \t]+|[\(,;])(((?:new|decl)[ \t]+)?\b[a-zA-Z_][\w_]*(?<!\bdefault)\b[ \t]*:)(?=[ \t]*[\w_])'
       captures:
         1: invalid.deprecated
     # 1.6 variable declarations
