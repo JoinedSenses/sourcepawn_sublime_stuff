@@ -11,7 +11,7 @@ scope: source.sp
 variables:
   numerals_binary: '\b0b[01]+\b'
   numerals_hex: '\b0x[0-9a-fA-F]{0,8}\b'
-  numerals: '(?<![\w\]\)])\-?\b[0-9]+\.?[0-9]*\b'
+  numerals: '\b\d+(\.\d*)?(e-?\d*)?\b'
 
   constant_placeholder: \%(c|\.?\d*d|\d*\.?\d*f|\d*\.?\d*i|s|L|N|t|T|u|\d*x|\d*X)
   constant_character_escape: (?<!\\)\\x(0(7[A-Fa-f0-9]{6}|8[A-Fa-f0-9]{8}|\d|[A-F]\b)|10)|\\n|\\0
@@ -574,13 +574,13 @@ contexts:
         5: keyword.control.other
         6: storage.type
 
-    - match: (?<!#if|#defined)[ \t]*(?:({{classes}})|({{types}})|\b([a-zA-Z_][\w_]*))(?<!\breturn|\bnew|\bconst|\bstatic|\bdelete|\bstruct|\bsizeof)(?=[ \t]*\[[ \t]*\][ \t]+[a-zA-Z_])
+    - match: (?<!#if|#defined)[ \t]*(?:({{classes}})|({{types}})|\b([a-zA-Z_][\w_]*))(?<!\belse|return|\bnew|\bconst|\bstatic|\bdelete|\bstruct|\bsizeof)(?=[ \t]*\[[ \t]*\][ \t]+[a-zA-Z_])
       captures:
         1: support.class
         2: support.type
         3: storage.type
 
-    - match: (?<!#if|#defined)[ \t]*(?:({{classes}})|({{types}})|\b([a-zA-Z_][\w_]*))(?<!\breturn|\bnew|\bconst|\bstatic|\bdelete|\bstruct|\bsizeof)[ \t]+(?=\b[a-zA-Z_][\w_]*[ \t]*(?:\[.*?\][ \t]*)?(?:[;,\)=]|$))
+    - match: (?<!#if|#defined)[ \t]*(?:({{classes}})|({{types}})|\b([a-zA-Z_][\w_]*))(?<!\belse|return|\bnew|\bconst|\bstatic|\bdelete|\bstruct|\bsizeof)[ \t]+(?=\b[a-zA-Z_][\w_]*[ \t]*(?:\[.*?\][ \t]*)?(?:[;,\)=]|$))
       captures:
         1: support.class
         2: support.type
