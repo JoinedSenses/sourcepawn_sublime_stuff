@@ -533,8 +533,10 @@ contexts:
       scope: support.constant
     - match: '\b(?:{{t_primitive}})\b'
       scope: storage.type
-    - match: \b(?:{{ALL_PROPERTIES}})\b
-      scope: variable.other.member
+    - match: (\.)({{ALL_PROPERTIES}})\b
+      captures:
+        1: punctuation.accessor
+        2: variable.other.member
 
     - match: \b(enum(?:[ \t]+struct)?)[ \t]+([\w_]+)?
       captures:
