@@ -543,7 +543,7 @@ contexts:
         1: storage.modifier
         2: storage.type
 
-    - match: \b(typedef)[ \t]+([\w_]+)
+    - match: \b(type(?:def|set))[ \t]+([\w_]+)
       captures:
         1: storage.modifier
         2: storage.type
