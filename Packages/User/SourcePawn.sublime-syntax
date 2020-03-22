@@ -543,6 +543,11 @@ contexts:
         1: storage.modifier
         2: storage.type
 
+    - match: \b(typedef)[ \t]+([\w_]+)
+      captures:
+        1: storage.modifier
+        2: storage.type
+
     - match: \b(public|stock|native|typeset|typedef|methodmap|property|enum|struct|forward|function|const|static)\b
       scope: storage.modifier
 
