@@ -457,19 +457,19 @@ contexts:
       scope: keyword.operator.assignment
 
   strings:
-    - match: (?<!\\)\"
+    - match: (?<!\\)(\\\\)*\"
       push:
         - meta_scope: string
-        - match: (?<!\\)\"|\\\\"
+        - match: (?<!\\)(\\\\)*\"
           pop: true
         - match: '{{constant_placeholder}}'
           scope: constant.other.placeholder
         - match: '{{constant_character_escape}}'
           scope: constant.character.escape
-    - match: (?<!\\)\'
+    - match: (?<!\\)(\\\\)*\'
       push:
         - meta_scope: string
-        - match: (?<!\\)\'|\\\\'
+        - match: (?<!\\)(\\\\)*\'
           pop: true
         - match: '{{constant_placeholder}}'
           scope: constant.other.placeholder
