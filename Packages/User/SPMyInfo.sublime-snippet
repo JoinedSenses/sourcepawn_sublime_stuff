@@ -8,6 +8,6 @@ public Plugin myinfo = {
 	url = ${5:url}
 }$0
 ]]></content>
-	<tabTrigger>myinfo</tabTrigger>
+	<tabTrigger>_myinfo</tabTrigger>
 	<source>source.sp</source>
 </snippet>
