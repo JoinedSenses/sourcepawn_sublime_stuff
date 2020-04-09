@@ -1,0 +1,43 @@
+<snippet>
+	<content><![CDATA[
+#if defined _${1:${TM_FILENAME/(.+)\..+/$1/}}_included_
+  #endinput
+#endif
+#define _$1_included_
+
+// --------------
+
+$0
+
+// -------------- 
+
+${2:public Extension __ext_$1 = {
+	name = "",
+	file = "",
+	autoload = 0,
+	#if defined REQUIRE_EXTENSIONS
+		required = 1,
+	#else
+		required = 0,
+	#endif
+\};}
+
+${3:public SharedPlugin __pl_$1 = {
+	name = "$1",
+	file = "$1.smx",
+#if defined REQUIRE_PLUGIN
+	required = 1,
+#else
+	required = 0,
+#endif
+\};}
+
+#if !defined REQUIRE_PLUGIN
+public void __pl_$1_SetNTVOptional() {
+	// MarkNativeAsOptional("");
+}
+#endif
+]]></content>
+	<tabTrigger>_include</tabTrigger>
+	<source>source.sp</source>
+</snippet>
