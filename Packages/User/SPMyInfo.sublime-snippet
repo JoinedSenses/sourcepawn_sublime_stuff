@@ -1,0 +1,13 @@
+<snippet>
+	<content><![CDATA[
+public Plugin myinfo = {
+	name = ${1:name},
+	author = ${2:author},
+	description = ${3:desc},
+	version = ${4:version},
+	url = ${5:url}
+}$0
+]]></content>
+	<tabTrigger>myinfo</tabTrigger>
+	<source>source.sp</source>
+</snippet>

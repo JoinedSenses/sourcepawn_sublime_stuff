@@ -1,0 +1,28 @@
+<snippet>
+	<content><![CDATA[
+#pragma semicolon 1
+#pragma newdecls required
+
+#include <sourcemod>
+
+public Plugin myinfo = {
+	name = "${TM_FILENAME/(.+)\..+/$1/}",
+	author = "",
+	description = "",
+	version = "0.1.0",
+	url = ""
+}
+
+public void OnPluginStart() {
+	RegAdminCmd("sm_${1:test}", ${2:cmdTest}, ADMFLAG_ROOT);
+}
+
+public Action $2(int client, int args) {
+	$0
+
+	return Plugin_Handled;
+}
+]]></content>
+	<tabTrigger>_test</tabTrigger>
+	<source>source.sp</source>
+</snippet>
