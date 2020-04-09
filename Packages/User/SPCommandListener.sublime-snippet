@@ -1,0 +1,10 @@
+<snippet>
+	<content><![CDATA[
+public Action ${1:commandListener}(int client, const char[] command, int argc) {
+	$0
+	return Plugin_Continue;
+}
+]]></content>
+	<tabTrigger>_cmdlistener</tabTrigger>
+	<source>source.sp</source>
+</snippet>

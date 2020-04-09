@@ -1,0 +1,10 @@
+<snippet>
+	<content><![CDATA[
+public Action ${1:serverCommand}(int args) {
+	$0
+	return Plugin_Handled;
+}
+]]></content>
+	<tabTrigger>_srvcmd</tabTrigger>
+	<source>source.sp</source>
+</snippet>

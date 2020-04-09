@@ -1,0 +1,22 @@
+<snippet>
+	<content><![CDATA[
+#pragma semicolon 1
+#pragma newdecls required
+
+#include <sourcemod>
+
+public Plugin myinfo = {
+	name = ${1:name},
+	author = ${2:author},
+	description = ${3:desc},
+	version = ${4:version},
+	url = ${5:url}
+}
+
+public void OnPluginStart() {
+	
+}
+]]></content>
+	<tabTrigger>_newplugin</tabTrigger>
+	<source>source.sp</source>
+</snippet>
