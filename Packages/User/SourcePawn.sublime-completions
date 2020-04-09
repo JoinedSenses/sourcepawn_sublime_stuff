@@ -1,0 +1,13 @@
+{
+  "scope": "source.sp comment.block",
+  "completions":
+  [
+    { "trigger" : "@author",        "contents": "@author ${1:[author]}"},
+    { "trigger" : "@param",         "contents": "@param ${1:[varname]} ${2:[description]}" },
+    { "trigger" : "@return",        "contents": "@return {${1:[type]}} ${2:[description]}" },
+    { "trigger" : "@todo",          "contents": "@todo ${1:[description]}"},
+    { "trigger" : "@deprecated",    "contents": "@deprecated ${1:[description]}"},
+    { "trigger" : "@see",           "contents": "@see ${1:[description]}"},
+    { "trigger" : "@error",         "contents": "@error ${1:[description]}"},
+  ],
+}
