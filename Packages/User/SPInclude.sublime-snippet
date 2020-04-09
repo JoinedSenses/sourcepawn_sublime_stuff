@@ -15,11 +15,11 @@ ${2:public Extension __ext_$1 = {
 	name = "",
 	file = "",
 	autoload = 0,
-	#if defined REQUIRE_EXTENSIONS
-		required = 1,
-	#else
-		required = 0,
-	#endif
+#if defined REQUIRE_EXTENSIONS
+	required = 1,
+#else
+	required = 0,
+#endif
 \};}
 
 ${3:public SharedPlugin __pl_$1 = {
