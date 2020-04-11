@@ -1,0 +1,14 @@
+<snippet>
+	<content><![CDATA[
+public void ${1:sqlQueryCallback}(Database db, DBResultSet results, const char[] error, ${2:any data}) {
+	if (!db || !results || error[0]) {
+		LogError("$1 - Query failed! (%s)", error);
+		return;
+	}
+
+	$0
+}
+]]></content>
+	<tabTrigger>_sqlquerycallback</tabTrigger>
+	<source>source.sp</source>
+</snippet>

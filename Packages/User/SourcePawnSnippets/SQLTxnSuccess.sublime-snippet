@@ -1,0 +1,9 @@
+<snippet>
+	<content><![CDATA[
+public void ${1:sqlTxnSuccess}(Database db, any data, int numQueries, DBResultSet[] results, any[] queryData) {
+	$0
+}
+]]></content>
+	<tabTrigger>_sqltxnsuccess</tabTrigger>
+	<source>source.sp</source>
+</snippet>

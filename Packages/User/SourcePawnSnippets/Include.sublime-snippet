@@ -10,8 +10,8 @@
 $0
 
 // -------------- 
-
-${2:public Extension __ext_$1 = {
+${2:
+public Extension __ext_$1 = {
 	name = "",
 	file = "",
 	autoload = 0,
@@ -20,8 +20,8 @@ ${2:public Extension __ext_$1 = {
 #else
 	required = 0,
 #endif
-\};}
-
+\};
+}
 ${3:public SharedPlugin __pl_$1 = {
 	name = "$1",
 	file = "$1.smx",
@@ -30,8 +30,8 @@ ${3:public SharedPlugin __pl_$1 = {
 #else
 	required = 0,
 #endif
-\};}
-
+\};
+}
 #if !defined REQUIRE_PLUGIN
 public void __pl_$1_SetNTVOptional() {
 	// MarkNativeAsOptional("");

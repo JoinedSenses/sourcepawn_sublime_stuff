@@ -1,0 +1,9 @@
+<snippet>
+	<content><![CDATA[
+public void ${1:sqlTxnFailure}(Database db, any data, int numQueries, const char[] error, int failIndex, any[] queryData) {
+	$0
+}
+]]></content>
+	<tabTrigger>_sqltxnfailure</tabTrigger>
+	<source>source.sp</source>
+</snippet>

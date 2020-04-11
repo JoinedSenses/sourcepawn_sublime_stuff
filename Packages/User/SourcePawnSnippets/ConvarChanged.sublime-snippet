@@ -1,0 +1,9 @@
+<snippet>
+	<content><![CDATA[
+public void ${1:cvarChanged}(ConVar convar, const char[] oldValue, const char[] newValue) {
+	$0
+}
+]]></content>
+	<tabTrigger>_cvarchanged</tabTrigger>
+	<source>source.sp</source>
+</snippet>

@@ -1,0 +1,61 @@
+<snippet>
+	<content><![CDATA[
+public int ${1:menuHandler}(Menu menu, MenuAction action, int param1, int param2) {
+	switch (action) {$0${2:
+		case MenuAction_Start: {
+			// A menu has been started
+			// (nothing passed)
+		\}}${3:
+		case MenuAction_Display: {
+			// A menu is about to be displayed
+			// (param1=client, param2=MenuPanel Handle)
+		\}}${4:
+		case MenuAction_Select: {
+			// An item was selected
+			// (param1=client, param2=item)
+		\}}${5:
+		case MenuAction_Cancel: {
+			// The menu was cancelled
+			// (param1=client, param2=reason)
+		\}}${6:
+		case MenuAction_End: {
+			// A menu display has fully ended
+			// (param1=MenuEnd reason, if MenuEnd_Cancelled param2=MenuCancel_Reason)
+
+			// delete menu;
+		\}}${7:
+		case MenuAction_VoteEnd: {
+			// (VOTE ONLY): A vote sequence has succeeded.
+			// Not called if SetVoteResultCallback used on menu
+			// (param1=chosen item)
+		\}}${8:
+		case MenuAction_VoteStart: {
+			// (VOTE ONLY): A vote sequence has started
+			// (nothing passed)
+		\}}${9:
+		case MenuAction_VoteCancel: {
+			// (VOTE ONLY): A vote sequence has been cancelled
+			// (param1=reason)
+		\}}${10:
+		case MenuAction_DrawItem: {
+			// An item is being drawn; return the new style
+			// (param1=client, param2=item)
+
+			// return ITEMDRAW_DEFAULT;
+		\}}${11:
+		case MenuAction_DisplayItem {
+			// Item text is being drawn to the display
+			// (param1=client, param2=item)
+
+			// return RedrawMenuItem(text);
+		\}}
+	}
+
+	return 0;
+}
+]]></content>
+	<!-- Optional: Set a tabTrigger to define how to trigger the snippet -->
+	<tabTrigger>_menuhandler</tabTrigger>
+	<!-- Optional: Set a scope to limit where the snippet will trigger -->
+	<scope>source.sp</scope>
+</snippet>

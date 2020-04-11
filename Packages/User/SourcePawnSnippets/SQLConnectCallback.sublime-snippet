@@ -1,0 +1,13 @@
+<snippet>
+	<content><![CDATA[
+public void ${1:sqlConnectCallback}(Database db, const char[] error, ${2:any data}) {
+	if (!db || error[0]) {
+		SetFailState("$1 - Connection failure (%s)", error);
+	}
+	
+	$0
+}
+]]></content>
+	<tabTrigger>_sqlconnectcallback</tabTrigger>
+	<scope>source.sp</scope>
+</snippet>

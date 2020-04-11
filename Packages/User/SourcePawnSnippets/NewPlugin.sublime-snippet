@@ -1,0 +1,35 @@
+<snippet>
+	<content><![CDATA[
+#pragma semicolon 1
+#pragma newdecls required
+
+#include <sourcemod>
+
+#define PLUGIN_NAME "${1:NewPlugin}"
+#define PLUGIN_AUTHOR "${2:}"
+#define PLUGIN_DESCRIPTION "${3:}"
+#define PLUGIN_VERSION "${4:0.1.0}"
+#define PLUGIN_URL "${5:https://alliedmods.net}"
+
+public Plugin myinfo = {
+	name = PLUGIN_NAME,
+	author = PLUGIN_AUTHOR,
+	description = PLUGIN_DESCRIPTION,
+	version = PLUGIN_VERSION,
+	url = PLUGIN_URL
+}
+
+public void OnPluginStart() {
+	CreateConVar(
+		"sm_${1/([A-Z])|(\s)/(?1\l$1:)(?2:)/g}_version",
+		PLUGIN_VERSION,
+		PLUGIN_DESCRIPTION,
+		FCVAR_SPONLY|FCVAR_NOTIFY|FCVAR_DONTRECORD
+	).SetString(PLUGIN_VERSION);
+
+	$0
+}
+]]></content>
+	<tabTrigger>_newplugin</tabTrigger>
+	<source>source.sp</source>
+</snippet>
