@@ -27,7 +27,7 @@ variables:
   pragmas: 'ctrlchar|dynamic|newdecls|rational|semicolon|tabsize|unused'
   pragma_derecated: 'deprecated'
   pragma_newdecls: 'required|optional'
-  end_of_line: '(?<!\\)(\\\\)*$\n'
+  end_of_line: '(?<!\\)(\\\\)*$(?=\n)'
 
 contexts:
   main:
@@ -109,7 +109,7 @@ contexts:
             - include: comments
             - include: strings
             - include: constants
-            - match: (?<!\\)(\\\\)*$
+            - match: '{{end_of_line}}'
               pop: true
         - match: '{{end_of_line}}'
           pop: true
@@ -125,7 +125,7 @@ contexts:
     - include: preprocessor-line-continuation
 
   preprocessor-line-continuation:
-    - match: '(?<!\\)(?:\\\\)*(\\)$\n'
+    - match: '(?<!\\)(?:\\\\)*(\\)$(?=\n)'
       captures:
         1: punctuation.separator.continuation.sp
     - match: \\([ \t]+?)$
@@ -137,7 +137,7 @@ contexts:
       scope: punctuation.definition.comment.begin.sp
       push:
         - meta_scope: comment.block.sp
-        - match: (?<!\\)(?:\\\\)*(\\)$\n
+        - match: (?<!\\)(?:\\\\)*(\\)$(?=\n)
           scope: punctuation.separator.continuation.sp
         - match: \*\/
           scope: punctuation.definition.comment.end.sp
@@ -146,7 +146,7 @@ contexts:
       scope: punctuation.definition.comment.sp
       push:
         - meta_scope: comment.line.double-slash.sp
-        - match: (?<!\\)(?:\\\\)*(\\)$\n
+        - match: (?<!\\)(?:\\\\)*(\\)$(?=\n)
           captures:
             1: punctuation.separator.continuation.sp
           pop: true
@@ -183,12 +183,12 @@ contexts:
         3: meta.preprocessor.sp
       push:
         - meta_scope: meta.preprocessor.sp
-        # - include: preprocessor-line-continuation
+        - include: preprocessor-line-continuation
         - include: comments
         - match: (\S+?)(?=$|\/\*|\/\/|\b|\s)
           captures:
             1: invalid.illegal.sp
-        - match: $
+        - match: '{{end_of_line}}'
           pop: true
 
 
@@ -309,43 +309,3 @@ contexts:
         2: invalid.deprecated.sp
         3: storage.type.sp
         4: entity.name.function.sp
-
-
-  #   # Strings begin and end with quotes, and use backslashes as an escape
-  #   # character
-  #   - match: '"'
-  #     scope: punctuation.definition.string.begin.example-c
-  #     push: double_quoted_string
-
-  #   # Comments begin with a '//' and finish at the end of the line
-  #   - match: '//'
-  #     scope: punctuation.definition.comment.example-c
-  #     push: line_comment
-
-  #   # Keywords are if, else for and while.
-  #   # Note that blackslashes don't need to be escaped within single quoted
-  #   # strings in YAML. When using single quoted strings, only single quotes
-  #   # need to be escaped: this is done by using two single quotes next to each
-  #   # other.
-  #   - match: '\b(if|else|for|while)\b'
-  #     scope: keyword.control.example-c
-
-  #   # Numbers
-  #   - match: '\b(-)?[0-9.]+\b'
-  #     scope: constant.numeric.example-c
-
-  # double_quoted_string:
-  #   - meta_scope: string.quoted.double.example-c
-  #   - match: '\\.'
-  #     scope: constant.character.escape.example-c
-  #   - match: '"'
-  #     scope: punctuation.definition.string.end.example-c
-  #     pop: true
-
-  # line_comment:
-  #   - meta_scope: comment.line.example-c
-  #   - match: $
-  #     pop: true
-
-
-
