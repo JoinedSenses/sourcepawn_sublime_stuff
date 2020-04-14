@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<plist version="1.0">
+<dict>
+	<key>scope</key>
+	<string>source.sp</string>
+	<key>settings</key>
+	<dict>
+		<key>cancelCompletion</key>
+		<!-- <string>(^.*\bconst\s*$)|^\s*(\}?\s*(else|try|do|#if|#ifdef|#else|#elif|#endif|#pragma\s+once)|(class|struct|union|enum|namespace)\s*[a-zA-Z_0-9]+*)$</string> -->
+		<string>^\s*(#if|#else|#elseif|#endif|#pragma)</string>
+	</dict>
+</dict>
+</plist>

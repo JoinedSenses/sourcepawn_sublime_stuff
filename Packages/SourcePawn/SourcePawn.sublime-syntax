@@ -1,0 +1,311 @@
+%YAML 1.2
+---
+# See http://www.sublimetext.com/docs/3/syntax.html
+file_extensions:
+  - sp
+  - inc
+scope: source.sp
+
+variables:
+  numerals_binary: '\b0b[01]+\b'
+  numerals_hex: '\b0x[0-9a-fA-F]{0,8}\b'
+  numerals_intfloat: '\b\d+(\.\d*)?(e-?\d*)?\b'
+  numerals: '{{numerals_binary}}|{{numerals_hex}}|{{numerals_intfloat}}'
+
+  identifier: '(?:[[:alpha:]_]\w*)'
+  deprecated_identifier: '\b{{identifier}}:'
+  casts: 'view_as'
+  modifier_decl: 'public[ \t]+native|stock|native|forward|static'
+  operator_method_name: '\boperator\s*[-+*/%^&|~!=<>]|[-+*/%^&|=!<>]=|<<=?|>>=?|&&|\|\||\+\+|--|,|->\*?|\(\)|\[\]'
+  control_keywords: 'break|case|continue|default|do|else|for|if|return|switch|while'
+  memory_operators: 'new|delete'
+  basic_types: 'any|bool|char|float|int|void'
+  before_tag: 'enum|enum\s+struct|methodmap|struct'
+  storage_classes: 'static|native|forward|public|stock|function'
+  type_qualifier: 'const'
+  directives: 'include|pragma|define|error|if|file|endif|endinput'
+  pragmas: 'ctrlchar|dynamic|newdecls|rational|semicolon|tabsize|unused'
+  pragma_derecated: 'deprecated'
+  pragma_newdecls: 'required|optional'
+
+contexts:
+  main:
+    - include: preprocessor-global
+    - include: global
+
+
+  preprocessor-global:
+    - include: preprocessor-rule-enabled-global
+
+  global:
+
+    - include: preprocessor-expressions
+    - include: constants
+    - include: typedef_set
+    - include: strings
+    - include: comments
+    - include: keywords
+    - include: types
+    - include: functions
+
+
+  keywords:
+    - match: \bbreak\b
+      scope: keyword.control.flow.break.sp
+    - match: \bcontinue\b
+      scope: keyword.control.flow.continue.sp
+    - match: \breturn\b
+      scope: keyword.control.flow.return.sp
+    - match: '{{control_keywords}}'
+      scope: keyword.control.sp
+    - match: '\b(?:sizeof|cellsof|tagof)\b'
+      scope: keyword.operator.word.c
+
+  expressions:
+    - include: early-expressions
+    - include: late-expressions
+
+  early-expressions:
+    - include: preprocessor-expressions
+    - include: comments
+    - include: parens
+
+  late-expressions:
+    - include: types
+
+  preprocessor-expressions:
+    - include: preprocessor-macro-define
+    - include: pragma
+    - include: preprocessor-other
+
+  preprocessor-macro-define:
+    - match: '^\s*(#)(\s*)(define)\b'
+      captures:
+        1: meta.preprocessor.sp
+        2: invalid.illegal.sp
+        3: meta.preprocessor.sp keyword.control.import.define.sp
+      push:
+        - meta_scope: meta.preprocessor.sp
+        - include: comments
+        - match: '[^[:alpha:]_\s]+'
+          scope: invalid.deprecated.sp
+        - match: '({{identifier}})(?=\()'
+          captures:
+            1: entity.name.function.preprocessor.c
+          set:
+            - match: '\('
+              scope: punctuation.section.group.begin.sp
+              set: preprocessor-macro-params
+            - match: $
+              pop: true
+
+
+        - match: '({{identifier}})'
+          captures:
+           1: entity.name.constant.sp
+          push:
+            - meta_scope: meta.preprocessor.sp
+            - include: comments
+            - include: strings
+            - include: constants
+            - match: (?<!\\)(\\\\)*$
+              pop: true
+        - match: (?<!\\)(\\\\)*$\n
+          pop: true
+
+  preprocessor-macro-params:
+    - meta_scope: meta.preprocessor.macro.parameters.sp meta.group.sp
+    - match: \)
+      scope: punctuation.section.group.end.sp
+      set: preprocessor-macro-definition
+
+  preprocessor-macro-definition:
+    - meta_content_scope: meta.preprocessor.macro.sp
+    - include: preprocessor-line-continuation
+
+  preprocessor-line-continuation:
+    - match: '(?<!\\)(?:\\\\)*(\\)$\n'
+      captures:
+        1: punctuation.separator.continuation.sp
+    - match: \\([ \t]+?)$
+      captures:
+        1: invalid.illegal.space-after-continuation.sp
+
+  # TODO: Finish
+  pragma:
+    - match: '^[ \t]*(#)(\s*)(pragma)\b'
+      captures:
+        1: meta.preprocessor.sp
+        2: invalid.illegal.sp
+        3: keyword.control.import.pragma
+
+  preprocessor-other:
+    - match: '^\s*(#)(\s*)((?:else)?if)\b'
+      captures:
+        1: meta.preprocessor.sp
+        2: invalid.illegal.sp
+        3: meta.preprocessor.sp
+      push:
+        - meta_scope: meta.preprocessor.sp
+        - match: \bdefined\b
+          scope: keyword.control.sp
+        - match: $
+          pop: true
+
+
+
+
+
+  # preprocessor-macro-params:
+
+  typedef_set:
+    - match: \btypedef\b
+      scope: keyword.declaration.function.sp
+      set:
+      - match: $\n
+        pop: true
+      - match: '(?:[ \t]+\b([^[:alpha:]_]+)?({{identifier}})(?:[ \t]*(=)(?:[ \t]*(function)(?:[ \t]+({{identifier}})[ \t]*)?)?)?)?'
+        captures:
+          1: invalid.illegal.sp
+          2: storage.type.function.sp
+          3: keyword.operator.assignment.sp
+          4: storage.modifier.sp
+          5: storage.type.sp
+      - include: parens
+
+
+
+  parens:
+    - match: \(
+      scope: punctuation.section.group.begin.sp
+      push:
+        - meta_scope: meta.group.sp
+        - match: \)
+          scope: punctuation.section.group.end.sp
+          pop: true
+        - include: expressions
+
+
+  types:
+    - match: '{{basic_types}}'
+      scope: storage.type.sp
+    - match: '{{identifier}}:[^:]'
+      scope: invalid.deprecated.sp
+
+
+  constants:
+    - match: '\b(true|false|null)\b'
+      captures:
+        1: constant.language.sp
+    - match: \b(__LINE__)\b
+      captures:
+        1: support.constant.sp
+    - match: '{{numerals}}'
+      scope: constant.numeric.sp
+    - match: '\b[A-Z_][A-Z_]+\b'
+      scope: variable.constant.sp
+
+  strings:
+    - match: (?<!\\)(\\\\)*\"
+      push:
+        - meta_scope: string.quoted.double.sp
+        - match: (?<!\\)(\\\\)*\"
+          pop: true
+        # - match: '{{constant_placeholder}}'
+        #   scope: constant.other.placeholder.sp
+        # - match: '{{constant_character_escape}}'
+        #   scope: constant.character.escape.sp
+    - match: (?<!\\)(\\\\)*\'
+      push:
+        - meta_scope: string.quoted.single.sp
+        - match: (?<!\\)(\\\\)*\'
+          pop: true
+        # - match: '{{constant_placeholder}}'
+        #   scope: constant.other.placeholder.sp
+        # - match: '{{constant_character_escape}}'
+        #   scope: constant.character.escape.sp
+
+  comments:
+    - match: (?=\/\*)
+      captures:
+        0: punctuation.definition.comment
+      push:
+        - meta_scope: comment.block
+        - match: (?<=\*/)
+          captures:
+            0: punctuation.definition.comment
+          pop: true
+        - match: (@(?:return|noreturn|note|section|endsection|error))
+          scope: keyword
+        - match: (@param)(?:\s+)([A-Za-z_@.][A-Za-z0-9_@.]*+|...)
+          captures:
+            1: keyword.operator
+            2: variable.parameter
+        - match: (@deprecated.*?)[ \t]*(\*\/|$)
+          captures:
+            1: invalid.deprecated
+            2: punctuation.definition.comment
+
+    - match: '\/\/'
+      scope: puncutation.definition.comment
+      push:
+        - meta_scope: comment
+        - match: (?<!\\)(\\\\)*$\n
+          pop: true
+        - match: \@(?:return|noreturn|note|section|endsection|error)
+          scope: keyword
+        - match: (@param)\s+([A-Za-z_@.][A-Za-z0-9_@.]*+|...)
+          captures:
+            1: keyword.operator
+            2: variable.parameter
+        - match: (@deprecated).*[ \t]*$
+          scope: invalid.deprecated
+
+  # should be near the end?
+  functions:
+    - match: '[ \t]*(?:({{modifier_decl}})[ \t]+)?(?:({{deprecated_identifier}})|({{identifier}}))(?<!{{control_keywords}})[ \t]+({{identifier}})[ \t]*(?=\()'
+      captures:
+        1: storage.modifier.sp
+        2: invalid.deprecated.sp
+        3: storage.type.sp
+        4: entity.name.function.sp
+
+
+  #   # Strings begin and end with quotes, and use backslashes as an escape
+  #   # character
+  #   - match: '"'
+  #     scope: punctuation.definition.string.begin.example-c
+  #     push: double_quoted_string
+
+  #   # Comments begin with a '//' and finish at the end of the line
+  #   - match: '//'
+  #     scope: punctuation.definition.comment.example-c
+  #     push: line_comment
+
+  #   # Keywords are if, else for and while.
+  #   # Note that blackslashes don't need to be escaped within single quoted
+  #   # strings in YAML. When using single quoted strings, only single quotes
+  #   # need to be escaped: this is done by using two single quotes next to each
+  #   # other.
+  #   - match: '\b(if|else|for|while)\b'
+  #     scope: keyword.control.example-c
+
+  #   # Numbers
+  #   - match: '\b(-)?[0-9.]+\b'
+  #     scope: constant.numeric.example-c
+
+  # double_quoted_string:
+  #   - meta_scope: string.quoted.double.example-c
+  #   - match: '\\.'
+  #     scope: constant.character.escape.example-c
+  #   - match: '"'
+  #     scope: punctuation.definition.string.end.example-c
+  #     pop: true
+
+  # line_comment:
+  #   - meta_scope: comment.line.example-c
+  #   - match: $
+  #     pop: true
+
+
+

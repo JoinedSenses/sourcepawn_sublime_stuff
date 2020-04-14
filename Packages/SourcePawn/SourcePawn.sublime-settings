@@ -1,0 +1,10 @@
+{
+	"extensions":
+	[
+		"sp",
+		"inc"
+	],
+
+    // "auto_complete": true,
+    // "auto_complete_selector": "source"
+}

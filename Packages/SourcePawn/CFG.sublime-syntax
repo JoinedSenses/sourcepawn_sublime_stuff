@@ -1,0 +1,45 @@
+%YAML 1.2
+---
+name: Config
+file_extensions: [cfg]
+scope: source.cfg
+
+contexts:
+  main:
+    - match: (?<!\\)\"
+      push:
+        - meta_scope: string
+        - match: (?<!\\)\"|\\\\"
+          pop: true
+
+    - match: (?<!\\)\'
+      push:
+        - meta_scope: string
+        - match: (?<!\\)\'|\\\\'
+          pop: true
+
+    - match: (?=\/\*)
+      captures:
+        0: punctuation.definition.comment
+      push:
+        - meta_scope: comment.block
+        - match: (?<=\*/)
+          captures:
+            0: punctuation.definition.comment
+          pop: true
+
+    - match: '\/\/'
+      scope: puncutation.definition.comment
+      push:
+        - meta_scope: comment
+        - match: $
+          pop: true
+
+    - match: \{
+      scope: punctuation.section.braces.begin
+    - match: \}
+      scope: punctuation.section.braces.end
+    - match: (?<!\.)(?:\s|^)(\d+\.?\d*)([^\d\s]+)?\s
+      captures:
+        1: constant.numeric
+        2: invalid.illegal

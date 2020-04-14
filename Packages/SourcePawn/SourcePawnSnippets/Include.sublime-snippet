@@ -21,6 +21,12 @@ public Extension __ext_$1 = {
 	required = 0,
 #endif
 \};
+
+#if !defined REQUIRE_EXTENSIONS
+public void __ext_$1_SetNTVOptional()
+	// MarkNativeAsOptional("");
+\}
+#endif
 }
 ${3:public SharedPlugin __pl_$1 = {
 	name = "$1",
@@ -31,12 +37,13 @@ ${3:public SharedPlugin __pl_$1 = {
 	required = 0,
 #endif
 \};
-}
+
 #if !defined REQUIRE_PLUGIN
 public void __pl_$1_SetNTVOptional() {
 	// MarkNativeAsOptional("");
-}
+\}
 #endif
+}
 ]]></content>
 	<tabTrigger>_include</tabTrigger>
 	<source>source.sp</source>

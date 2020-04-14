@@ -1,0 +1,7 @@
+{
+	"scope": "source.sp",
+	"completions":
+	[ 
+		{ "trigger": "view_as", "contents": "view_as<$1>($0)" }
+	]
+}

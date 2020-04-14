@@ -6,6 +6,6 @@ methodmap ${1:name} ${2:< Handle} {
 	}
 }
 ]]></content>
-	<tabTrigger>_methodmap</tabTrigger>
+	<tabTrigger>methodmap</tabTrigger>
 	<source>source.sp</source>
 </snippet>
