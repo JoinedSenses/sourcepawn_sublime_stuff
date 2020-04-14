@@ -27,6 +27,7 @@ variables:
   pragmas: 'ctrlchar|dynamic|newdecls|rational|semicolon|tabsize|unused'
   pragma_derecated: 'deprecated'
   pragma_newdecls: 'required|optional'
+  end_of_line: '(?<!\\)(\\\\)*$\n'
 
 contexts:
   main:
@@ -110,7 +111,7 @@ contexts:
             - include: constants
             - match: (?<!\\)(\\\\)*$
               pop: true
-        - match: (?<!\\)(\\\\)*$\n
+        - match: '{{end_of_line}}'
           pop: true
 
   preprocessor-macro-params:
@@ -131,6 +132,27 @@ contexts:
       captures:
         1: invalid.illegal.space-after-continuation.sp
 
+  preprocessor-comments:
+    - match: (?<!\\)(\\\\)*\/\*
+      scope: punctuation.definition.comment.begin.sp
+      push:
+        - meta_scope: comment.block.sp
+        - match: (?<!\\)(?:\\\\)*(\\)$\n
+          scope: punctuation.separator.continuation.sp
+        - match: \*\/
+          scope: punctuation.definition.comment.end.sp
+          pop: true
+    - match: \/\/
+      scope: punctuation.definition.comment.sp
+      push:
+        - meta_scope: comment.line.double-slash.sp
+        - match: (?<!\\)(?:\\\\)*(\\)$\n
+          captures:
+            1: punctuation.separator.continuation.sp
+          pop: true
+        - match: '{{end_of_line}}'
+          pop: true
+
   # TODO: Finish
   pragma:
     - match: '^[ \t]*(#)(\s*)(pragma)\b'
@@ -140,17 +162,35 @@ contexts:
         3: keyword.control.import.pragma
 
   preprocessor-other:
-    - match: '^\s*(#)(\s*)((?:else)?if)\b'
+    - match: '^[ \t]*(#)(\s*)((?:else)?if)\b'
       captures:
         1: meta.preprocessor.sp
         2: invalid.illegal.sp
         3: meta.preprocessor.sp
       push:
         - meta_scope: meta.preprocessor.sp
+        - include: preprocessor-line-continuation
+        - include: preprocessor-comments
         - match: \bdefined\b
           scope: keyword.control.sp
+        - match: '{{end_of_line}}'
+          pop: true
+
+    - match: '^[ \t]*(#)(\s*)(endif|endinput)\b'
+      captures:
+        1: meta.preprocessor.sp
+        2: invalid.illegal.sp
+        3: meta.preprocessor.sp
+      push:
+        - meta_scope: meta.preprocessor.sp
+        # - include: preprocessor-line-continuation
+        - include: comments
+        - match: (\S+?)(?=$|\/\*|\/\/|\b|\s)
+          captures:
+            1: invalid.illegal.sp
         - match: $
           pop: true
+
 
 
 
@@ -161,13 +201,13 @@ contexts:
   typedef_set:
     - match: \btypedef\b
       scope: keyword.declaration.function.sp
-      set:
+      push:
       - match: $\n
         pop: true
       - match: '(?:[ \t]+\b([^[:alpha:]_]+)?({{identifier}})(?:[ \t]*(=)(?:[ \t]*(function)(?:[ \t]+({{identifier}})[ \t]*)?)?)?)?'
         captures:
           1: invalid.illegal.sp
-          2: storage.type.function.sp
+          2: entity.name.type
           3: keyword.operator.assignment.sp
           4: storage.modifier.sp
           5: storage.type.sp
@@ -187,7 +227,7 @@ contexts:
 
 
   types:
-    - match: '{{basic_types}}'
+    - match: '\b({{basic_types}})\b'
       scope: storage.type.sp
     - match: '{{identifier}}:[^:]'
       scope: invalid.deprecated.sp
@@ -226,14 +266,14 @@ contexts:
         #   scope: constant.character.escape.sp
 
   comments:
-    - match: (?=\/\*)
+    - match: (?<!\\)(\\\\)*\/\*
       captures:
-        0: punctuation.definition.comment
+        0: punctuation.definition.comment.begin.sp
       push:
-        - meta_scope: comment.block
-        - match: (?<=\*/)
+        - meta_scope: comment.block.sp
+        - match: \*\/
           captures:
-            0: punctuation.definition.comment
+            0: punctuation.definition.comment.end.sp
           pop: true
         - match: (@(?:return|noreturn|note|section|endsection|error))
           scope: keyword
@@ -250,7 +290,7 @@ contexts:
       scope: puncutation.definition.comment
       push:
         - meta_scope: comment
-        - match: (?<!\\)(\\\\)*$\n
+        - match: '{{end_of_line}}'
           pop: true
         - match: \@(?:return|noreturn|note|section|endsection|error)
           scope: keyword
