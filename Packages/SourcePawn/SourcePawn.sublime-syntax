@@ -57,7 +57,7 @@ contexts:
       scope: keyword.control.flow.continue.sp
     - match: \breturn\b
       scope: keyword.control.flow.return.sp
-    - match: '{{control_keywords}}'
+    - match: '\b({{control_keywords}})\b'
       scope: keyword.control.sp
     - match: '\b(?:sizeof|cellsof|tagof)\b'
       scope: keyword.operator.word.c
@@ -229,6 +229,8 @@ contexts:
   types:
     - match: '\b({{basic_types}})\b'
       scope: storage.type.sp
+    - match: '\bHandle\b'
+      scope: storage.type.sp
     - match: '{{identifier}}:[^:]'
       scope: invalid.deprecated.sp
 
@@ -303,7 +305,7 @@ contexts:
 
   # should be near the end?
   functions:
-    - match: '[ \t]*(?:({{modifier_decl}})[ \t]+)?(?:({{deprecated_identifier}})|({{identifier}}))(?<!{{control_keywords}})[ \t]+({{identifier}})[ \t]*(?=\()'
+    - match: '^[ \t]*(?:({{modifier_decl}})[ \t]+)?(?:({{deprecated_identifier}})|({{identifier}}))(?<!{{control_keywords}}|public)[ \t]+({{identifier}})[ \t]*(?=\()'
       captures:
         1: storage.modifier.sp
         2: invalid.deprecated.sp
