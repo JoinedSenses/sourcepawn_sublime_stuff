@@ -95,15 +95,15 @@ contexts:
     - match: '^\s*(?:#(\s*)(define))\b\s*?'
       captures:
         1: invalid.illegal.sp
-        2: keyword.control.import.define.sp
+        2: keyword.control.define.sp
       push:
-        - meta_scope: meta.preprocessor.sp
+        - meta_scope: meta.preprocessor.define.sp
         - include: preprocessor-line-continuation
         - include: preprocessor-comments
         - match: '{{end_of_line}}'
           pop: true
 
-        - match: '(([^[:alpha:]_\(\s])?\S+)(?=\()'
+        - match: '(([^[:alpha:]_\(\s])?\S+?)(?=\()'
           captures:
             1: entity.name.function.sp
             2: invalid.illegal.sp
@@ -132,11 +132,12 @@ contexts:
 
   preprocessor-macro-params:
     - meta_scope: meta.preprocessor.macro.parameters.sp meta.group.sp
-    - match: '{{identifier}}'
-      scope: variable.parameter.c
+    - match: '%\d+'
+      scope: variable.parameter.sp
     - match: \)
       scope: punctuation.section.group.end.sp
       set: preprocessor-macro-definition
+
 
   preprocessor-macro-definition:
     - meta_content_scope: meta.preprocessor.macro.sp
@@ -170,60 +171,70 @@ contexts:
         - match: '{{end_of_line}}'
           pop: true
 
-  # TODO: Finish
-  # newdecls|rational|unused
   pragma:
     - match: '^[ \t]*(#)(\s*)(pragma)\b'
       captures:
         1: meta.preprocessor.sp
         2: invalid.illegal.sp
-        3: keyword.control.import.pragma.sp
+        3: keyword.control.pragma.sp
       push:
         - meta_scope: meta.preprocessor.pragma.sp
-        - include: comments
+        - include: preprocessor-line-continuation
+        - include: preprocessor-comments
+
         - match: '{{end_of_line}}'
           pop: true
+
         - match: '(dynamic|semicolon|tabsize)([ \t]+\d*)?'
           captures:
             1: keyword.control.sp
             2: constant.numeric.integer.sp
-          push: preprocessor_eol
-        - match: 'ctrlchar'
-          scope: keyword.control.sp
-          push: preprocessor_eol
-        - match: 'unused'
-          scope: keyword.control.sp
-          push:
-            - match: '{{end_of_line}}'
-              pop: true
-            - include: preprocessor-line-continuation
-            - include: preprocessor-comments
-            - match: '{{identifier}}'
-              scope: variable.other.sp
-              push: preprocessor_eol
+          set: preprocessor_eol
+
+        - match: (ctrlchar)([ \t]+(\')(?:([^\\'])|({{const_char_escape}}))?('))?
+          captures:
+            1: keyword.control.sp
+            2: constant.character.escape.sp
+            3: punctuation.definition.string.begin.sp
+            4: constant.character.sp
+            5: constant.character.escape.sp
+            6: punctuation.definition.string.end.sp
+          set: preprocessor_eol
+
+        - match: '(unused)([ \t]+{{identifier}})?'
+          captures:
+            1: keyword.control.sp
+            2: variable.other.sp
+          set: preprocessor_eol
+
         - match: 'rational'
           scope: keyword.control.sp
-          push: preprocessor_eol
-        - match: '(newdecls([ \t]+(?:required|optional))?)'
+          set: preprocessor_eol
+
+        - match: '(newdecls(?:[ \t]+(?:required|optional)\b(?:$|[^\S]))?)'
           scope: keyword.control.sp
-          push: preprocessor_eol
-        - match: \S+
-          push: preprocessor_eol
+          set: preprocessor_eol
+
+        - match: 'deprecated'
+          scope: keyword.control.sp invalid.deprecated.sp
+          set:
+          - meta_content_scope: meta.preprocessor.pragma.deprecated.sp
+          - match: '{{end_of_line}}'
+            pop: true
+
+        - match: \S
+          push:
+          - clear_scopes: true
+          - match: '{{end_of_line}}'
+            pop: true
 
 
   preprocessor_eol:
-    - clear_scopes: 1
     - match: '{{end_of_line}}'
       pop: true
     - include: preprocessor-line-continuation
     - include: preprocessor-comments
-    # - match: .*?
-    #   set:
-    #     - meta_scope: meta.sp
-    #     - match: '{{end_of_line}}'
-    #       pop: true
 
-    # - match: 'deprecated'
 
   preprocessor-other:
     - match: '^[ \t]*(#(\s*)((?:else)?if))\b'
@@ -232,7 +243,7 @@ contexts:
         2: invalid.illegal.sp
         3: keyword.control.import.if.sp
       push:
-        - meta_scope: meta.preprocessor.sp
+        - meta_scope: meta.preprocessor.conditional.sp
         - include: preprocessor-line-continuation
         - include: preprocessor-comments
         - match: \bdefined\b
@@ -264,13 +275,12 @@ contexts:
         - match: '{{end_of_line}}'
           pop: true
 
-    - match: '^[ \t]*(#(\s*)(endif|endinput|else))\b'
+    - match: '^[ \t]*(?:#(\s*)(endif|endinput|else))\b'
       captures:
-        1: meta.preprocessor.sp
-        2: invalid.illegal.sp
-        3: keyword.control.import.if.sp
+        1: invalid.illegal.sp
+        2: keyword.control.import.if.sp
       push:
-        - meta_scope: meta.preprocessor.sp
+        - meta_scope: meta.preprocessor.conditional.sp
         - include: preprocessor-line-continuation
         - include: comments
         - match: (\S+?)(?=$|\/\*|\/\/|\b|\s)
@@ -291,8 +301,6 @@ contexts:
         - include: strings
         - match: '{{end_of_line}}'
           pop: true
-
-    # - match:
 
     - match: '^[ \t]*(#(\s*)((?:try)?include))\b'
       captures:
@@ -327,7 +335,7 @@ contexts:
               pop: true
 
         - match: \S+
-          push: preprocessor_eol
+          set: preprocessor_eol
 
 
     - match: '^[ \t]*(#)'
@@ -407,28 +415,23 @@ contexts:
             1: constant.character.escape.sp
             2: invalid.illegal.sp
 
-        # - match: '{{constant_placeholder}}'
-        #   scope: constant.other.placeholder.sp
-        # - match: '{{constant_character_escape}}'
-        #   scope: constant.character.escape.sp
-
   const_char:
-    - match: (?<!\\)(?:\\\\)*\K(\')(?:([^\\'])|({{const_char_escape}}))(')
+    - match: (?<!\\)(?:\\\\)*\K(\')(?:([^\\'])|({{const_char_escape}}))?(')
       captures:
         1: punctuation.definition.string.begin.sp
         2: constant.character.sp
         3: constant.character.escape.sp
         4: punctuation.definition.string.end.sp
 
-    - match: (?<!\\)(?:\\{2})*\K\'
-      scope: punctuation.definition.string.begin.sp
+    - match: (?<!\\)(?:\\{2})*\K(\')([^']+|')?
+      captures:
+        1: punctuation.definition.string.begin.sp
+        2: invalid.illegal.sp
       set:
         - meta_scope: string.quoted.single.sp
         - match: (?<!\\)(?:\\{2})*\K\'
           scope: punctuation.definition.string.end.sp
           pop: true
-        - match: (?:[^']+?|')
-          scope: invalid.illegal.sp
 
 
   comments:
