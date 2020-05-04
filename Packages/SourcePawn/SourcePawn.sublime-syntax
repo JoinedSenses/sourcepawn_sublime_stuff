@@ -341,7 +341,7 @@ contexts:
               scope: punctuation.definition.string.end.sp
               pop: true
 
-        - match: \S+
+        - match: (?=\S)
           set: preprocessor_eol
 
 
@@ -357,14 +357,14 @@ contexts:
 
   typedef:
     - match: \btypedef\b
-      scope: keyword.declaration.function.sp
-      push:
+      scope: keyword.declaration.sp
+      set:
       - include: comments
       - match: '(?=[^[:alpha:]_\s])'
         pop: true
-      - match: '\s+({{identifier}})\s*'
+      - match: '\b({{identifier}})\b\s*'
         scope: entity.name.type.typedef.sp
-        push:
+        set:
           - include: comments
           - match: '\s*=\s*'
             scope: keyword.operator.assignment
@@ -380,7 +380,7 @@ contexts:
 
   typedef_function:
     - include: comments
-    - match: 'function'
+    - match: '\bfunction\b'
       scope: storage.modifier.sp
       push:
         - include: comments
@@ -404,7 +404,13 @@ contexts:
 
   function-params:
     - meta_content_scope: meta.function.parameters.sp meta.group.sp
-    - match: (const\s+)?({{identifier}})\s*(?:(?:(?:(\[)(?:\s*|(.*?))(\]))|(\s*&))\s*)?({{identifier}})
+    - match: '\bconst\b'
+      scope: storage.modifier.sp
+
+    - match: ','
+      scope: punctuation.separator.sp
+
+    - match: (const\s+)?({{identifier}})\s*(?:(?:(?:(\[)(?:\s*|(.*?))(\]))|(\s*&))\s*)?({{identifier}})?
       captures:
         1: storage.modifier.sp
         2: storage.type.sp
@@ -424,6 +430,23 @@ contexts:
           escape: \]
           escape_captures:
             0: punctuation.section.brackets.end.sp
+        - match: '='
+          scope: keyword.operator.assignment.sp
+          embed: expressions
+          escape: '(?=,)'
+        - match: '[^,\s]+'
+          scope: invalid.illegal.sp
+
+    - match: '\S'
+      scope: invalid.illegal.sp
+      push:
+        - meta_content_scope: invalid.illegal.sp
+        - match: '(?=,)'
+          pop: true
+
+
+
+
 
   brackets:
     - match: \[
