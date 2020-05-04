@@ -1,6 +1,7 @@
 %YAML 1.2
 ---
 # See http://www.sublimetext.com/docs/3/syntax.html
+name: SourcePawn
 file_extensions:
   - sp
   - inc
@@ -23,8 +24,8 @@ variables:
   before_tag: 'enum|enum\s+struct|methodmap|struct'
   storage_classes: 'static|native|forward|public|stock|function'
   type_qualifier: 'const'
-  directives: 'include|pragma|define|error|if|file|endif|endinput'
-  pragmas: 'ctrlchar|dynamic|newdecls|rational|semicolon|tabsize|unused'
+  # directives: 'include|pragma|define|error|if|file|endif|endinput'
+  # pragmas: 'ctrlchar|dynamic|newdecls|rational|semicolon|tabsize|unused'
   pragma_derecated: 'deprecated'
   pragma_newdecls: 'required|optional'
   end_of_line: '(?<!\\)(\\\\)*$(?=\n)'
@@ -33,34 +34,18 @@ variables:
 
 contexts:
   main:
-    - include: preprocessor-global
     - include: global
 
-
-
-  preprocessor-global:
-    - include: preprocessor-rule-enabled-global
-
   global:
-
-    - include: preprocessor-expressions
-    - include: constants
-    - include: typedef_set
-    - include: strings
-    - include: comments
-    - include: keywords
-    - include: types
-    - include: functions
-  #   - include: paren_test
-
-  # paren_test:
-  #   - match: \(
-  #     push:
-  #       - meta_scope: meta.group.sp
-  #       - include: paren_test
-  #       - match: \)
-  #         pop: true
-
+    - include: early-expressions
+    # - include: preprocessor-expressions
+    # - include: constants
+    # - include: typedef_set
+    # - include: strings
+    # - include: comments
+    # - include: keywords
+    # - include: types
+    # - include: functions
 
   keywords:
     - match: \bbreak\b
@@ -76,26 +61,28 @@ contexts:
 
   expressions:
     - include: early-expressions
-    - include: late-expressions
+    # - include: late-expressions
 
   early-expressions:
     - include: preprocessor-expressions
     - include: comments
-    - include: parens
+    - include: case-default
+    - include: typedef
+    # - include: parens
 
-  late-expressions:
-    - include: types
+  # late-expressions:
+  #   - include: types
 
   preprocessor-expressions:
     - include: preprocessor-macro-define
-    - include: pragma
+    - include: preprocessor-pragma
     - include: preprocessor-other
 
   preprocessor-macro-define:
     - match: '^\s*(?:#(\s*)(define))\b\s*?'
       captures:
         1: invalid.illegal.sp
-        2: keyword.control.define.sp
+        2: keyword.control.define.spf
       push:
         - meta_scope: meta.preprocessor.define.sp
         - include: preprocessor-line-continuation
@@ -132,11 +119,25 @@ contexts:
 
   preprocessor-macro-params:
     - meta_scope: meta.preprocessor.macro.parameters.sp meta.group.sp
+    - include: preprocessor-comments
+    - include: preprocessor-line-continuation
     - match: '%\d+'
       scope: variable.parameter.sp
     - match: \)
       scope: punctuation.section.group.end.sp
       set: preprocessor-macro-definition
+    - match: ','
+      scope: punctuation.separator.sp
+      push:
+      - include: preprocessor-comments
+      - include: preprocessor-line-continuation
+      - match: '%\d+'
+        scope: variable.parameter.sp
+        pop: true
+      - match: '(?=\))'
+        pop: true
+      - match: '\S+'
+        scope: invalid.illegal.unexpected-character.sp
 
 
   preprocessor-macro-definition:
@@ -145,6 +146,11 @@ contexts:
     - include: preprocessor-comments
     - match: '{{end_of_line}}'
       pop: true
+    - match: '\{'
+      scope: punctuation.section.block.begin.sp
+    - match: '\}'
+      scope: punctuation.section.block.end.sp
+    - include: expressions
 
   preprocessor-line-continuation:
     - match: '(?<!\\)(?:\\\\)*\K(\\)$(?=\n)'
@@ -171,7 +177,7 @@ contexts:
         - match: '{{end_of_line}}'
           pop: true
 
-  pragma:
+  preprocessor-pragma:
     - match: '^[ \t]*(#)(\s*)(pragma)\b'
       captures:
         1: meta.preprocessor.sp
@@ -254,6 +260,7 @@ contexts:
               pop: true
         - match: '{{end_of_line}}'
           pop: true
+
     - match: '^[ \t]*(#(\s*)(undef))\b'
       captures:
         1: meta.preprocessor.sp
@@ -348,22 +355,90 @@ contexts:
         - include: preprocessor-line-continuation
         - include: preprocessor-comments
 
-  typedef_set:
+  typedef:
     - match: \btypedef\b
       scope: keyword.declaration.function.sp
       push:
-      - match: $(?=\n)
+      - include: comments
+      - match: '(?=[^[:alpha:]_\s])'
         pop: true
-      - match: '(?:[ \t]+\b([^[:alpha:]_]+)?({{identifier}})(?:[ \t]*(=)(?:[ \t]*(function)(?:[ \t]+({{identifier}})[ \t]*)?)?)?)?'
-        captures:
-          1: invalid.illegal.sp
-          2: entity.name.type
-          3: keyword.operator.assignment.sp
-          4: storage.modifier.sp
-          5: storage.type.sp
-      - include: parens
+      - match: '\s+({{identifier}})\s*'
+        scope: entity.name.type.typedef.sp
+        push:
+          - include: comments
+          - match: '\s*=\s*'
+            scope: keyword.operator.assignment
+            set: typedef_function
+          - match: '(?=\S)'
+            pop: true
+      - match: '(?=\S)'
+        pop: true
 
+      # pop: true
+      # - match: '{{end_of_line}}'
+      #   pop: true
 
+  typedef_function:
+    - include: comments
+    - match: 'function'
+      scope: storage.modifier.sp
+      push:
+        - include: comments
+        - match: '({{identifier}})\s*(?=\(|$)'
+          scope: storage.type.sp
+          push: typedef-definition-params
+        - match: '(?=\S)'
+          pop: true
+    - match: '(?=\S)'
+      pop: true
+
+  typedef-definition-params:
+    - match: \(
+      scope: meta.function.parameters.sp meta.group.sp punctuation.section.group.begin.sp
+      embed: function-params
+      escape : \)
+      escape_captures:
+        0: punctuation.section.group.end.sp
+    - match: '(?=\S)'
+      pop: true
+
+  function-params:
+    - meta_content_scope: meta.function.parameters.sp meta.group.sp
+    - match: (const\s+)?({{identifier}})\s*(?:(?:(?:(\[)(?:\s*|(.*?))(\]))|(\s*&))\s*)?({{identifier}})
+      captures:
+        1: storage.modifier.sp
+        2: storage.type.sp
+        3: punctuation.section.brackets.begin.sp
+        4: invalid.illegal.sp
+        5: punctuation.section.brackets.end.sp
+        6: keyword.operator.reference.sp
+        7: variable.parameter.sp
+      push:
+        - include: comments
+        - match: ','
+          scope: punctuation.separator.sp
+          pop: true
+        - match: '\['
+          scope: punctuation.section.brackets.begin.sp
+          embed: bracket-contents
+          escape: \]
+          escape_captures:
+            0: punctuation.section.brackets.end.sp
+
+  brackets:
+    - match: \[
+      scope: punctuation.section.brackets.begin.c++
+      push:
+        - meta_scope: meta.brackets.c++
+        - match: \]
+          scope: punctuation.section.brackets.end.c++
+          pop: true
+        - include: expressions
+
+  bracket-contents:
+    - meta_content_scope: meta.brackets.sp
+    - match: '{{numerals}}'
+      scope: constant.numeric.sp
 
   parens:
     - match: \(
@@ -372,6 +447,30 @@ contexts:
         - meta_scope: meta.group.sp
         - match: \)
           scope: punctuation.section.group.end.sp
+          pop: true
+        - include: expressions
+
+
+
+  case-default:
+    - match: '\bdefault\b'
+      scope: keyword.control.sp
+      push:
+        - match: ':'
+          scope: punctuation.separator.sp
+          pop: true
+        - match: '.*?[^:\s]+(?=(?:$))|.*?[^:\s]+(?=(?::))'
+          scope: invalid.illegal.sp
+          push:
+            - match: '(?=:)'
+              scope: punctuation.separator.sp
+              pop: true
+
+    - match: '\bcase\b'
+      scope: keyword.control.sp
+      push:
+        - match: ':'
+          scope: punctuation.separator.sp
           pop: true
         - include: expressions
 
