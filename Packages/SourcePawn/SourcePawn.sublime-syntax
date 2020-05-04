@@ -14,20 +14,20 @@ variables:
   numerals: '{{numerals_binary}}|{{numerals_hex}}|{{numerals_intfloat}}'
 
   identifier: '(?:[[:alpha:]_]\w*)'
-  deprecated_identifier: '\b{{identifier}}:'
-  casts: 'view_as'
+  # deprecated_identifier: '\b{{identifier}}:'
+  # casts: 'view_as'
   modifier_decl: 'public[ \t]+native|stock|native|forward|static'
-  operator_method_name: '\boperator\s*[-+*/%^&|~!=<>]|[-+*/%^&|=!<>]=|<<=?|>>=?|&&|\|\||\+\+|--|,|->\*?|\(\)|\[\]'
+  # operator_method_name: '\boperator\s*[-+*/%^&|~!=<>]|[-+*/%^&|=!<>]=|<<=?|>>=?|&&|\|\||\+\+|--|,|->\*?|\(\)|\[\]'
   control_keywords: 'break|case|continue|default|do|else|for|if|return|switch|while'
-  memory_operators: 'new|delete'
+  # memory_operators: 'new|delete'
   basic_types: 'any|bool|char|float|int|void'
-  before_tag: 'enum|enum\s+struct|methodmap|struct'
-  storage_classes: 'static|native|forward|public|stock|function'
-  type_qualifier: 'const'
+  # before_tag: 'enum|enum\s+struct|methodmap|struct'
+  # storage_classes: 'static|native|forward|public|stock|function'
+  # type_qualifier: 'const'
   # directives: 'include|pragma|define|error|if|file|endif|endinput'
   # pragmas: 'ctrlchar|dynamic|newdecls|rational|semicolon|tabsize|unused'
-  pragma_derecated: 'deprecated'
-  pragma_newdecls: 'required|optional'
+  # pragma_derecated: 'deprecated'
+  # pragma_newdecls: 'required|optional'
   end_of_line: '(?<!\\)(\\\\)*$(?=\n)'
   str_format_char: '%[!\-\d\.]*[%bcdfiLNstTuxX]?'
   const_char_escape: \\(?:[abefnrt'"%\\]|(?:x[a-zA-Z0-9]{0,2}|\d+);?)
@@ -207,7 +207,7 @@ contexts:
             6: punctuation.definition.string.end.sp
           set: preprocessor_eol
 
-        - match: '(unused)([ \t]+{{identifier}})?'
+        - match: '(unused)([ \t]+{{identifier}}\b)?'
           captures:
             1: keyword.control.sp
             2: variable.other.sp
@@ -255,7 +255,7 @@ contexts:
         - match: \bdefined\b
           scope: keyword.control.import.define.sp
           push:
-            - match: '{{identifier}}'
+            - match: '\b{{identifier}}\b'
               scope: variable.other.constant.sp
               pop: true
         - match: '{{end_of_line}}'
@@ -270,7 +270,7 @@ contexts:
         - meta_scope: meta.preprocessor.sp
         - include: preprocessor-line-continuation
         - include: preprocessor-comments
-        - match: '{{identifier}}'
+        - match: '\b{{identifier}}\b'
           scope: variable.other.constant.sp
           push:
             - include: preprocessor-line-continuation
@@ -475,13 +475,13 @@ contexts:
         - include: expressions
 
 
-  types:
-    - match: '\b({{basic_types}})\b'
-      scope: support.type.sp
-    - match: '\bHandle\b'
-      scope: storage.type.enum.sp
-    - match: '{{identifier}}:[^:]'
-      scope: invalid.deprecated.sp
+  # types:
+  #   - match: '\b({{basic_types}})\b'
+  #     scope: support.type.sp
+  #   - match: '\bHandle\b'
+  #     scope: storage.type.enum.sp
+    # - match: '{{identifier}}:[^:]'
+    #   scope: invalid.deprecated.sp
 
 
   # https://github.com/alliedmodders/sourcepawn/blob/d919ffc892fb2c908990bd2307e79893bde220a9/compiler/parser.cpp#L1005
@@ -572,10 +572,10 @@ contexts:
           scope: invalid.deprecated
 
   # should be near the end?
-  functions:
-    - match: '^[ \t]*(?:({{modifier_decl}})[ \t]+)?(?:({{deprecated_identifier}})|({{identifier}}))(?<!{{control_keywords}}|public)[ \t]+({{identifier}})[ \t]*(?=\()'
-      captures:
-        1: storage.modifier.sp
-        2: invalid.deprecated.sp
-        3: storage.type.sp
-        4: entity.name.function.sp
+  # functions:
+  #   - match: '^[ \t]*(?:({{modifier_decl}})[ \t]+)?(?:({{deprecated_identifier}})|({{identifier}}))(?<!{{control_keywords}}|public)[ \t]+({{identifier}})[ \t]*(?=\()'
+  #     captures:
+  #       1: storage.modifier.sp
+  #       2: invalid.deprecated.sp
+  #       3: storage.type.sp
+  #       4: entity.name.function.sp
