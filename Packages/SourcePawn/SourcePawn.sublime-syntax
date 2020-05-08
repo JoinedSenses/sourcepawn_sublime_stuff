@@ -65,9 +65,10 @@ contexts:
 
   early-expressions:
     - include: preprocessor-expressions
-    - include: comments
+    - include: comments_documentation
     - include: case-default
     - include: typedef
+    - include: typeset
     # - include: parens
 
   # late-expressions:
@@ -347,7 +348,6 @@ contexts:
       captures:
         1: meta.preprocessor.sp
       push:
-        # - meta_scope: meta.sp
         - match: '{{end_of_line}}'
           pop: true
         - include: preprocessor-line-continuation
@@ -355,18 +355,6 @@ contexts:
 
 
   typedef:
-    # - match: '\btypedef\b'
-    #   scope: keyword.declaration.sp
-    #   set:
-    #     - match: '\b({{identifier}})\s*(=)'
-    #       captures:
-    #         1: entity.name.type.sp
-    #         2: keyword.operator.assignment.sp
-    #       set: typedef_function
-
-    #     - match: (?=\S)
-    #       pop: true
-
     - match: \b(typedef)\b
       scope: keyword.declaration.sp
       branch_point: typedef_begin
@@ -374,22 +362,13 @@ contexts:
         - typedef_type
         - typedef_end
 
-    - match: \b(typeset)\b
-      scope: keyword.declaration.sp
-      branch_point: typeset_begin
-      branch:
-        - typeset_type
-        - typedef_end
-
   typedef_type:
     - include: comments
-    - include: preprocessor-line-continuation
 
     - match: '\b({{identifier}})\b'
       scope: entity.name.type.sp
       push:
         - include: comments
-        - include: preprocessor-line-continuation
 
         - match: '='
           scope: keyword.operator.assignment.sp
@@ -402,34 +381,9 @@ contexts:
     - match: '(?=\S)'
       pop: true
 
-  typeset_type:
-    - include: comments
-    - include: preprocessor-line-continuation
-
-    - match: '\b({{identifier}})\b'
-      scope: entity.name.type.sp
-      push:
-        - include: comments
-        - include: preprocessor-line-continuation
-        - match: \{
-          scope: punctuation.section.block.begin.sp
-          set:
-            - meta_scope: meta.block.sp
-            - match: \}
-              scope: punctuation.section.block.end.sp
-              pop: 2
-
-            - include: typeset_function
-
-        - match: (?=\S)
-          fail: typeset_begin
-
-    - match: (?=\S)
-      pop: true
-
   typedef_function:
     - include: comments
-    - include: preprocessor-line-continuation
+
     - match: '\bfunction\b'
       scope: storage.modifier.sp
       branch_point: typedef_function_begin
@@ -442,13 +396,11 @@ contexts:
 
   typedef_function_type:
     - include: comments
-    - include: preprocessor-line-continuation
 
     - match: '\b({{identifier}})\b'
       scope: storage.type.sp
       push:
         - include: comments
-        - include: preprocessor-line-continuation
 
         - match: \(
           scope: meta.function.parameters.sp punctuation.section.group.begin.sp
@@ -462,27 +414,68 @@ contexts:
         - match: (?=\S)
           fail: typedef_function_begin
 
+  typeset:
+    - match: \b(typeset)\b
+      scope: keyword.declaration.sp
+      branch_point: typeset_begin
+      branch:
+        - typeset_type
+        - typedef_end
+
+  typeset_end:
+    - match: '(?=\S)'
+      pop: true
+
+  typeset_type:
+    - include: comments
+
+    - match: '\b(?:{{identifier}})\b'
+      scope: entity.name.type.sp
+      push:
+        - include: comments
+        - match: \{
+          scope: punctuation.section.block.begin.sp
+          set:
+            - meta_scope: meta.block.typeset.sp
+            - match: \}
+              scope: punctuation.section.block.end.sp
+              pop: 2
+
+            - include: comments_documentation
+            - include: typeset_function
+
+        - match: (?=\S)
+          fail: typeset_begin
+
   typeset_function:
     - include: comments
-    - include: preprocessor-line-continuation
 
     - match: '\bfunction\b'
       scope: storage.modifier.sp
+      branch_point: typeset_function_begin
+      branch:
+        - typeset_function_type
+        - typeset_end
+
+  typeset_function_type:
+    - include: comments
+
+    - match: '\b(?:{{identifier}})\b'
+      scope: storage.type.sp
       push:
         - include: comments
-        - include: preprocessor-line-continuation
-        - match: '\b({{identifier}})\s*(\()'
-          captures:
-            1: storage.type.sp
-            2: meta.function.parameters.sp punctuation.section.group.begin.sp
-          push:
+
+        - match: \(
+          scope: meta.function.parameters.sp punctuation.section.group.begin.sp
+          set:
             - match: \)
               scope: punctuation.section.group.end.sp
-              pop: true
+              pop: 2
+
             - include: function-params
 
         - match: (?=\S)
-          pop: true
+          fail: typeset_function_begin
 
   function-params:
     - include: comments
@@ -589,8 +582,8 @@ contexts:
   #     scope: support.type.sp
   #   - match: '\bHandle\b'
   #     scope: storage.type.enum.sp
-    # - match: '{{identifier}}:[^:]'
-    #   scope: invalid.deprecated.sp
+  #   - match: '{{identifier}}:[^:]'
+  #     scope: invalid.deprecated.sp
 
 
   # https://github.com/alliedmodders/sourcepawn/blob/d919ffc892fb2c908990bd2307e79893bde220a9/compiler/parser.cpp#L1005
@@ -641,7 +634,6 @@ contexts:
           scope: punctuation.definition.string.end.sp
           pop: true
 
-
   comments:
     - match: (?<!\\)(\\\\)*\K\/\*
       captures:
@@ -649,36 +641,56 @@ contexts:
       push:
         - meta_scope: comment.block.sp
         - match: \*\/
-          captures:
-            0: punctuation.definition.comment.end.sp
+          scope: punctuation.definition.comment.end.sp
           pop: true
-        - match: (@(?:return|noreturn|note|section|endsection|error))
-          scope: keyword
-        - match: (@param)(?:\s+)([A-Za-z_@.][A-Za-z0-9_@.]*+|...)
-          captures:
-            1: keyword.operator
-            2: variable.parameter
-        - match: (@deprecated.*?)[ \t]*(\*\/|$)
-          captures:
-            1: invalid.deprecated
-            2: punctuation.definition.comment
+        - include: comment_keywords
 
     - match: '\/\/'
       scope: puncutation.definition.comment
       push:
-        - meta_scope: comment
-        - match: (?<!\\)(?:\\\\)*\K(\\)$(?=\n)
-          scope: punctuation.separator.continuation.sp
+        - meta_scope: comment.line.sp
         - match: '{{end_of_line}}'
           pop: true
-        - match: \@(?:return|noreturn|note|section|endsection|error)
-          scope: keyword
-        - match: (@param)\s+([A-Za-z_@.][A-Za-z0-9_@.]*+|...)
-          captures:
-            1: keyword.operator
-            2: variable.parameter
-        - match: (@deprecated).*[ \t]*$
-          scope: invalid.deprecated
+        - match: (?<!\\)(?:\\\\)*\K(\\)$(?=\n)
+          scope: punctuation.separator.continuation.sp
+        - include: comment_keywords
+
+  comments_documentation:
+    - match: '\/\/'
+      scope: comment.line.sp puncutation.definition.comment
+      embed: sp_comment_doc
+      embed_scope: comment.line.sp
+      escape: '{{end_of_line}}'
+
+    - match: (?<!\\)(\\\\)*\K\/\*\*
+      scope: comment.block.documentation.sp punctuation.definition.comment.begin.sp
+      embed: sp_comment_doc
+      embed_scope: comment.block.documentation.sp
+      escape: \*\/
+      escape_captures:
+        0: comment.block.documentation.sp punctuation.definition.comment.end.sp
+
+    - match: (?<!\\)(\\\\)*\K\/\*
+      scope: comment.block.documentation.sp punctuation.definition.comment.begin.sp
+      push:
+        - meta_scope: comment.block.sp
+        - match: \*\/
+          scope: punctuation.definition.comment.end.sp
+          pop: true
+        - include: comment_keywords
+
+  sp_comment_doc:
+    - match: '@(?:deprecated|endsection|error|noreturn|note|return|section)'
+      scope: keyword.other.documentation.sp
+    - match: (@param)\s+(\S+)?
+      captures:
+        1: keyword.other.documentation.param
+        2: variable.parameter
+    - include: comment_keywords
+
+  comment_keywords:
+    - match: '\b(TODO|ToDo|FixMe|FIXME|NOTE|BUG|XXX|HACK|IDEA)\b(\s*[-:])?'
+      scope: keyword.other.documentation.note.sp
 
   # should be near the end?
   # functions:
