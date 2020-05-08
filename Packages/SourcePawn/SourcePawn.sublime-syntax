@@ -101,7 +101,6 @@ contexts:
             - match: '{{end_of_line}}'
               pop: true
 
-
         # - match: '(([^[:alpha:]_\(\s])\S*?|\S+)'
         - match: '(([^[:alpha:]_\(\s])?\S+)(?=\s)'
           captures:
@@ -139,7 +138,6 @@ contexts:
       - match: '\S+'
         scope: invalid.illegal.unexpected-character.sp
 
-
   preprocessor-macro-definition:
     - meta_content_scope: meta.preprocessor.macro.sp
     - include: preprocessor-line-continuation
@@ -150,6 +148,8 @@ contexts:
       scope: punctuation.section.block.begin.sp
     - match: '\}'
       scope: punctuation.section.block.end.sp
+    - match: '%\d+'
+      scope: variable.other.readwrite.sp
     - include: expressions
 
   preprocessor-line-continuation:
@@ -234,13 +234,11 @@ contexts:
           - match: '{{end_of_line}}'
             pop: true
 
-
   preprocessor_eol:
     - match: '{{end_of_line}}'
       pop: true
     - include: preprocessor-line-continuation
     - include: preprocessor-comments
-
 
   preprocessor-other:
     - match: '^[ \t]*(#(\s*)((?:else)?if))\b'
@@ -349,61 +347,146 @@ contexts:
       captures:
         1: meta.preprocessor.sp
       push:
-        - meta_scope: meta.sp
+        # - meta_scope: meta.sp
         - match: '{{end_of_line}}'
           pop: true
         - include: preprocessor-line-continuation
         - include: preprocessor-comments
 
-  typedef:
-    - match: \btypedef\b
-      scope: keyword.declaration.sp
-      set:
-      - include: comments
-      - match: '(?=[^[:alpha:]_\s])'
-        pop: true
-      - match: '\b({{identifier}})\b\s*'
-        scope: entity.name.type.typedef.sp
-        set:
-          - include: comments
-          - match: '\s*=\s*'
-            scope: keyword.operator.assignment
-            set: typedef_function
-          - match: '(?=\S)'
-            pop: true
-      - match: '(?=\S)'
-        pop: true
 
-      # pop: true
-      # - match: '{{end_of_line}}'
-      #   pop: true
+  typedef:
+    # - match: '\btypedef\b'
+    #   scope: keyword.declaration.sp
+    #   set:
+    #     - match: '\b({{identifier}})\s*(=)'
+    #       captures:
+    #         1: entity.name.type.sp
+    #         2: keyword.operator.assignment.sp
+    #       set: typedef_function
+
+    #     - match: (?=\S)
+    #       pop: true
+
+    - match: \b(typedef)\b
+      scope: keyword.declaration.sp
+      branch_point: typedef_begin
+      branch:
+        - typedef_type
+        - typedef_end
+
+    - match: \b(typeset)\b
+      scope: keyword.declaration.sp
+      branch_point: typeset_begin
+      branch:
+        - typeset_type
+        - typedef_end
+
+  typedef_type:
+    - include: comments
+    - include: preprocessor-line-continuation
+
+    - match: '\b({{identifier}})\b'
+      scope: entity.name.type.sp
+      push:
+        - include: comments
+        - include: preprocessor-line-continuation
+
+        - match: '='
+          scope: keyword.operator.assignment.sp
+          set: typedef_function
+
+        - match: (?=\S)
+          fail: typedef_begin
+
+  typedef_end:
+    - match: '(?=\S)'
+      pop: true
+
+  typeset_type:
+    - include: comments
+    - include: preprocessor-line-continuation
+
+    - match: '\b({{identifier}})\b'
+      scope: entity.name.type.sp
+      push:
+        - include: comments
+        - include: preprocessor-line-continuation
+        - match: \{
+          scope: punctuation.section.block.begin.sp
+          set:
+            - meta_scope: meta.block.sp
+            - match: \}
+              scope: punctuation.section.block.end.sp
+              pop: 2
+
+            - include: typeset_function
+
+        - match: (?=\S)
+          fail: typeset_begin
+
+    - match: (?=\S)
+      pop: true
 
   typedef_function:
     - include: comments
+    - include: preprocessor-line-continuation
+    - match: '\bfunction\b'
+      scope: storage.modifier.sp
+      branch_point: typedef_function_begin
+      branch:
+        - typedef_function_type
+        - typedef_end
+
+    - match: (?=\S)
+      pop: 2
+
+  typedef_function_type:
+    - include: comments
+    - include: preprocessor-line-continuation
+
+    - match: '\b({{identifier}})\b'
+      scope: storage.type.sp
+      push:
+        - include: comments
+        - include: preprocessor-line-continuation
+
+        - match: \(
+          scope: meta.function.parameters.sp punctuation.section.group.begin.sp
+          set:
+            - match: \)
+              scope: punctuation.section.group.end.sp
+              pop: 2
+
+            - include: function-params
+
+        - match: (?=\S)
+          fail: typedef_function_begin
+
+  typeset_function:
+    - include: comments
+    - include: preprocessor-line-continuation
+
     - match: '\bfunction\b'
       scope: storage.modifier.sp
       push:
         - include: comments
-        - match: '({{identifier}})\s*(?=\(|$)'
-          scope: storage.type.sp
-          push: typedef-definition-params
-        - match: '(?=\S)'
-          pop: true
-    - match: '(?=\S)'
-      pop: true
+        - include: preprocessor-line-continuation
+        - match: '\b({{identifier}})\s*(\()'
+          captures:
+            1: storage.type.sp
+            2: meta.function.parameters.sp punctuation.section.group.begin.sp
+          push:
+            - match: \)
+              scope: punctuation.section.group.end.sp
+              pop: true
+            - include: function-params
 
-  typedef-definition-params:
-    - match: \(
-      scope: meta.function.parameters.sp meta.group.sp punctuation.section.group.begin.sp
-      embed: function-params
-      escape : \)
-      escape_captures:
-        0: punctuation.section.group.end.sp
-    - match: '(?=\S)'
-      pop: true
+        - match: (?=\S)
+          pop: true
 
   function-params:
-    - meta_content_scope: meta.function.parameters.sp meta.group.sp
+    - include: comments
+
     - match: '\bconst\b'
       scope: storage.modifier.sp
 
@@ -420,32 +503,35 @@ contexts:
         6: keyword.operator.reference.sp
         7: variable.parameter.sp
       push:
-        - include: comments
-        - match: ','
-          scope: punctuation.separator.sp
+        - match: '(?=,|\))'
           pop: true
+
+        - include: comments
+
         - match: '\['
           scope: punctuation.section.brackets.begin.sp
-          embed: bracket-contents
-          escape: \]
-          escape_captures:
-            0: punctuation.section.brackets.end.sp
+          push:
+            - meta_content_scope: meta.brackets.sp
+
+            - match: '\]'
+              scope: punctuation.section.brackets.end.sp
+              pop: true
+
+            - include: bracket-contents
+
         - match: '='
           scope: keyword.operator.assignment.sp
-          embed: expressions
-          escape: '(?=,)'
-        - match: '[^,\s]+'
+          push:
+            - include: expressions
+
+            - match: '(?=,|\))'
+              pop: 2
+
+        - match: '[^,\s=\)]+'
           scope: invalid.illegal.sp
 
-    - match: '\S'
-      scope: invalid.illegal.sp
-      push:
-        - meta_content_scope: invalid.illegal.sp
-        - match: '(?=,)'
-          pop: true
-
-
-
+    - match: (?=\S)
+      pop: true
 
 
   brackets:
@@ -459,7 +545,7 @@ contexts:
         - include: expressions
 
   bracket-contents:
-    - meta_content_scope: meta.brackets.sp
+    - include: comments
     - match: '{{numerals}}'
       scope: constant.numeric.sp
 
