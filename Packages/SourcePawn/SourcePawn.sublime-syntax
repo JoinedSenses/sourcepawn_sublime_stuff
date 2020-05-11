@@ -47,7 +47,7 @@ contexts:
     - include: early-expressions
 
   early-expressions:
-    - include: preprocessor-expressions
+    - include: preprocessor
     - include: comments_documentation
     - include: expressions-simple
 
@@ -60,8 +60,11 @@ contexts:
     - include: case-default
     - include: operators
     - include: unique-keywords
+    - include: parens
+    - include: brackets
+    - include: braces
 
-  preprocessor-expressions:
+  preprocessor:
     - include: preprocessor-macro-define
     - include: preprocessor-pragma
     - include: preprocessor-other
@@ -129,13 +132,43 @@ contexts:
     - include: preprocessor-comments
     - match: '{{end_of_line}}'
       pop: true
-    - match: '\{'
-      scope: punctuation.section.block.begin.sp
-    - match: '\}'
-      scope: punctuation.section.block.end.sp
+    - include: preprocessor-expressions
+
+
+  preprocessor-expressions:
+    - match: '{{end_of_line}}'
+      pop: true
+
     - match: '%\d+'
       scope: variable.other.readwrite.sp
-    - include: expressions-simple
+    - match: \(
+      scope: punctuation.section.group.begin.sp
+      push:
+        - meta_scope: meta.group.sp
+        - match: \)
+          scope: punctuation.section.group.end.sp
+          pop: true
+
+        - include: preprocessor-expressions
+    - match: \{
+      scope: punctuation.section.braces.begin.sp
+      push:
+        - meta_scope: meta.block.sp
+        - match: \}
+          scope: punctuation.section.braces.end.sp
+          pop: true
+
+        - include: preprocessor-expressions
+    - match: \[
+      scope: punctuation.section.brackets.begin.sp
+      push:
+        - meta_scope: meta.brackets.sp
+        - match: \}
+          scope: punctuation.section.brackets.end.sp
+          pop: true
+
+        - include: preprocessor-expressions
+    - include: expressions
 
   preprocessor-line-continuation:
     - match: '(?<!\\)(?:\\\\)*\K(\\)$(?=\n)'
@@ -259,7 +292,7 @@ contexts:
             - include: preprocessor-line-continuation
             - include: preprocessor-comments
             - match: \S+
-              scope: invalid.illegal.sp
+              scope: invalid.illegal.unexpected-character.sp
             - match: '{{end_of_line}}'
               pop: true
         - match: '{{end_of_line}}'
@@ -282,7 +315,7 @@ contexts:
     - match: '^[ \t]*(#(\s*)(error))\b'
       captures:
         1: meta.preprocessor.sp
-        2: invalid.illegal.sp
+        2: invalid.illegal.unexpected-space.sp
         3: keyword.control.import.error.sp
       push:
         - meta_scope: meta.preprocessor.diagnostic.sp
@@ -295,7 +328,7 @@ contexts:
     - match: '^[ \t]*(#(\s*)((?:try)?include))\b'
       captures:
         1: meta.preprocessor.sp
-        2: invalid.illegal.sp
+        2: invalid.illegal.unexpected-space.sp
         3: keyword.control.import.include.sp
       push:
         - meta_scope: meta.preprocessor.sp
@@ -311,7 +344,7 @@ contexts:
             - match: (?:({{const_char_escape}})|(\\.))
               captures:
                 1: constant.character.escape.sp
-                2: invalid.illegal.sp
+                2: invalid.illegal.unexpected-character.sp
             - match: (?<!\\)(\\\\)*\K\"
               scope: punctuation.definition.string.end.sp
               set: preprocessor_eol
@@ -380,9 +413,14 @@ contexts:
             - match: (?=\S)
               fail: enum_begin
 
-    - match: '\b(?:{{identifier}})\b'
-      scope: entity.name.enum.sp
+    - match: (?:\b({{identifier}})\s*(:)\s*)?\b({{identifier}}\b(?:\s*(:))?)
+      captures:
+        1: storage.type.sp
+        2: punctuation.separator.sp
+        3: entity.name.enum.sp
+        4: punctuation.separator.sp
       push:
+        - include: comments
         - match: (?=\{)
           set: enum_contents
         - match: (?=\S)
@@ -413,9 +451,9 @@ contexts:
             - match: (?=\))
               pop: true
             - match: '[^\s\)]+'
-              scope: invalid.illegal.sp
+              scope: invalid.illegal.unexpected-character.sp
         - match: '[^\s\)]+'
-          scope: invalid.illegal.sp
+          scope: invalid.illegal.unexpected-character.sp
 
     - match: '([\+\-\*\/]|<<?|>>?)'
       scope: keyword.operator.arithmetic.sp
@@ -423,10 +461,10 @@ contexts:
         - match: (?=\)|=)
           pop: true
         - match: '[^\s\)]+'
-          scope: invalid.illegal.sp
+          scope: invalid.illegal.unexpected-character.sp
 
     - match: '[^\s\)]+'
-      scope: invalid.illegal.sp
+      scope: invalid.illegal.unexpected-character.sp
 
   enum_contents:
     - match: \{
@@ -443,7 +481,7 @@ contexts:
       pop: 3
 
     - include: comments
-    - include: preprocessor-expressions
+    - include: preprocessor
 
     - match: '\b(?:{{identifier}})\b\s*:'
       fail: enum_contents_begin
@@ -467,15 +505,18 @@ contexts:
 
             - include: expressions
 
+        - match: (?=\[)
+          fail: enum_contents_begin
+
         - match: \s+(?=[[:alpha:]_])
-          scope: invalid.illegal.sp
+          scope: invalid.illegal.missing-comma.sp
           pop: true
 
         - match: '[^\s,\}]+'
-          scope: invalid.illegal.sp
+          scope: invalid.illegal.syntax.sp
 
     - match: '[^\s,\}]+'
-      scope: invalid.illegal.sp
+      scope: invalid.illegal.syntax.sp
 
   enum_oldstruct_contents:
     - meta_scope: meta.enumstruct.legacy.sp meta.block.sp
@@ -484,7 +525,7 @@ contexts:
       pop: 3
 
     - include: comments_documentation
-    - include: preprocessor-expressions
+    - include: preprocessor
 
     - match: ','
       scope: punctuation.separator.sp
@@ -499,7 +540,7 @@ contexts:
       push: enum_oldstruct_variables
 
     - match: '[^\s\}]+'
-      scope: invalid.illegal.sp
+      scope: invalid.illegal.syntax.sp
 
   enum_oldstruct_variables:
     - match: '(?=,|\})'
@@ -521,11 +562,11 @@ contexts:
               pop: true
 
         - match: \s+(?=[[:alpha:]_])
-          scope: invalid.illegal.sp
+          scope: invalid.illegal.missing-comma.sp
           pop: true
 
         - match: \S+
-          scope: invalid.illegal.sp
+          scope: invalid.illegal.syntax.sp
 
     - match: (?=\S)
       pop: true
@@ -541,7 +582,7 @@ contexts:
 
     - match: '^\s*((?:(?:public|static|const)\s+)*)({{identifier}})\b'
       captures:
-        1: invalid.illegal.sp
+        1: invalid.illegal.syntax.sp
         2: storage.type.sp
       branch_point: enum_struct_variable_begin
       branch:
@@ -551,12 +592,12 @@ contexts:
 
     - match: '^\s*(const|static|public)\b'
       captures:
-        1: invalid.illegal.sp
+        1: invalid.illegal.syntax.sp
 
   enum_struct_variable:
     - match: '\['
       push:
-        - meta_scope: invalid.illegal.sp
+        - meta_scope: invalid.illegal.syntax.sp
         - match: \]
           pop: true
 
@@ -587,7 +628,7 @@ contexts:
           pop: 2
 
         - match: '[^[:alpha:]_\s;]+'
-          scope: invalid.illegal.sp
+          scope: invalid.illegal.unexpected-character.sp
 
         - match: '{{end_of_line}}'
           pop: 2
@@ -624,14 +665,11 @@ contexts:
           scope: meta.function.c meta.block.c punctuation.section.block.end.sp
           pop: 2
 
-        - match: '\bthis\b'
-          scope: variable.language
-
         - include: expressions
 
   enum_struct_variable_end:
     - match: '.*?'
-      scope: invalid.illegal.sp
+      scope: invalid.illegal.syntax.sp
       pop: true
 
   methodmap:
@@ -771,25 +809,71 @@ contexts:
           pop: 2
 
   function-params:
-    - include: comments
+    - match: (?=\S)
+      branch_point: function_param_begin
+      branch:
+      - function_param_old
+      - function_param_new
 
-    - match: '\bconst\b'
-      scope: storage.modifier.sp
+  function_param_old:
+    - match: (?=\))
+      pop: true
+
+    - include: comments
 
     - match: ','
       scope: punctuation.separator.sp
+      pop: true
 
-    - match: (const\s+)?({{identifier}})\s*(?:(?:(?:(\[)(?:\s*|(.*?))(\]))|(\s*&))\s*)?({{identifier}})?
+    - match: '&'
+      scope: keyword.operator.reference.sp
+
+    - match: \bconst\b\s*
+      scope: storage.modifier.sp
+
+    - match: \b({{identifier}})\s*(:)
       captures:
-        1: storage.modifier.sp
-        2: storage.type.sp
-        3: punctuation.section.brackets.begin.sp
-        4: invalid.illegal.sp
-        5: punctuation.section.brackets.end.sp
-        6: keyword.operator.reference.sp
-        7: variable.parameter.sp
+        1: storage.type.sp
+        2: punctuation.separator.sp
       push:
-        - match: '(?=,|\))'
+        - match: (?=,|\))
+          pop: true
+
+        - include: comments
+        - include: function_param_old_cont
+
+        - match: '\.\.\.'
+          scope: keyword.operator.variadic.c
+          set:
+            - match: (?=\))
+              pop: true
+
+            - include: comments
+
+            - match: '[^\s\)]'
+              scope: invalid.illegal.variadic-must-be-end.sp
+
+        - match: '\.{1,2}'
+
+        - match: (\S+)
+          scope: invalid.illegal.sp
+
+    - match: (?=\b({{identifier}})\b)
+      push: function_param_old_cont
+
+    - match: \S+
+      scope: invalid.illegal.sp
+
+
+  function_param_old_cont:
+    - include: comments
+
+    - match: (&\s*)?\b({{identifier}})\b
+      captures:
+        1: keyword.operator.reference.sp
+        2: variable.parameter.sp
+      set:
+        - match: (?=,|\))
           pop: true
 
         - include: comments
@@ -799,18 +883,105 @@ contexts:
 
         - match: '='
           scope: keyword.operator.assignment.sp
-          push:
-            - include: expressions-simple
-
+          set:
             - match: '(?=,|\))'
-              pop: 2
+              pop: true
 
-        - match: '[^,\s=\)]+'
-          scope: invalid.illegal.sp
+            - match: \b{{identifier}}\b
+              scope: variable.other.constant.sp
 
-    - match: (?=\S)
+            - include: expressions
+
+        - match: '(?=[[:alpha:]_])'
+          fail: function_param_begin
+
+        - match: '\.'
+          fail: function_param_begin
+
+
+  function_param_new:
+    - match: (?=\))
       pop: true
 
+    - include: comments
+
+    - match: ','
+      scope: punctuation.separator.sp
+      pop: true
+
+    - match: '\bconst\b'
+      scope: storage.modifier.sp
+
+    - match: '\b{{identifier}}\b'
+      scope: storage.type.sp
+      push:
+        - match: (?=,|\))
+          pop: true
+
+        - include: comments
+
+        - match: '\.\.\.'
+          scope: keyword.operator.variadic.c
+          set:
+            - match: (?=\))
+              pop: true
+
+            - include: comments
+
+            - match: '[^\s\)]'
+              scope: invalid.illegal.variadic-must-be-end.sp
+
+        - match: '\.{1,2}'
+
+        - match: '\['
+          scope: punctuation.section.brackets.begin.sp
+          push:
+            - meta_scope: meta.brackets.sp
+            - match: \]
+              scope: punctuation.section.brackets.end.sp
+              pop: true
+
+            - match: (?=,|\))
+              pop: 2
+
+            - include: comments
+
+            - match: '[^\s\]]+'
+              scope: invalid.illegal.sp
+
+        - match: '&'
+          scope: keyword.operator.reference.sp
+
+        - match: '\b{{identifier}}\b'
+          scope: variable.parameter.sp
+          set:
+            - match: (?=,|\))
+              pop: true
+
+            - match: (?=\[)
+              push: brackets
+
+            - include: comments
+
+            - match: '='
+              scope: keyword.operator.assignment.sp
+              set:
+                - match: '(?=,|\))'
+                  pop: true
+
+                - match: \b{{identifier}}\b
+                  scope: variable.other.constant.sp
+
+                - include: expressions
+
+            - match: '[^[;&,\)\s]]+'
+              scope: invalid.illegal.sp
+
+        - match: '[^[;&,\)\s]]+'
+          scope: invalid.illegal.sp
+
+    - match: '[^[;&,\)\s]]+'
+      scope: invalid.illegal.sp
 
   brackets:
     - match: \[
@@ -822,11 +993,6 @@ contexts:
           pop: true
         - include: expressions-simple
 
-  # bracket-contents:
-  #   - include: comments
-  #   - match: '{{numerals}}'
-  #     scope: constant.numeric.sp
-
   parens:
     - match: \(
       scope: punctuation.section.group.begin.sp
@@ -834,6 +1000,17 @@ contexts:
         - meta_scope: meta.group.sp
         - match: \)
           scope: punctuation.section.group.end.sp
+          pop: true
+
+        - include: expressions
+
+  braces:
+    - match: \{
+      scope: punctuation.section.braces.begin.sp
+      push:
+        - meta_scope: meta.block.sp
+        - match: \}
+          scope: punctuation.section.braces.end.sp
           pop: true
 
         - include: expressions
@@ -954,6 +1131,8 @@ contexts:
       scope: keyword.operator.word.sp
     - match: \bdelete|new\b
       scope: keyword.control.sp
+    - match: '\bthis\b'
+      scope: variable.language
 
   operators:
     - match: (?:\+\+|--)
