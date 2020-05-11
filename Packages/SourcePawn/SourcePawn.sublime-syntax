@@ -818,19 +818,15 @@ contexts:
   function_param_old:
     - match: (?=\))
       pop: true
-
-    - include: comments
-
     - match: ','
       scope: punctuation.separator.sp
       pop: true
-
-    - match: '&'
+    - match: '&(\s*&)*'
       scope: keyword.operator.reference.sp
-
+      captures:
+        1: invalid.illegal.sp
     - match: \bconst\b\s*
       scope: storage.modifier.sp
-
     - match: \b({{identifier}})\s*(:)
       captures:
         1: storage.type.sp
@@ -838,65 +834,63 @@ contexts:
       push:
         - match: (?=,|\))
           pop: true
-
-        - include: comments
-        - include: function_param_old_cont
-
+        - match: \b({{identifier}})\b
+          scope: variable.parameter.sp
+          set:
+            - match: (?=,|\))
+              pop: true
+            - match: '(?=\[)'
+              push: brackets
+            - match: '='
+              scope: keyword.operator.assignment.sp
+              set:
+                - match: '(?=,|\))'
+                  pop: true
+                - match: \b{{identifier}}\b
+                  scope: variable.other.constant.sp
+                - include: expressions
+            - include: comments
+            - match: (?=\S)
+              set:
+                - match: (?=,|\))
+                  pop: true
         - match: '\.\.\.'
           scope: keyword.operator.variadic.c
           set:
             - match: (?=\))
               pop: true
-
+            - match: ','
+              scope: punctuation.separator.sp invalid.illegal.variadic-must-be-end.sp
+              set:
+                - match: (?=\))
+                  pop: true
+                - include: comments
             - include: comments
-
-            - match: '[^\s\)]'
-              scope: invalid.illegal.variadic-must-be-end.sp
-
         - match: '\.{1,2}'
-
-        - match: (\S+)
-          scope: invalid.illegal.sp
-
-    - match: (?=\b({{identifier}})\b)
-      push: function_param_old_cont
-
-    - match: \S+
-      scope: invalid.illegal.sp
-
-
-  function_param_old_cont:
-    - include: comments
-
-    - match: (&\s*)?\b({{identifier}})\b
-      captures:
-        1: keyword.operator.reference.sp
-        2: variable.parameter.sp
-      set:
-        - match: (?=,|\))
-          pop: true
-
         - include: comments
 
+    - match: \b({{identifier}})\b
+      scope: variable.parameter.sp
+      push:
+        - match: (?=,|\))
+          pop: true
         - match: '(?=\[)'
           push: brackets
-
         - match: '='
           scope: keyword.operator.assignment.sp
           set:
             - match: '(?=,|\))'
               pop: true
-
             - match: \b{{identifier}}\b
               scope: variable.other.constant.sp
-
             - include: expressions
-
-        - match: '(?=[[:alpha:]_])'
+        - include: comments
+        - match: '(?=[[:alpha:]_\.])'
           fail: function_param_begin
+    - include: comments
 
-        - match: '\.'
-          fail: function_param_begin
+    - match: \S+
+      scope: invalid.illegal.sp
 
 
   function_param_new:
@@ -904,35 +898,30 @@ contexts:
       pop: true
 
     - include: comments
-
     - match: ','
       scope: punctuation.separator.sp
       pop: true
-
     - match: '\bconst\b'
       scope: storage.modifier.sp
-
     - match: '\b{{identifier}}\b'
       scope: storage.type.sp
       push:
         - match: (?=,|\))
           pop: true
-
-        - include: comments
-
         - match: '\.\.\.'
           scope: keyword.operator.variadic.c
           set:
             - match: (?=\))
               pop: true
-
+            - match: ','
+              scope: punctuation.separator.sp invalid.illegal.variadic-must-be-end.sp
+              set:
+                - match: (?=\))
+                  pop: true
+                - include: comments
             - include: comments
 
-            - match: '[^\s\)]'
-              scope: invalid.illegal.variadic-must-be-end.sp
-
         - match: '\.{1,2}'
-
         - match: '\['
           scope: punctuation.section.brackets.begin.sp
           push:
@@ -940,42 +929,36 @@ contexts:
             - match: \]
               scope: punctuation.section.brackets.end.sp
               pop: true
-
             - match: (?=,|\))
               pop: 2
-
             - include: comments
-
             - match: '[^\s\]]+'
               scope: invalid.illegal.sp
-
-        - match: '&'
+        - match: '&(\s*&)*'
           scope: keyword.operator.reference.sp
-
+          captures:
+            1: invalid.illegal.sp
         - match: '\b{{identifier}}\b'
           scope: variable.parameter.sp
           set:
             - match: (?=,|\))
               pop: true
-
             - match: (?=\[)
               push: brackets
-
-            - include: comments
-
             - match: '='
               scope: keyword.operator.assignment.sp
               set:
                 - match: '(?=,|\))'
                   pop: true
-
                 - match: \b{{identifier}}\b
                   scope: variable.other.constant.sp
-
                 - include: expressions
-
-            - match: '[^[;&,\)\s]]+'
-              scope: invalid.illegal.sp
+            - include: comments
+            - match: (?=\S)
+              set:
+                - match: (?=,|\))
+                  pop: true
+        - include: comments
 
         - match: '[^[;&,\)\s]]+'
           scope: invalid.illegal.sp
