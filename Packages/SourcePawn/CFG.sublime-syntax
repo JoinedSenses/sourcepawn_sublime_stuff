@@ -4,42 +4,57 @@ name: Config
 file_extensions: [cfg]
 scope: source.cfg
 
+variables:
+  end_of_line: '(?<!\\)(\\\\)*\K$(?=\n)'
+
+
 contexts:
   main:
-    - match: (?<!\\)\"
+    - include: expressions
+
+  expressions:
+    - match: (?<!\\)(\\\\)*\K\"
+      scope: punctuation.definition.string.begin.sp
       push:
-        - meta_scope: string
-        - match: (?<!\\)\"|\\\\"
+        - meta_scope: string.quoted.double.sp
+        - match: (?<!\\)(\\\\)*\K\"
+          scope: punctuation.definition.string.end.sp
           pop: true
 
-    - match: (?<!\\)\'
-      push:
-        - meta_scope: string
-        - match: (?<!\\)\'|\\\\'
-          pop: true
-
-    - match: (?=\/\*)
+    - match: (?<!\\)(\\\\)*\K\/\*
       captures:
-        0: punctuation.definition.comment
+        0: punctuation.definition.comment.begin.sp
       push:
-        - meta_scope: comment.block
-        - match: (?<=\*/)
-          captures:
-            0: punctuation.definition.comment
+        - meta_scope: comment.block.sp
+        - match: \*\/
+          scope: punctuation.definition.comment.end.sp
           pop: true
 
     - match: '\/\/'
       scope: puncutation.definition.comment
       push:
-        - meta_scope: comment
-        - match: $
+        - meta_scope: comment.line.sp
+        - match: '{{end_of_line}}'
           pop: true
+        - match: (?<!\\)(?:\\\\)*\K(\\)$(?=\n)
+          scope: punctuation.separator.continuation.sp
+        - include: comment_keywords
 
-    - match: \{
-      scope: punctuation.section.braces.begin
-    - match: \}
-      scope: punctuation.section.braces.end
     - match: (?<!\.)(?:\s|^)(\d+\.?\d*)([^\d\s]+)?\s
       captures:
         1: constant.numeric
         2: invalid.illegal
+
+    - match: \}
+      scope: invalid.illegal.cfg
+
+    - match: \{
+      scope: punctuation.section.block.begin.cfg
+      push:
+        - meta_scope: meta.braces.cfg
+        - match: \}
+          scope: punctuation.section.block.end.cfg
+          pop: true
+
+        - include: expressions
+

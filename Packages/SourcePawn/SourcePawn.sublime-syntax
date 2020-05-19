@@ -14,20 +14,10 @@ variables:
   numerals: '{{numerals_binary}}|{{numerals_hex}}|{{numerals_intfloat}}'
 
   identifier: '(?:[[:alpha:]_]\w*)'
-  # deprecated_identifier: '\b{{identifier}}:'
-  # casts: 'view_as'
   modifier_decl: 'public[ \t]+native|stock|native|forward|static'
   # operator_method_name: '\boperator\s*[-+*/%^&|~!=<>]|[-+*/%^&|=!<>]=|<<=?|>>=?|&&|\|\||\+\+|--|,|->\*?|\(\)|\[\]'
   control_keywords: 'break|case|continue|default|do|else|for|if|return|switch|while'
-  # memory_operators: 'new|delete'
   basic_types: 'any|bool|char|float|int|void'
-  # before_tag: 'enum|enum\s+struct|methodmap|struct'
-  # storage_classes: 'static|native|forward|public|stock|function'
-  # type_qualifier: 'const'
-  # directives: 'include|pragma|define|error|if|file|endif|endinput'
-  # pragmas: 'ctrlchar|dynamic|newdecls|rational|semicolon|tabsize|unused'
-  # pragma_derecated: 'deprecated'
-  # pragma_newdecls: 'required|optional'
   end_of_line: '(?<!\\)(\\\\)*\K$(?=\n)'
   str_format_char: '%[!\-\d\.]*[%bcdfiLNstTuxX]?'
   const_char_escape: \\(?:[abefnrt'"%\\]|(?:x[a-zA-Z0-9]{0,2}|\d+);?)
@@ -37,11 +27,12 @@ variables:
 # ---------------------------------------------------------------------------
 contexts:
   main:
+    - include: preprocessor
     - include: global
 
   global:
-    - include: early-expressions
     - include: data-types
+    - include: early-expressions
 
   expressions:
     - include: early-expressions
@@ -62,7 +53,9 @@ contexts:
     - include: unique-keywords
     - include: parens
     - include: brackets
-    - include: braces
+    - include: block
+    - match: '\)|\}'
+      scope: invalid.illegal.stray-bracket-end.c
 
   preprocessor:
     - include: preprocessor-macro-define
@@ -73,7 +66,7 @@ contexts:
     - match: '^\s*(?:#(\s*)(define))\b\s*?'
       captures:
         1: invalid.illegal.unexpected-space.sp
-        2: keyword.control.define.spf
+        2: keyword.control.import.define.spf
       push:
         - meta_scope: meta.preprocessor.define.sp
         - include: preprocessor-line-continuation
@@ -200,9 +193,9 @@ contexts:
       captures:
         1: meta.preprocessor.sp
         2: invalid.illegal.unexpected-space.sp
-        3: keyword.control.pragma.sp
+        3: keyword.control.import.pragma.sp
       push:
-        - meta_scope: meta.preprocessor.pragma.sp
+        - meta_scope: meta.preprocessor.import.pragma.sp
         - include: preprocessor-line-continuation
         - include: preprocessor-comments
 
@@ -211,13 +204,13 @@ contexts:
 
         - match: '\b(dynamic|semicolon|tabsize)([ \t]+\d*)?'
           captures:
-            1: keyword.control.sp
+            1: keyword.control.import.sp
             2: constant.numeric.integer.sp
           set: preprocessor_eol
 
         - match: \b(ctrlchar)([ \t]+(\')(?:([^\\'])|({{const_char_escape}}))?('))?
           captures:
-            1: keyword.control.sp
+            1: keyword.control.import.sp
             2: constant.character.escape.sp
             3: punctuation.definition.string.begin.sp
             4: constant.character.sp
@@ -227,20 +220,20 @@ contexts:
 
         - match: '\b(unused)([ \t]+{{identifier}}\b)?'
           captures:
-            1: keyword.control.sp
+            1: keyword.control.import.sp
             2: variable.other.sp
           set: preprocessor_eol
 
         - match: '\brational\b'
-          scope: keyword.control.sp
+          scope: keyword.control.import.sp
           set: preprocessor_eol
 
         - match: '\b(newdecls(?:[ \t]+(?:required|optional)\b(?:$|[^\S]))?)'
-          scope: keyword.control.sp
+          scope: keyword.control.import.sp
           set: preprocessor_eol
 
         - match: '\bdeprecated\b'
-          scope: keyword.control.sp invalid.deprecated.sp
+          scope: keyword.control.import.sp invalid.deprecated.sp
           set:
           - meta_content_scope: meta.preprocessor.pragma.deprecated.sp
           - match: '{{end_of_line}}'
@@ -413,7 +406,7 @@ contexts:
             - match: (?=\S)
               fail: enum_begin
 
-    - match: (?:\b({{identifier}})\s*(:)\s*)?\b({{identifier}}\b(?:\s*(:))?)
+    - match: (?:\b({{identifier}})\s*(:)\s*)?\b({{identifier}}\b)(?:\s*(:))?
       captures:
         1: storage.type.sp
         2: punctuation.separator.sp
@@ -492,7 +485,7 @@ contexts:
     - match: '\b(?:{{identifier}})\b'
       scope: entity.name.constant.enum.sp
       push:
-        - include: comment
+        - include: comments
 
         - match: (?=,|\})
           pop: true
@@ -555,11 +548,15 @@ contexts:
           pop: true
         - match: (?=\})
           pop: true
-        - match: (?=\[)
-          push:
-            - include: brackets
-            - match: (?=\S)
-              pop: true
+        - include: brackets
+        # - match: \[
+        #   scope: punctuation.section.brackets.begin.c
+        #   push:
+        #     - meta_scope: meta.brackets.c
+        #     - match: \]
+        #       scope: punctuation.section.brackets.end.c
+        #       pop: true
+        #     - include: expressions
 
         - match: \s+(?=[[:alpha:]_])
           scope: invalid.illegal.missing-comma.sp
@@ -577,13 +574,14 @@ contexts:
       scope: punctuation.section.braces.end.sp
       pop: 2
 
+    - include: comments_documentation
+
     - match: ';'
       scope: punctuation.terminator.sp
 
-    - match: '^\s*((?:(?:public|static|const)\s+)*)({{identifier}})\b'
+    - match: '^\s*((?:(?:public|static|const)\s+)*)(?={{identifier}}\b)'
       captures:
         1: invalid.illegal.syntax.sp
-        2: storage.type.sp
       branch_point: enum_struct_variable_begin
       branch:
         - enum_struct_variable
@@ -595,67 +593,65 @@ contexts:
         1: invalid.illegal.syntax.sp
 
   enum_struct_variable:
-    - match: '\['
-      push:
-        - meta_scope: invalid.illegal.syntax.sp
-        - match: \]
-          pop: true
-
-    - match: (?=\})
-      pop: true
-
-    - match: '^\s*(?={{identifier}}\s+[[:alpha:]_\s])|[^[:alpha:]_\s]'
-      fail: enum_struct_variable_begin
-
-    - match: '\b(?:{{identifier}})\b'
-      scope: variable.other.member.sp
+    - match: \b{{identifier}}\b
+      scope: storage.type.sp
       push:
         - include: comments
+        - match: '\['
+          push:
+            - meta_scope: invalid.illegal.syntax.sp
+            - match: \]
+              pop: true
+            - include: comments
+            - match: (?=\})
+              pop: 3
         - match: (?=\})
           pop: 2
-
-        - match: (?=\()
-          fail: enum_struct_variable_begin
-
-        - match: (?=\[)
-          push:
+        - match: '(?=^\s*{{identifier}}\s+[[:alpha:]_\s])|[^[:alpha:]_\s]'
+          pop: 2
+        - match: '\b(?:{{identifier}})\b'
+          scope: variable.other.member.sp
+          set:
+            - match: (?=\})
+              pop: 2
+            - match: (?=\()
+              fail: enum_struct_variable_begin
             - include: brackets
-            - match: (?=\S)
-              pop: true
-
-        - match: ';'
-          scope: punctuation.terminator.sp
-          pop: 2
-
-        - match: '[^[:alpha:]_\s;]+'
-          scope: invalid.illegal.unexpected-character.sp
-
-        - match: '{{end_of_line}}'
-          pop: 2
+            - match: ';'
+              scope: punctuation.terminator.sp
+              pop: 2
+            - include: comments
+            - match: '[^[:alpha:]_\s;]+'
+              scope: invalid.illegal.unexpected-character.sp
+            - match: '(?=\s*[[:alpha:]_]|\})'
+              pop: 2
 
   enum_struct_function:
-    - match: '\b(?:{{identifier}})\b'
-      scope: entity.name.function.sp
+    - match: \b{{identifier}}\b
+      scope: meta.function.return-type.sp storage.type.sp
       push:
-        - match: \(
-          scope: meta.function.parameters.sp punctuation.section.group.begin.sp
+        - match: '\b(?:{{identifier}})\b'
+          scope: meta.function.sp entity.name.function.sp
           set:
-            - match: \)
-              scope: punctuation.section.group.end.sp
+            - match: \(
+              scope: punctuation.section.group.begin.sp
               set:
-                - include: comments
-                - match: (?=\{)
-                  set: function-definition-body-datatypes
-                - match: (?=\S)
-                  pop: true
-
-            - include: function-params
-
-        - match: (?=\S)
-          fail: enum_struct_variable_begin
+                - meta_scope: meta.function.parameters.sp
+                - match: \)
+                  scope: punctuation.section.group.end.sp
+                  set:
+                    - match: (?=\{)
+                      set: function-definition-body-enum
+                    - include: comments
+                    - match: '(?=\s*[[:alpha:]_]|\})'
+                      pop: 2
+                - include: function-params
+            - include: comments
+            - match: (?=\S)
+              fail: enum_struct_variable_begin
           # pop: 2
 
-  function-definition-body-datatypes:
+  function-definition-body-enum:
     - meta_content_scope: meta.function.sp
     - match: '\{'
       scope: meta.block.sp punctuation.section.block.begin.sp
@@ -667,6 +663,18 @@ contexts:
 
         - include: expressions
 
+  function-definition-body-methodmap:
+    - meta_content_scope: meta.function.sp
+    - match: '\{'
+      scope: meta.block.sp punctuation.section.block.begin.sp
+      push:
+        - meta_content_scope: meta.function.sp meta.block.sp
+        - match: '\}'
+          scope: meta.function.c meta.block.c punctuation.section.block.end.sp
+          pop: true
+
+        - include: expressions
+
   enum_struct_variable_end:
     - match: '.*?'
       scope: invalid.illegal.syntax.sp
@@ -675,6 +683,195 @@ contexts:
   methodmap:
     - match: '\bmethodmap\b'
       scope: storage.modifier.sp
+      branch_point: methodmap_begin
+      branch:
+        - - match: '{{identifier}}'
+            scope: entity.name.class.sp
+            push:
+              - meta_scope: meta.class.methodmap.sp
+              - match: '<'
+                scope: punctuation.separator.sp
+                push:
+                  - match: '{{identifier}}'
+                    scope: entity.other.inherited-class.sp
+                    set:
+                      - match: (?=\{)
+                        pop: true
+                      - include: comments
+                      - match: (?=\S)
+                        fail: methodmap_begin
+                  - include: comments
+                  - match: (?=\S)
+                    pop: true
+              - match: '\{'
+                scope: meta.block.sp punctuation.section.block.begin.sp
+                set:
+                  - meta_content_scope: meta.class.methodmap.sp meta.block.sp
+                  - match: '\}'
+                    scope: meta.class.methodmap.sp meta.block.sp punctuation.section.block.end.sp
+                    pop: 2
+                  - include: methodmap-body
+              - include: comments
+              - match: (?=\S)
+                fail: methodmap_begin
+
+        - - match: (?=\S)
+            pop: true
+
+  methodmap-body:
+    - include: comments_documentation
+    - include: function-definition-body-methodmap
+    - match: '\bpublic\b'
+      scope: storage.modifier.sp
+      branch_point: methodmap_func_begin
+      branch:
+        - - match: '(?=\s*\b(public|property)\b|\}|[^[:alpha:]_\s])'
+            pop: true
+
+          - match: '\b(?:native|static)\b'
+            scope: storage.modifier.sp
+
+          - match: '\b(?:const)\b'
+            scope: invalid.illegal.sp
+
+          - match: \b{{identifier}}\b
+            scope: meta.function.return-type.sp storage.type.sp
+            push:
+              - match: (?=\() # constructor
+                fail: methodmap_func_begin
+
+              - match: (?={{identifier}})
+                branch_point: methodmap_func_name_begin
+                branch:
+                  - - match: \b{{identifier}}\b
+                      push:
+                        - match: \(
+                          fail: methodmap_func_name_begin
+
+                        - match: (?=\S)
+                          pop: 3
+
+                  - - match: '\b{{identifier}}\b'
+                      scope: meta.function.sp entity.name.function.sp
+                      set:
+                        - match: \(
+                          scope: punctuation.section.group.begin.sp
+                          set:
+                            - meta_scope: meta.function.parameters.sp
+                            - match: \)
+                              scope: punctuation.section.group.end.sp
+                              pop: 2
+
+                            - include: function-params
+                        # - match: '(?=\b(public|property)\b|\}|[^[:alpha:]_\s])'
+                        #   pop: true
+
+              - match: '(?=\b(public|property)\b|\}|[^[:alpha:]_\s])'
+                pop: true
+
+          - include: comments
+
+        - - meta_scope: meta.function.sp
+
+          - match: '\b(?:native|static)\b'
+            scope: storage.modifier.sp
+
+          - match: \b{{identifier}}\b
+            scope: entity.name.function.constructor.sp
+            push:
+              - match: \(
+                scope: punctuation.section.group.begin.sp
+                set:
+                  - meta_scope: meta.function.parameters.sp
+
+                  - match: \)
+                    scope: punctuation.section.group.end.sp
+                    pop: 2
+
+                  - include: function-params
+
+              - include: comments
+
+              - match: (?=\S)
+                fail: methodmap_func_begin
+
+        - - match: (?=\S)
+            pop: true
+
+    - match: '\bproperty\b'
+      scope: storage.modifier.sp
+      branch_point: property_begin
+      branch:
+        - - match: '(?=\s*\b(public|property)\b|\}|[^[:alpha:]_\s])'
+            pop: true
+
+          - match: \b{{identifier}}\b
+            scope: storage.type.sp
+            push:
+              - match: '(?=\s*\b(public|property)\b|\}|[^[:alpha:]_\s])'
+                pop: 2
+
+              - match: \b{{identifier}}\b
+                scope: entity.name.trait.sp
+                set:
+                - match: \{
+                  scope: punctuation.section.braces.begin.sp
+                  set:
+                    - meta_scope: meta.block.sp
+                    - match: \}
+                      scope: punctuation.section.braces.end.sp
+                      pop: 2
+
+                    - match: (?<=^|;|\)|\})\s*\bpublic\b
+                      scope: storage.modifier.sp
+                      push:
+                        - match: \bnative\b
+                          scope: storage.modifier.sp
+
+                        - match: '\bget\b'
+                          scope: support.function.sp
+                          set:
+                          - match: \(
+                            scope: punctuation.section.group.begin.sp
+                            set:
+                              - meta_scope: meta.group.sp
+                              - match: \)
+                                scope: punctuation.section.group.end.sp
+                                pop: true
+
+                              - match: \S
+                                scope: invalid.illegal.sp
+                          - include: comments
+                          - match: (?=\S)
+                            pop: true
+
+                        - match: '\bset\b'
+                          scope: support.function.sp
+                          set:
+                          - match: \(
+                            scope: punctuation.section.group.begin.sp
+                            set:
+                              - meta_scope: meta.group.sp
+                              - match: \)
+                                scope: punctuation.section.group.end.sp
+                                pop: true
+
+                              - include: function-params
+                          - include: comments
+                          - match: (?=\S)
+                            pop: true
+
+                    - match: ';'
+                      scope: punctuation.terminator.sp
+
+                    - include: function-definition-body-methodmap
+
+                    - include: comments
+
+                - include: comments
+        - - match: ''
+            pop: true
+
 
   typedef:
     - match: \b(typedef)\b
@@ -839,8 +1036,7 @@ contexts:
           set:
             - match: (?=,|\))
               pop: true
-            - match: '(?=\[)'
-              push: brackets
+            - include: brackets
             - match: '='
               scope: keyword.operator.assignment.sp
               set:
@@ -874,8 +1070,7 @@ contexts:
       push:
         - match: (?=,|\))
           pop: true
-        - match: '(?=\[)'
-          push: brackets
+        - include: brackets
         - match: '='
           scope: keyword.operator.assignment.sp
           set:
@@ -920,7 +1115,6 @@ contexts:
                   pop: true
                 - include: comments
             - include: comments
-
         - match: '\.{1,2}'
         - match: '\['
           scope: punctuation.section.brackets.begin.sp
@@ -943,8 +1137,7 @@ contexts:
           set:
             - match: (?=,|\))
               pop: true
-            - match: (?=\[)
-              push: brackets
+            - include: brackets
             - match: '='
               scope: keyword.operator.assignment.sp
               set:
@@ -969,7 +1162,7 @@ contexts:
   brackets:
     - match: \[
       scope: punctuation.section.brackets.begin.sp
-      set:
+      push:
         - meta_scope: meta.brackets.sp
         - match: \]
           scope: punctuation.section.brackets.end.sp
@@ -987,7 +1180,7 @@ contexts:
 
         - include: expressions
 
-  braces:
+  block:
     - match: \{
       scope: punctuation.section.braces.begin.sp
       push:
@@ -1001,7 +1194,7 @@ contexts:
   case-default:
     - match: '\bdefault\b'
       scope: keyword.control.sp
-      set:
+      push:
         - match: ':'
           scope: punctuation.separator.sp
           pop: true
@@ -1017,7 +1210,7 @@ contexts:
 
     - match: '\bcase\b'
       scope: keyword.control.sp
-      set:
+      push:
         - match: ':'
           scope: punctuation.separator.sp
           pop: true
@@ -1071,7 +1264,7 @@ contexts:
 
     - match: (?<!\\)(\\\\)*\K\"
       scope: punctuation.definition.string.begin.sp
-      set:
+      push:
         - meta_scope: string.quoted.double.sp
         - match: (?<!\\)(\\\\)*\K\"
           scope: punctuation.definition.string.end.sp
@@ -1095,7 +1288,7 @@ contexts:
       captures:
         1: punctuation.definition.string.begin.sp
         2: invalid.illegal.unexpected-character.sp
-      set:
+      push:
         - meta_scope: string.quoted.single.sp
         - match: (?<!\\)(?:\\{2})*\K\'
           scope: punctuation.definition.string.end.sp
