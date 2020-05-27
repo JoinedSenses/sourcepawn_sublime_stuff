@@ -32,19 +32,45 @@ contexts:
 
   global:
     - include: data-types
+    - include: global-decl
     - include: early-expressions
+    - include: late-expressions
+
+  data-types:
+    - include: enum
+    - include: methodmap
+
+  global-decl:
+    - include: typedef
+    - include: typeset
+    # - include: functag
+    # - include: funcenum
+    - include: native-forward
+    - include: public
+    - include: global-declaration
 
   expressions:
     - include: early-expressions
+    - include: late-expressions
 
   early-expressions:
     - include: preprocessor
     - include: comments_documentation
     - include: expressions-simple
+    - include: accessor
 
+  late-expressions:
+    - include: function-call
+    - match: ';'
+      scope: punctuation.terminator.sp
+
+  preprocessor:
+    - include: preprocessor-macro-define
+    - include: preprocessor-pragma
+    - include: preprocessor-other
 
   expressions-simple:
-    - include: comments
+    # - include: comments
     - include: constants
     - include: strings
     - include: view_as
@@ -54,13 +80,11 @@ contexts:
     - include: parens
     - include: brackets
     - include: block
-    - match: '\)|\}'
+    - match: ','
+      scope: punctuation.separator.sp
+    - match: '[\)\}\]]'
       scope: invalid.illegal.stray-bracket-end.c
 
-  preprocessor:
-    - include: preprocessor-macro-define
-    - include: preprocessor-pragma
-    - include: preprocessor-other
 
   preprocessor-macro-define:
     - match: '^\s*(?:#(\s*)(define))\b\s*?'
@@ -92,7 +116,7 @@ contexts:
           set:
             - include: preprocessor-line-continuation
             - include: preprocessor-comments
-            - include: expressions-simple
+            - include: expressions
             - match: '{{end_of_line}}'
               pop: true
 
@@ -362,22 +386,18 @@ contexts:
         - include: preprocessor-line-continuation
         - include: preprocessor-comments
 
-  data-types:
-    - include: enum
-    - include: methodmap
-    - include: typedef
-    - include: typeset
+
 
   enum:
-    - match: '\benum\b'
-      scope: storage.modifier.sp
+    - match: '(?<=^|[;\)\}]|\*\/)\s*enum\b'
+      scope: storage.type.enum.sp keyword.declaration.enum.sp
       branch_point: enum_begin
       branch:
         - enum_definition
         - enum_end
 
   enum_end:
-    - match: (?=\S)
+    - match: ''
       pop: true
 
   enum_definition:
@@ -387,7 +407,7 @@ contexts:
       set: enum_contents
 
     - match: \bstruct\b
-      scope: storage.modifier.sp
+      scope: storage.type.struct keyword.declaration.struct.sp
       branch_point: enum_struct_begin
       branch:
       - enum_struct_type
@@ -473,9 +493,6 @@ contexts:
       scope: punctuation.section.braces.end.sp
       pop: 3
 
-    - include: comments
-    - include: preprocessor
-
     - match: '\b(?:{{identifier}})\b\s*:'
       fail: enum_contents_begin
 
@@ -508,6 +525,9 @@ contexts:
         - match: '[^\s,\}]+'
           scope: invalid.illegal.syntax.sp
 
+    - include: comments
+    - include: preprocessor
+
     - match: '[^\s,\}]+'
       scope: invalid.illegal.syntax.sp
 
@@ -517,9 +537,6 @@ contexts:
       scope: punctuation.section.braces.end.sp
       pop: 3
 
-    - include: comments_documentation
-    - include: preprocessor
-
     - match: ','
       scope: punctuation.separator.sp
 
@@ -528,6 +545,9 @@ contexts:
         1: storage.type.sp
         2: punctuation.separator.sp
       push: enum_oldstruct_variables
+
+    - include: comments_documentation
+    - include: preprocessor
 
     - match: (?=[[:alpha:]_])
       push: enum_oldstruct_variables
@@ -549,14 +569,6 @@ contexts:
         - match: (?=\})
           pop: true
         - include: brackets
-        # - match: \[
-        #   scope: punctuation.section.brackets.begin.c
-        #   push:
-        #     - meta_scope: meta.brackets.c
-        #     - match: \]
-        #       scope: punctuation.section.brackets.end.c
-        #       pop: true
-        #     - include: expressions
 
         - match: \s+(?=[[:alpha:]_])
           scope: invalid.illegal.missing-comma.sp
@@ -574,8 +586,6 @@ contexts:
       scope: punctuation.section.braces.end.sp
       pop: 2
 
-    - include: comments_documentation
-
     - match: ';'
       scope: punctuation.terminator.sp
 
@@ -591,6 +601,9 @@ contexts:
     - match: '^\s*(const|static|public)\b'
       captures:
         1: invalid.illegal.syntax.sp
+
+    - include: comments_documentation
+    - include: preprocessor
 
   enum_struct_variable:
     - match: \b{{identifier}}\b
@@ -649,7 +662,6 @@ contexts:
             - include: comments
             - match: (?=\S)
               fail: enum_struct_variable_begin
-          # pop: 2
 
   function-definition-body-enum:
     - meta_content_scope: meta.function.sp
@@ -663,17 +675,7 @@ contexts:
 
         - include: expressions
 
-  function-definition-body-methodmap:
-    - meta_content_scope: meta.function.sp
-    - match: '\{'
-      scope: meta.block.sp punctuation.section.block.begin.sp
-      push:
-        - meta_content_scope: meta.function.sp meta.block.sp
-        - match: '\}'
-          scope: meta.function.c meta.block.c punctuation.section.block.end.sp
-          pop: true
 
-        - include: expressions
 
   enum_struct_variable_end:
     - match: '.*?'
@@ -681,7 +683,7 @@ contexts:
       pop: true
 
   methodmap:
-    - match: '\bmethodmap\b'
+    - match: '(?<=^|[;\)\}]|\*\/)\s*methodmap\b'
       scope: storage.modifier.sp
       branch_point: methodmap_begin
       branch:
@@ -721,7 +723,8 @@ contexts:
   methodmap-body:
     - include: comments_documentation
     - include: function-definition-body-methodmap
-    - match: '\bpublic\b'
+
+    - match: '(?<=^|[;\)\}]|\*\/)\s*public\b'
       scope: storage.modifier.sp
       branch_point: methodmap_func_begin
       branch:
@@ -730,7 +733,6 @@ contexts:
 
           - match: '\b(?:native|static)\b'
             scope: storage.modifier.sp
-
           - match: '\b(?:const)\b'
             scope: invalid.illegal.sp
 
@@ -743,39 +745,32 @@ contexts:
               - match: (?={{identifier}})
                 branch_point: methodmap_func_name_begin
                 branch:
-                  - - match: \b{{identifier}}\b
-                      push:
-                        - match: \(
-                          fail: methodmap_func_name_begin
-
-                        - match: (?=\S)
-                          pop: 3
-
                   - - match: '\b{{identifier}}\b'
                       scope: meta.function.sp entity.name.function.sp
-                      set:
+                      push:
                         - match: \(
                           scope: punctuation.section.group.begin.sp
                           set:
                             - meta_scope: meta.function.parameters.sp
                             - match: \)
                               scope: punctuation.section.group.end.sp
-                              pop: 2
-
+                              pop: 4
                             - include: function-params
-                        # - match: '(?=\b(public|property)\b|\}|[^[:alpha:]_\s])'
-                        #   pop: true
+                        - include: comments
+                        - match: \S
+                          fail: methodmap_func_name_begin
+                    - include: comments
 
+                  - - match: ''
+                      pop: 3
+              - include: comments
               - match: '(?=\b(public|property)\b|\}|[^[:alpha:]_\s])'
                 pop: true
-
           - include: comments
 
         - - meta_scope: meta.function.sp
-
           - match: '\b(?:native|static)\b'
             scope: storage.modifier.sp
-
           - match: \b{{identifier}}\b
             scope: entity.name.function.constructor.sp
             push:
@@ -783,34 +778,29 @@ contexts:
                 scope: punctuation.section.group.begin.sp
                 set:
                   - meta_scope: meta.function.parameters.sp
-
                   - match: \)
                     scope: punctuation.section.group.end.sp
                     pop: 2
-
                   - include: function-params
-
               - include: comments
-
               - match: (?=\S)
                 fail: methodmap_func_begin
+          - include: comments
 
         - - match: (?=\S)
             pop: true
 
-    - match: '\bproperty\b'
+    - match: '(?<=^|[;\)\}])\s*\bproperty\b'
       scope: storage.modifier.sp
       branch_point: property_begin
       branch:
         - - match: '(?=\s*\b(public|property)\b|\}|[^[:alpha:]_\s])'
             pop: true
-
           - match: \b{{identifier}}\b
             scope: storage.type.sp
             push:
               - match: '(?=\s*\b(public|property)\b|\}|[^[:alpha:]_\s])'
                 pop: 2
-
               - match: \b{{identifier}}\b
                 scope: entity.name.trait.sp
                 set:
@@ -821,13 +811,11 @@ contexts:
                     - match: \}
                       scope: punctuation.section.braces.end.sp
                       pop: 2
-
                     - match: (?<=^|;|\)|\})\s*\bpublic\b
                       scope: storage.modifier.sp
                       push:
                         - match: \bnative\b
                           scope: storage.modifier.sp
-
                         - match: '\bget\b'
                           scope: support.function.sp
                           set:
@@ -838,13 +826,11 @@ contexts:
                               - match: \)
                                 scope: punctuation.section.group.end.sp
                                 pop: true
-
                               - match: \S
                                 scope: invalid.illegal.sp
                           - include: comments
                           - match: (?=\S)
                             pop: true
-
                         - match: '\bset\b'
                           scope: support.function.sp
                           set:
@@ -855,50 +841,364 @@ contexts:
                               - match: \)
                                 scope: punctuation.section.group.end.sp
                                 pop: true
-
                               - include: function-params
                           - include: comments
                           - match: (?=\S)
                             pop: true
-
+                        - include: comments
                     - match: ';'
                       scope: punctuation.terminator.sp
-
                     - include: function-definition-body-methodmap
-
                     - include: comments
-
                 - include: comments
         - - match: ''
             pop: true
 
+    - include: preprocessor
+
+  function-definition-body-methodmap:
+    - meta_content_scope: meta.function.sp
+    - match: '\{'
+      scope: meta.block.sp punctuation.section.block.begin.sp
+      push:
+        - meta_content_scope: meta.function.sp meta.block.sp
+        - match: '\}'
+          scope: meta.function.c meta.block.c punctuation.section.block.end.sp
+          pop: true
+
+        - include: expressions
+
+  function-definition-body:
+    - meta_content_scope: meta.function.sp
+    - match: \{
+      scope: meta.block.sp punctuation.section.block.begin.sp
+      set:
+        - meta_content_scope: meta.function.sp meta.block.sp
+        - match: \}
+          scope: meta.function.sp meta.block.sp punctuation.section.block.end.sp
+          pop: true
+
+        - include: expressions
+
+  public:
+    - match: (?<=^|[;\)\}]|\*\/)\s*public\b
+      scope: storage.modifier.sp
+      branch_point: public_begin
+      branch:
+        # public function, no type
+        - - match: \b{{identifier}}\b
+            scope: meta.function.sp support.function.sp
+            push:
+              - meta_content_scope: meta.function.parameters.sp
+              - match: \(
+                scope: punctuation.section.group.begin.sp
+                set:
+                  - meta_content_scope: meta.function.parameters.sp
+                  - match: \)
+                    scope: punctuation.section.group.end.sp
+                    set:
+                      - meta_content_scope: meta.function.sp
+                      - match: \s*\{
+                        scope: meta.block.sp punctuation.section.block.begin.sp
+                        set:
+                          - meta_content_scope: meta.function.sp meta.block.sp
+                          - match: \}
+                            scope: meta.function.sp meta.block.sp punctuation.section.block.end.sp
+                            pop: 2
+                          - include: expressions
+
+                      - include: comments
+                      - match: (?=\s*\S)
+                        pop: 2
+
+                  - include: function-params
+              - match: \S
+                fail: public_begin
+
+        # public typed function
+        - - match: (\b{{identifier}}\b)(?:\s*(:))?
+            captures:
+              0: meta.function.return-type.sp
+              1: storage.type.sp
+              2: punctuation.separator.sp
+            push:
+              - meta_content_scope: meta.function.sp
+              - match: '{{identifier}}'
+                scope: support.function.sp
+                set:
+                  - meta_content_scope: meta.function.parameters.sp
+                  - match: \(
+                    scope: punctuation.section.group.begin.sp
+                    set:
+                      - meta_content_scope: meta.function.parameters.sp
+                      - match: \)
+                        scope: punctuation.section.group.end.sp
+                        set:
+                          - meta_content_scope: meta.function.sp
+                          - match: \s*\{
+                            scope: meta.block.sp punctuation.section.block.begin.sp
+                            set:
+                              - meta_content_scope: meta.function.sp meta.block.sp
+                              - match: \}
+                                scope: meta.function.sp meta.block.sp punctuation.section.block.end.sp
+                                pop: 2
+                              - include: expressions
+
+                          - include: comments
+                          - match: (?=\s*\S)
+                            pop: 2
+                      - include: function-params
+
+                  - include: comments
+                  - match: \S
+                    fail: public_begin
+
+              - include: comments
+              - match: \S
+                fail: public_begin
+
+          - include: comments
+          - match: \S
+            fail: public_begin
+
+         # struct
+        - - match: (\b{{identifier}}\b)(?:\s*(:))?
+            captures:
+              1: storage.type.sp
+              2: punctuation.separator.sp
+            push:
+              - match: '{{identifier}}'
+                scope: variable.other.sp
+                set:
+                  - match: '='
+                    scope: keyword.operator.assignment.sp
+                    set:
+                      - match: \{
+                        scope: punctuation.section.block.begin.sp
+                        set:
+                          - meta_scope: meta.block.struct.sp
+                          - match: \}
+                            scope: punctuation.section.block.end.sp
+                            pop: 2
+
+                          - match: (\b{{identifier}}\b)
+                            captures:
+                              1: variable.other.member.sp
+                            push:
+                              - match: '='
+                                scope: keyword.operator.assignment.sp
+                                set:
+                                  - match: (?=[,\}])
+                                    pop: true
+                                  - include: expressions
+
+                                  - match: \s*(?=\b{{identifier}}\s*=)
+                                    scope: invalid.illegal.missing-comma.sp
+                                    pop: true
+
+                                  - include: preprocessor
+
+                              - match: \s*(?=\b{{identifier}}\s*=)
+                                scope: invalid.illegal.missing-comma.sp
+                                pop: true
+
+                          - match: ','
+                            scope: punctuation.separator.sp
+
+                          - include: preprocessor
+                          - include: comments
+
+                      - include: comments
+                      - match: (?=\S)
+                        pop: 2
+
+                  - match: '\S'
+                    fail: public_begin
+
+              - match: '\S' # try to match public func with no type (old syntax)
+                fail: public_begin
+
+          - include: comments
+
+          - match: \S
+            fail: public_begin
+
+        - - match: ''
+            pop: true
+
+  global-declaration:
+    - match: '(?<=^|[;\)\}]|\*\/)(?:\s*(stock)\b)?(?:\s*(static))?(?=\s*\b{{identifier}}\b)'
+      captures:
+        1: keyword.declaration.sp
+        2: storage.modifier.sp
+      branch_point: global_decl_begin
+      branch:
+        - - match: (?=\s*(public|stock|static|enum|struct|methodmap|typedef|typeset)|[^[:alpha:]_\s])
+            pop: true
+
+          # this will be (should be, anyways) a variable
+          - match: \bconst\b
+            scope: storage.modifier.sp
+            pop: true
+
+            # this will be a variable
+          - match: '\b(new|decl)\b'
+            scope: keyword.declaration.sp
+            pop: true
+
+            # this should be the type of a function
+          - match: '\b({{identifier}})(?:\s*(:))?'
+            captures:
+              1: storage.type.sp
+              2: punctuation.separator.sp
+            branch_point: global_decl_typed_old_begin
+            branch:
+              - - match: (?=\s*\() # found an untyped function (old syntax)
+                  fail: global_decl_begin
+
+                # looks like there is another declaration ahead. lets get out of here.
+                - match: '(?=\s*\b{{identifier}}\b\s+[[:alpha:]_])'
+                  pop: 2
+
+                # we're identifying a typed function
+                - match: '{{identifier}}'
+                  scope: entity.name.function.sp
+                  push:
+                    - match: \(
+                      scope: punctuation.section.group.begin.sp
+                      set:
+                        - meta_content_scope: meta.function.parameters.sp
+                        - match: \)
+                          scope: punctuation.section.group.end.sp
+                          set:
+                            - meta_content_scope: meta.function.sp
+                            - match: \s*\{
+                              scope: meta.block.sp punctuation.section.block.begin.sp
+                              set:
+                                - meta_content_scope: meta.function.sp meta.block.sp
+                                - match: \}
+                                  scope: meta.function.sp meta.block.sp punctuation.section.block.end.sp
+                                  pop: 3
+                                - include: expressions
+
+                            - include: comments
+                            - match: (?=\s*\S)
+                              pop: 3
+
+                        - include: function-params
+
+                    # idk what we found, but it's not a function. lets go back to the very beginning.
+                    # i would guess it's another declaration. this will trigger FAIL2
+                    - match: (?=\S)
+                      fail: global_decl_begin
+
+              - - match: ''
+                  pop: 2
+
+
+          # this can be a variable or a function
+          - match: \b{{identifier}}\b
+            scope: storage.type.sp
+            pop: true
+
+        # untyped function (old syntax)
+        - - match: '\b{{identifier}}\b'
+            scope: entity.name.function.sp
+            push:
+              - match: \(
+                scope: punctuation.section.group.begin.sp
+                set:
+                  - meta_content_scope: meta.function.parameters.sp
+                  - match: \)
+                    scope: punctuation.section.group.end.sp
+                    set:
+                      - match: (?=\{)
+                        push: function-definition-body
+                      - include: comments
+                      - match: (?=\s*\S)
+                        pop: 2
+
+                  - include: function-params
+
+              # FAIL2 as noted above. Lets check if this is a variable.
+              - match: (?=\S)
+                fail: global_decl_begin
+
+        # gonna try matching variable declarations here.
+        - - match: (\b{{identifier}}\b)(?:\s*(:))?
+            captures:
+              1: storage.type.sp
+              2: invalid.illegal.old-syntax.sp # illegal because decl is missing new/decl
+            push:
+              # looks like there is another declaration ahead. lets get out of here.
+              - match: '(?=\s*\b{{identifier}}\b\s+[[:alpha:]_])'
+                pop: 2
+
+              # this appears to be our variable. lets see if it's chained.
+              - match: '\b{{identifier}}\b'
+                scope: variable.other.readwrite.sp
+                set:
+                  - match: (?=;)
+                    pop: 2
+
+                  - include: brackets
+
+                  - match: ','
+                    scope: punctuation.separator.sp
+                    push:
+                      - match: '(?=\s*\b{{identifier}}(\s*:|\s+[[:alpha:]_]))' # stop here. this isnt expected.
+                        pop: 3
+
+                      - match: '\b{{identifier}}\b' # found another variable
+                        scope: variable.other.readwrite.sp
+                        pop: true
+
+                  - match: '='
+                    scope: keyword.operator.assignment.sp
+                    push:
+                      - match: (?=,) # continue checking for chained
+                        pop: true
+
+                      - match: (?=;) # end
+                        pop: 3
+
+                      - match: (?=\s*\b{{identifier}}\s*([[:alpha:]_])) # stop here. this isnt expected.
+                        pop: 3
+
+                      - include: expressions
+
+                  - match: (?=\S)
+                    pop: 2
+
+
+        - - match: ''
+            pop: true
+
+
+
+
+  # function-declaration-continued:
+  #   - match: (?=\s*\b{{identifier}}\b)
 
   typedef:
-    - match: \b(typedef)\b
+    - match: (?<=^|[;\)\}]|\*\/)\s*typedef\b
       scope: keyword.declaration.sp
       branch_point: typedef_begin
       branch:
-        - typedef_type
-        - typedef_end
+        - - include: comments
+          - match: '\b({{identifier}})\b'
+            scope: entity.name.type.sp
+            push:
+              - include: comments
 
-  typedef_type:
-    - include: comments
+              - match: '='
+                scope: keyword.operator.assignment.sp
+                set: typedef_function
 
-    - match: '\b({{identifier}})\b'
-      scope: entity.name.type.sp
-      push:
-        - include: comments
-
-        - match: '='
-          scope: keyword.operator.assignment.sp
-          set: typedef_function
-
-        - match: (?=\S)
-          fail: typedef_begin
-
-  typedef_end:
-    - match: '(?=\S)'
-      pop: true
+              - match: (?=\S)
+                fail: typedef_begin
+        - - match: ''
+            pop: true
 
   typedef_function:
     - include: comments
@@ -907,88 +1207,95 @@ contexts:
       scope: storage.modifier.sp
       branch_point: typedef_function_begin
       branch:
-        - typedef_function_type
-        - typedef_end
+        - - include: comments
+
+          - match: '\b({{identifier}})\b'
+            scope: storage.type.sp
+            push:
+              - include: comments
+
+              - match: \(
+                scope: meta.function.parameters.sp punctuation.section.group.begin.sp
+                set:
+                  - match: \)
+                    scope: punctuation.section.group.end.sp
+                    pop: 2
+
+                  - include: function-params
+
+              - match: (?=\S)
+                fail: typedef_function_begin
+        - - match: ''
+            pop: true
 
     - match: (?=\S)
       pop: 2
 
-  typedef_function_type:
-    - include: comments
-
-    - match: '\b({{identifier}})\b'
-      scope: storage.type.sp
-      push:
-        - include: comments
-
-        - match: \(
-          scope: meta.function.parameters.sp punctuation.section.group.begin.sp
-          set:
-            - match: \)
-              scope: punctuation.section.group.end.sp
-              pop: 2
-
-            - include: function-params
-
-        - match: (?=\S)
-          fail: typedef_function_begin
-
   typeset:
-    - match: \b(typeset)\b
+    - match: (?<=^|[;\)\}]|\*\/)\s*typeset\b
       scope: keyword.declaration.sp
       branch_point: typeset_begin
       branch:
-        - typeset_type
-        - typeset_end
+        - - include: comments
 
-  typeset_end:
-    - match: '(?=\S)'
-      pop: true
+          - match: '\b(?:{{identifier}})\b'
+            scope: entity.name.type.sp
+            push:
+              - include: comments
+              - match: \{
+                scope: punctuation.section.block.begin.sp
+                set:
+                  - meta_scope: meta.block.typeset.sp
+                  - match: \}
+                    scope: punctuation.section.block.end.sp
+                    pop: 2
 
-  typeset_type:
-    - include: comments
+                  - include: comments_documentation
+                  - include: typeset_function
 
-    - match: '\b(?:{{identifier}})\b'
-      scope: entity.name.type.sp
-      push:
-        - include: comments
-        - match: \{
-          scope: punctuation.section.block.begin.sp
-          set:
-            - meta_scope: meta.block.typeset.sp
-            - match: \}
-              scope: punctuation.section.block.end.sp
-              pop: 2
-
-            - include: comments_documentation
-            - include: typeset_function
-
-        - match: (?=\S)
-          fail: typeset_begin
+              - match: (?=\S)
+                fail: typeset_begin
+        - - match: ''
+            pop: true
 
   typeset_function:
     - include: comments
 
-    - match: '\bfunction\b'
+    - match: '(?<=^|[;\)\}]|\*\/)\s*function\b'
       scope: storage.modifier.sp
       branch_point: typeset_function_begin
       branch:
-        - typeset_function_type
-        - typeset_end
+        - - include: comments
+          - match: (?=\})|[^[:alpha:]_\s]+
+            pop: true
+          - match: '\bfunction\b'
+            fail: typeset_function_begin
+          - match: '\b(?:{{identifier}})\b'
+            scope: storage.type.sp
+            push:
+              - match: \(
+                scope: meta.function.parameters.sp punctuation.section.group.begin.sp
+                set:
+                  - match: \)
+                    scope: punctuation.section.group.end.sp
+                    pop: 2
+                  - include: function-params
+              - include: comments
+              - match: (?=\S)
+                pop: 2
+        - - match: ''
+            pop: true
 
     - match: ';'
       scope: punctuation.terminator.sp
 
   typeset_function_type:
     - include: comments
-
     - match: (?=\})|[^[:alpha:]_\s]+
       pop: true
-
     - match: '\bfunction\b'
       fail: typeset_function_begin
-
-    - match: '\b(?:{{identifier}})\b'
+    - match: '\b{{identifier}}\b'
       scope: storage.type.sp
       push:
         - include: comments
@@ -1004,6 +1311,55 @@ contexts:
 
         - match: (?=\S)
           pop: 2
+
+  native-forward:
+    - match: '(?<=^|[;\)\}]|\*\/)\s*(?:native|forward)'
+      scope: storage.type.function keyword.declaration.function
+      branch_point: native-forward-begin
+      branch:
+        # Typed eg - native int f(...) or forward bool:f(...)
+        - - match: '\b({{identifier}})\b(?:\s*(:))?'
+            captures:
+              1: meta.function.return-type.sp storage.type.sp
+              2: punctuation.separator.sp
+            push:
+              - match: \b{{identifier}}\b
+                scope: meta.function.sp entity.name.function.sp
+                set:
+                  - match: \(
+                    scope: meta.function.parameters.sp punctuation.section.group.begin.sp
+                    set:
+                      - match: \)
+                        scope: punctuation.section.group.end.sp
+                        pop: 2
+                      - include: function-params
+                  - include: comments
+                  - match: \S
+                    fail: native-forward-begin
+              - include: comments
+              - match: \S
+                fail: native-forward-begin
+          - include: comments
+
+        - - match: '{{identifier}}'
+            scope: entity.name.function.sp
+            push:
+              - match: \(
+                scope: meta.function.parameters.sp punctuation.section.group.begin.sp
+                set:
+                  - match: \)
+                    scope: punctuation.section.group.end.sp
+                    pop: 2
+                  - include: function-params
+              - include: comments
+              - match: \S
+                fail: native-forward-begin
+          - include: comments
+          - match: \S
+            fail: native-forward-begin
+
+        - - match: ''
+            pop: true
 
   function-params:
     - match: (?=\S)
@@ -1042,9 +1398,12 @@ contexts:
               set:
                 - match: '(?=,|\))'
                   pop: true
+
+                - include: expressions
+
                 - match: \b{{identifier}}\b
                   scope: variable.other.constant.sp
-                - include: expressions
+
             - include: comments
             - match: (?=\S)
               set:
@@ -1076,9 +1435,10 @@ contexts:
           set:
             - match: '(?=,|\))'
               pop: true
+            - include: expressions
             - match: \b{{identifier}}\b
               scope: variable.other.constant.sp
-            - include: expressions
+
         - include: comments
         - match: '(?=[[:alpha:]_\.])'
           fail: function_param_begin
@@ -1087,12 +1447,10 @@ contexts:
     - match: \S+
       scope: invalid.illegal.sp
 
-
   function_param_new:
     - match: (?=\))
       pop: true
 
-    - include: comments
     - match: ','
       scope: punctuation.separator.sp
       pop: true
@@ -1143,9 +1501,9 @@ contexts:
               set:
                 - match: '(?=,|\))'
                   pop: true
+                - include: expressions
                 - match: \b{{identifier}}\b
                   scope: variable.other.constant.sp
-                - include: expressions
             - include: comments
             - match: (?=\S)
               set:
@@ -1156,8 +1514,58 @@ contexts:
         - match: '[^[;&,\)\s]]+'
           scope: invalid.illegal.sp
 
+    - include: comments
     - match: '[^[;&,\)\s]]+'
       scope: invalid.illegal.sp
+
+  accessor:
+    - match: (\b{{identifier}}\b)\s*(::)
+      captures:
+        1: storage.type
+        2: punctuation.accessor.double-colon.sp
+      push:
+        - match: \s*\b{{identifier}}\b
+          scope: variable.other.member.sp
+          pop: true
+        - match: (?=\s*\S)
+          pop: true
+
+    - match: \.
+      scope: punctuation.accessor.dot.sp
+      push:
+        - match: '\b{{identifier}}\s*(?=\()'
+          scope: variable.function.sp
+          set:
+            - match: \(
+              scope: meta.group.sp punctuation.section.group.begin.sp
+              set:
+                - match: \)
+                  scope: meta.group.sp punctuation.section.group.end.sp
+                  pop: true
+                - include: expressions
+
+        - match: '\b{{identifier}}\b'
+          scope: variable.other.member.sp
+        - match: (?=\S)
+          pop: true
+
+    - match: \.(?!\.)
+      scope: punctuation.accessor.c
+
+  function-call:
+    - match: (?=\b{{identifier}}\b\s*\()
+      push:
+        - meta_content_scope: meta.function-call.sp
+        - match: '{{identifier}}'
+          scope: variable.function.sp
+          set:
+            - match: \(
+              scope: meta.group.sp punctuation.section.group.begin.sp
+              set:
+                - match: \)
+                  scope: meta.group.sp punctuation.section.group.end.sp
+                  pop: true
+                - include: expressions
 
   brackets:
     - match: \[
@@ -1167,7 +1575,7 @@ contexts:
         - match: \]
           scope: punctuation.section.brackets.end.sp
           pop: true
-        - include: expressions-simple
+        - include: expressions
 
   parens:
     - match: \(
@@ -1218,7 +1626,7 @@ contexts:
         - include: expressions-simple
 
   view_as:
-    - match: \b(view_as)\b\s*
+    - match: \bview_as\b
       scope: keyword.operator.word.viewas.sp
       push:
         - match: '<'
@@ -1232,6 +1640,7 @@ contexts:
               scope: storage.type.sp
 
             # - include: expressions-simple
+        - include: comments
 
         - match: (?=\S)
           pop: true
@@ -1256,7 +1665,7 @@ contexts:
         1: support.constant.sp
     - match: '{{numerals}}'
       scope: constant.numeric.sp
-    - match: '\b[A-Z_][A-Z_\d]+\b'
+    - match: '\b[A-Z_][A-Z_\d]*\b'
       scope: variable.constant.sp
 
   strings:
