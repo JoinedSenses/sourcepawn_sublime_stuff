@@ -75,7 +75,6 @@ contexts:
 
   late-expressions:
     - include: function-call
-      scope: support.constant.spn
     - match: ';'
       scope: punctuation.terminator.sp
 
@@ -1897,7 +1896,7 @@ contexts:
       scope: keyword.control.sp
     - match: '\b(?:sizeof|cellsof|tagof)\b'
       scope: keyword.operator.word.sp
-    - match: \bdelete|new\b
+    - match: \b(?:delete|new)\b
       scope: keyword.control.sp
     - match: '\bthis\b'
       scope: variable.language
