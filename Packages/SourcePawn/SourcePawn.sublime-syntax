@@ -10,10 +10,10 @@ scope: source.sp
 variables:
   numerals_binary: '\b0b[01]+\b'
   numerals_hex: '\b0x[0-9a-fA-F]{0,8}\b'
-  numerals_intfloat: '\d+(\.\d*)?(e-?\d*)?\b'
+  numerals_intfloat: '\b\d+(\.\d*)?(e-?\d*)?\b'
   numerals: '{{numerals_binary}}|{{numerals_hex}}|{{numerals_intfloat}}'
 
-  identifier: '(?:[[:alpha:]_]\w*)'
+  identifier: '(?:\b[[:alpha:]_]\w*\b)'
   modifier_decl: 'public[ \t]+native|stock|native|forward|static'
   # operator_method_name: '\boperator\s*[-+*/%^&|~!=<>]|[-+*/%^&|=!<>]=|<<=?|>>=?|&&|\|\||\+\+|--|,|->\*?|\(\)|\[\]'
   control_keywords: 'break|case|continue|default|do|else|for|if|return|switch|while'
@@ -23,9 +23,11 @@ variables:
   const_char_escape: \\(?:[abefnrt'"%\\]|(?:x[a-zA-Z0-9]{0,2}|\d+);?)
 
   global_decl_lookahead: (?=\s*(public|stock|static|forward|native|enum|struct|methodmap|typedef|typeset|functag|funcenum|new|decl)\b)
+  local_lookahead: \b(?:if|else|for|while|do|return|switch|case|continue|break|delete|new|decl|static|const|sizeof|cellsof|tagof)\b
+  invalid_var_lookahead: (?=;)|{{global_decl_lookahead}}|(?={{local_lookahead}})|(?=\s*{{identifier}}(?:\s*\(|\s+{{identifier}}))
 
   # Overkill. I have a formatted version with comments for maintenance
-  ALL_CONSTANTS: (?=\b[A-GIK-V_]\w{5})(?:T(?:E(?:MP_REQUIRE_EXTENSIONS|_EXPLFLAG_(?:DRAWALPHA|NO(?:ADDITIVE|DLIGHTS|FIREBALL(?:SMOKE)?|NE|PARTICLES|SOUND)|ROTATE))|F(?:Class_(?:DemoMan|Engineer|Heavy|Medic|Pyro|S(?:cout|niper|oldier|py)|Unknown)|Cond(?:Duration_Infinite|_(?:A(?:fterburnImmune|irCurrent)|B(?:alloonHead|l(?:ast(?:Immune|Jumping)|eeding)|onked|u(?:ffed|lletImmune|rningPyro))|C(?:harging|loak(?:Flicker|ed)|ompetitive(?:Loser|Winner)|rit(?:C(?:anteen|ola)|DemoCharge|Hype|Mmmph|On(?:Damage|F(?:irstBlood|lagCapture)|Kill|Win)|RuneTemp))|D(?:azed|e(?:adRingered|fenseBuff(?:Mmmph|NoCritBlock|ed)|moBuff|)|isguis(?:e(?:Removed|d(?:AsDispenser)?)|ing)|odgeChance)|EyeaductUnderworld|F(?:ireImmune|ocusBuff|reezeInput)|G(?:as|rappl(?:ed(?:(?:By|To)Player)|ingHook(?:Bleeding|Latched|SafeFall)?))|H(?:a(?:lloween(?:BombHead|CritCandy|G(?:hostMode|iant)|InHell|Kart(?:Cage|Dash|NoTurn)?|QuickHeal|SpeedBoost|T(?:hriller|iny))|sRune)|ealing(?:Debuff)?)|InHealRadius|Jarated|K(?:ing(?:Aura|Rune)|nockedIntoAir|ritzkrieged)|LostFooting|M(?:VMBotRadiowave|arkedForDeath(?:Silent)?|e(?:digunDebuff|gaHeal|leeOnly)|i(?:lked|niCritOnKill))|NoHealingDamageBuff|O(?:bscuredSmoke|nFire|verhealed)|P(?:a(?:rachute(?:Deployed)?|sstime(?:Interception|PenaltyDebuff))|lague(?:Rune)?|reventDeath)|R(?:adiusHealOnDamage|e(?:genBuffed|programmed|strictToMelee)|ocketPack|une(?:Agility|Haste|Imbalance|Knockout|Precision|Re(?:gen|sist)|Strength|Vampire|Warlock))|S(?:apped|lowed|mall(?:B(?:(?:last|ullet)Resist)|FireResist)|p(?:awnOutline|eedBuffAlly)|tealthed(?:UserBuffFade)?|upernovaRune|wimming(?:Curse|NoEffects))|T(?:aunting|eleport(?:edGlow|ing)|mpDamageBonus)|U(?:ber(?:(?:B(?:last|ullet)|Fire)Resist|charge(?:Fading|d(?:Canteen|Hidden|OnTakeDamage)?))|nknown[12])|Zoomed))|Holiday_(?:AprilFools|Birthday|C(?:hristmas|ommunityUpdate)|EndOfTheLine|FullMoon|Halloween(?:OrFullMoon(?:OrValentines)?)?|Invalid|MeetThePyro|ValentinesDay)|Object(?:Mode_(?:E(?:ntrance|xit)|None)|_(?:CartDispenser|Dispenser|S(?:apper|entry)|Teleporter))|Resource(?:Names|_(?:B(?:ackstabs|uildingsDestroyed)|Captures|D(?:e(?:aths|fenses)|ominations)|Hea(?:dshots|lPoints)|Invulns|KillAssists|MaxHealth|P(?:ing|layerClass)|Re(?:supplyPoints|venge)|Score|T(?:eleports|otalScore)))|Team_(?:Blue|Red|Spectator|Unassigned)|WeaponSlot_(?:Building|Grenade|Item[12]|Melee|P(?:DA|rimary)|Secondary)|_(?:C(?:ONDFLAG_(?:B(?:LEEDING|ONKED|UFFED)|C(?:HARGING|LOAK(?:ED|FLICKER)|RITCOLA)|D(?:AZED|E(?:ADRINGERED|FENSEBUFFED|MOBUFF)|ISGUIS(?:ED|ING))|HEALING|INHEALRADIUS|JARATED|KRITZKRIEGED|M(?:ARKEDFORDEATH|EGAHEAL|ILKED)|NONE|O(?:NFIRE|VERHEALED)|REGENBUFFED|SLOWED|T(?:AUNTING|ELEPORT(?:GLOW|ING))|UBERCHARGE(?:D|FADE)|ZOOMED)|USTOM_(?:A(?:EGIS_ROUND|IR_STICKY_BURST|XTINGUISHER_BOOSTED)|B(?:A(?:CKSTAB|SEBALL)|LEEDING|OOTS_STOMP|URNING(?:_(?:ARROW|FLARE))?)|C(?:A(?:NNONBALL_PUSH|RRIED_BUILDING)|HARGE_IMPACT|LEAVER(?:_CRIT)?|OMBO_PUNCH|ROC)|D(?:E(?:CAPITATION(?:_BOSS)?|FENSIVE_STICKY)|RAGONS_FURY_(?:BONUS_BURNING|IGNITE))|EYEBALL_ROCKET|F(?:ISH_KILL|L(?:ARE_(?:EXPLOSION|PELLET)|YINGBURN))|G(?:IANT_HAMMER|OLD_WRENCH)|HEADSHOT(?:_DECAPITATION)?|KART|M(?:ERASMUS_(?:DECAPITATION|GRENADE|PLAYER_BOMB|ZAP)|INIGUN)|P(?:ENETRATE_(?:ALL_PLAYERS|HEADSHOT|MY_TEAM)|ICKAXE|LA(?:SMA(?:_(?:CHARGED|GIB))?|YER_SENTRY)|RACTICE_STICKY|UMPKIN_BOMB)|R(?:OCKET_DIRECTHIT|UNE_REFLECT)|S(?:APPER_RECORDER_DEATH|HOTGUN_REVENGE_CRIT|LAP_KILL|PELL_(?:B(?:ATS|LASTJUMP)|FIREBALL|LIGHTNING|M(?:ETEOR|IRV|ONOCULUS)|SKELETON|T(?:ELEPORT|INY))|T(?:ANDARD_STICKY|ICKBOMB_EXPLOSION)|UICIDE)|T(?:AUNT(?:ATK_GASBLAST|_(?:A(?:LLCLASS_GUITAR_RIFF|R(?:MAGEDDON|ROW_STAB))|BARBARIAN_SWING|ENGINEER_(?:ARM|SMASH)|FENCING|GR(?:AND_SLAM|ENADE)|H(?:ADOUKEN|IGH_NOON)|UBERSLICE))|ELEFRAG|HROWABLE(?:_KILL)?|RIGGER_HURT)|WRENCH_FIX))|DEATHFLAG_(?:A(?:SSISTER(?:DOMINATION|REVENGE)|USTRALIUM)|DEADRINGER|FIRSTBLOOD|GIBBED|INTERRUPTED|KILLER(?:DOMINATION|REVENGE)|MINIBOSS|PURGATORY)|FLAGEVENT_(?:CAPTURED|D(?:EFENDED|ROPPED)|PICKEDUP|RETURNED)|STUNFLAG(?:S_(?:BIGBONK|GHOSTSCARE|LOSERSTATE|(?:NORMAL|SMALL)BONK)|_(?:BONKSTUCK|CHEERSOUND|GHOSTEFFECT|LIMITMOVEMENT|NOSOUNDOREFFECT|S(?:LOWDOWN|OUND)|THIRDPERSON))|WEAPON_(?:B(?:AT(?:_(?:FISH|GIFTWRAP|WOOD))?|O(?:NESAW|TTLE)|REAKABLE_SIGN|U(?:FF_ITEM|ILDER))|C(?:ANNON|HARGED_SMG|L(?:EAVER|UB)|OMPOUND_BOW|RO(?:SSBOW|WBAR))|D(?:I(?:RECTHIT|SPENSER(?:_GUN)?)|RG_POMSON)|F(?:I(?:REAXE|STS)|LA(?:ME(?:THROWER(?:_ROCKET)?|_BALL)|REGUN))|GR(?:APPLINGHOOK|ENADE(?:LAUNCHER|_(?:C(?:ALTROP|LEAVER|ONCUSSION)|DEMOMAN|EMP|GAS|HEAL|JAR(?:_(?:GAS|MILK))?|MIRV(?:BOMB|_DEMOMAN)?|N(?:A(?:IL|PALM)|ORMAL)|ORNAMENT|PIPEBOMB|S(?:MOKE_BOMB|T(?:ICKY_BALL|UNBALL))|THROWABLE|WATERBALLOON)))|HA(?:NDGUN_SCOUT_(?:PRIMARY|SEC)|RVESTER_SAW)|INVIS|JAR(?:_(?:GAS|MILK))?|KNIFE|L(?:ASER_POINTER|IFELINE|UNCHBOX)|M(?:E(?:CHANICAL_ARM|DIGUN)|INIGUN)|N(?:AILGUN|ONE)|P(?:A(?:R(?:ACHUTE|TICLE_CANNON)|SSTIME_GUN)|DA(?:_(?:ENGINEER_(?:BUILD|DESTROY)|SPY(?:_BUILD)?))?|EP_BRAWLER_BLASTER|I(?:PEBOMBLAUNCHER|STOL(?:_SCOUT)?)|UMPKIN_BOMB)|R(?:AYGUN(?:_REVENGE)?|EVOLVER|OCKET(?:LAUNCHER|PACK))|S(?:CATTERGUN|ENTRY_(?:BULLET|R(?:EVENGE|OCKET))|HO(?:TGUN_(?:BUILDING_RESCUE|HWG|P(?:RIMARY|YRO)|SOLDIER)|VEL)|LAP|MG|NIPERRIFLE(?:_(?:CLASSIC|DECAP))?|ODA_POPPER|PELLBOOK(?:_PROJECTILE)?|TICK(?:BOMB|Y_BALL_LAUNCHER)|WORD|YRINGEGUN_MEDIC)|T(?:HROWABLE|RANQ)|WRENCH)))|IMER_(?:(?:DATA_)?HNDL_CLOSE|FLAG_NO_MAPCHANGE|REPEAT)|est(?:Context|Number)|opMenu(?:Action_(?:D(?:isplay(?:Option|Title)|rawOption)|RemoveObject|SelectOption)|Object_(?:Category|Item)|Position_(?:Last(?:Category|Root)|Start)))|S(?:DK(?:C(?:all_(?:Entity(?:List)?|GameRules|Player|Raw|Static)|onf_(?:Address|Signature|Virtual))|Hook_(?:CanBeAutobalanced|FireBulletsPost|G(?:etMaxHealth|roundEntChangedPost)|(?:Blocked|EndTouch|OnTakeDamage(?:Alive)?|(?:Post|Pre)?Think|Reload|S(?:pawn|tartTouch)|T(?:ouch|raceAttack)|Use|VPhysicsUpdate|Weapon(?:Can(?:SwitchTo|Use)|Drop|Equip|Switch))(?:Post)?|SetTransmit|ShouldCollide)|Library_(?:Engine|Server)|Pass_(?:By(?:Ref|Value)|P(?:lain|ointer))|T(?:OOLS_DISABLE_SOUNDAPI|ype_(?:Bool|CBase(?:Entity|Player)|Edict|Float|PlainOldData|QAngle|String|Vector)))|EEK_(?:CUR|END|SET)|M(?:C(?:Error_(?:Custom|Invalid(?:Property1|Section[1-5]|Tokens)|Okay|Stream(?:Error|Open)|TokenOverflow)|Parse_(?:Continue|Halt(?:Fail)?))|_(?:PARAM_(?:COPYBACK|STRING_(?:BINARY|COPY|UTF8))|REPLY_TO_C(?:HAT|ONSOLE)))|ND(?:ATTN_(?:IDLE|NO(?:NE|RMAL)|RICOCHET|STATIC)|CHAN_(?:AUTO|BODY|ITEM|REPLACE|ST(?:ATIC|REAM)|USER_BASE|VOICE(?:_BASE)?|WEAPON)|LEVEL_(?:AIRCRAFT|C(?:AR|ONVO)|D(?:ISHWASHER|RYER)|FRIDGE|GUNFIRE|H(?:ELICOPTER|OME)|LIBRARY|MINIBIKE|NO(?:NE|RMAL)|R(?:AIDSIREN|OCKET|USTLE)|S(?:CREAMING|NOWMOBILE)|TR(?:AFFIC|AIN)|WHISPER)|PITCH_(?:HIGH|LOW|NORMAL)|VOL_NORMAL|_(?:CHANGE(?:PITCH|VOL)|DELAY|NOFLAGS|S(?:HOULDPAUSE|P(?:AWNING|EAKER)|TOP(?:LOOPING)?)))|OU(?:ND_FROM_(?:(?:LOCAL_)?PLAYER|WORLD)|RCE(?:MOD_(?:PLUGINAPI_VERSION|V(?:ERSION|_(?:CSET|M(?:AJOR|INOR)|RE(?:LEASE|V)|TAG))|)|_SDK_(?:ALIENSWARM|BLOODYGOODTIME|CS(?:GO|S)|D(?:ARKMESSIAH|OTA)|E(?:PISODE(?:1|2(?:VALVE)?)|YE)|LEFT4DEAD2?|ORIGINAL|UNKNOWN)))|P_(?:ERROR_(?:A(?:BORTED|RRAY_(?:BOUNDS|TOO_BIG))|D(?:ECOMPRESSOR|IVIDE_BY_ZERO)|FILE_FORMAT|HEAP(?:L(?:EAK|OW)|MIN)|IN(?:DEX|STRUCTION_PARAM|VALID_(?:ADDRESS|INSTRUCTION|NATIVE)|)|MEMACCESS|N(?:ATIVE|O(?:NE|T(?:DEBUGGING|_(?:FOUND|RUNNABLE)))|)|PARAM(?:S_MAX)?|STACK(?:L(?:EAK|OW)|MIN)|TRACKER_BOUNDS)|PARAMFLAG_BYREF)|URF_(?:BUMPLIGHT|HI(?:NT|TBOX)|LIGHT|NO(?:CHOP|D(?:ECALS|RAW)|LIGHT|PORTAL|SHADOWS)|SK(?:IP|Y(?:2D)?)|TR(?:ANS|IGGER)|WARP)|ort_(?:(?:A|De)scending|Float|Integer|Random|String))|C(?:O(?:MMAND_(?:FILTER_(?:ALIVE|CONNECTED|DEAD|NO_(?:BOTS|IMMUNITY|MULTI))|TARGET_(?:AMBIGUOUS|EMPTY_FILTER|IMMUNE|NO(?:NE|T_(?:ALIVE|DEAD|HUMAN|IN_GAME))))|NTENTS_(?:A(?:REAPORTAL|UX)|CURRENT_(?:0|180|270|90|DOWN|UP)|DE(?:BRIS|TAIL)|EMPTY|GRATE|HITBOX|IGNORE_NODRAW_OPAQUE|LADDER|M(?:IST|O(?:NSTER(?:CLIP)?|VEABLE))|O(?:PAQUE|RIGIN)|PLAYERCLIP|S(?:LIME|OLID)|T(?:E(?:AM[12]|STFOGVOLUME)|RANSLUCENT)|UNUSED[56]|W(?:ATER|INDOW)))|S(?:RoundEnd_(?:BombDefused|CT(?:S(?:toppedEscape|urrender)|Win|sReachedHostage)|Draw|GameStart|Hostages(?:Not)?Rescued|T(?:arget(?:Bomb|Sav)ed|errorist(?:Win|s(?:(?:Not)?Escaped|Planted|S(?:topped|urrender))))|VIP(?:(?:Not)?Escaped|Killed))|Weapon_(?:A(?:K47|SSAULTSUIT|UG|WP|XE)|B(?:AYONET|IZON|REACHCHARGE)|C(?:4|UTTERS|Z75A)|D(?:E(?:AGLE|COY|FUSER)|IVERSION)|ELITE|F(?:AMAS|I(?:REBOMB|STS|VESEVEN)|LASHBANG|RAGGRENADE)|G(?:3SG1|ALIL(?:AR)?|LOCK)|H(?:AMMER|E(?:A(?:LTHSHOT|VYASSAULTSUIT)|GRENADE)|KP2000)|INCGRENADE|K(?:EVLAR|NIFE(?:_(?:BUTTERFLY|F(?:ALCHION|LIP)|G(?:G|HOST|UT|YPSY_JACKKNIFE)|KARAMBIT|M9_BAYONET|PUSH|S(?:TILETTO|URVIVAL_BOWIE)|T(?:ATICAL)?|URSUS|WIDOWMAKER))?)|M(?:249|3|4A1(?:_SILENCER)?|A(?:C10|G7|X_WEAPONS(?:_NO_KNIFES)?)|ELEE|OLOTOV|P(?:5NAVY|[79]))|N(?:EGEV|IGHTVISION|O(?:NE|VA))|P(?:2(?:28|50)|90)|REVOLVER|S(?:AWEDOFF|C(?:AR(?:17|20)|OUT)|G55[026]|HIELD|MOKEGRENADE|NOWBALL|PANNER|SG08)|T(?:A(?:BLET|GGRENADE|SER)|EC9|MP)|UMP45|USP(?:_SILENCER)?|XM1014)|_(?:DMG_HEADSHOT|SLOT_(?:C4|GRENADE|KNIFE|PRIMARY|SECONDARY)|TEAM_(?:CT|NONE|SPECTATOR|T))|)|o(?:mmand_(?:Allow|Deny)|nVar(?:Bound_(?:Low|Upp)er|Query_(?:Not(?:Found|Valid)|Okay|Protected))|okie(?:Access_(?:P(?:r(?:ivate|otected)|ublic))|Menu(?:Action_(?:(?:Display|Select)Option)|_(?:(?:OnOff|YesNo)(?:_Int)?)|))))|F(?:BEAM_(?:END(?:ENTITY|VISIBLE)|F(?:ADE(?:IN|OUT)|OREVER)|HALOBEAM|ISACTIVE|NOTILE|ONLYNOISEONCE|S(?:HADE(?:IN|OUT)|INENOISE|OLID|TART(?:ENTITY|VISIBLE))|USE_HITBOXES)|CVAR_(?:A(?:CCESSIBLE_FROM_THREADS|RCHIVE(?:_(?:GAMECONSOLE|XBOX))?)|C(?:HEAT|LIENT(?:CMD_CAN_EXECUTE|DLL))|D(?:E(?:MO|VELOPMENTONLY)|ONTRECORD)|GAMEDLL|HIDDEN|MATERIAL_SYSTEM(?:_THREAD)?|N(?:EVER_AS_STRING|O(?:NE|T(?:IFY|_CONNECTED)))|PLUGIN|(?:R(?:INTABLEONLY|OTECTED))|RE(?:L(?:EASE|OAD_(?:MATERIALS|TEXTURES))|PLICATED)|S(?:ERVER_CAN(?:NOT_QUERY|_EXECUTE)|PONLY|S(?:_ADDED)?|)|U(?:N(?:LOGGED|REGISTERED)|SERINFO))|EATURECAP_(?:COMMANDLISTENER|PLAYERRUNCMD_11PARAMS)|L(?:OAT_PI|_(?:A(?:IMTARGET|TCONTROLS)|BASEVELOCITY|C(?:LIENT|ONVEYOR)|D(?:ISSOLVING|ONTTOUCH|UCKING)|E(?:DICT_(?:ALWAYS|CHANGED|D(?:IRTY_PVS_INFORMATION|ONTSEND)|F(?:REE|ULL(?:CHECK)?)|P(?:ENDING_DORMANT_CHECK|VSCHECK))|P2V_UNKNOWN1)|F(?:AKECLIENT|LY|R(?:EEZING|OZEN)|ULL_EDICT_CHANGED)|G(?:ODMODE|R(?:APHED|ENADE))|IN(?:RAIN|WATER)|KILLME|N(?:OTARGET|PC)|O(?:BJECT|N(?:FIRE|GROUND|TRAIN))|PARTIALGROUND|S(?:T(?:ATICPROP|EPMOVEMENT)|WIM)|TRANSRAGDOLL|UNBLOCKABLE_BY_PLAYER|W(?:ATERJUMP|ORLDBRUSH)))|PERM_[GOU]_(?:EXEC|READ|WRITE)|eature(?:Status_(?:Available|Un(?:available|known))|Type_(?:Capability|Native))|i(?:le(?:T(?:ime_(?:Created|Last(?:Access|Change))|ype_(?:Directory|File|Unknown)))|ndMap_(?:(?:Not)?Found|FuzzyMatch|NonCanonical|PossiblyAvailable)))|R(?:E(?:GEX_ERROR_(?:ASSERT|BAD(?:BR|COUNT|ENDIANNESS|LENGTH|M(?:AGIC|ODE)|NEWLINE|O(?:FFSET|PTION)|PA(?:RTIAL|T)|RPT|UTF8(?:_OFFSET)?)|CALLOUT|DFA_(?:BADRESTART|RECURSE|U(?:COND|ITEM|MLIMIT)|WSSIZE)|E(?:BRAC[EK]|C(?:OLLATE|TYPE)|ESCAPE|MPTY|PAREN|RANGE|S(?:IZE|PACE|UBREG))|IN(?:TERNAL|VARG)|JIT_(?:BADOPTION|STACKLIMIT)|MATCHLIMIT|NO(?:MATCH|MEMORY|NE|SUBSTRING)|NULL(?:WSLIMIT)?|PARTIAL|RECURS(?:ELOOP|IONLIMIT)|SHORTUTF8|UNKNOWN_OPCODE)|NDER(?:FX_(?:CLAMP_MIN_SCALE|DISTORT|E(?:NV_(?:RAIN|SNOW)|XPLODE)|F(?:ADE_(?:FAST|SLOW)|LICKER_(?:FAST|SLOW))|GLOWSHELL|HOLOGRAM|MAX|NO(?:NE|_DISSIPATION)|PULSE_(?:FAST(?:_WIDER?)?|SLOW(?:_WIDE)?)|RAGDOLL|S(?:OLID_(?:FAST|SLOW)|POTLIGHT|TROBE_(?:FAST(?:ER)?|SLOW)))|_(?:ENVIRONMENTAL|GLOW|NO(?:NE|RMAL)|TRANS(?:A(?:DD(?:FRAMEBLEND)?|LPHA(?:ADD)?)|COLOR|TEXTURE)|WORLDGLOW))|QUIRE_(?:EXTENSIONS|PLUGIN))|a(?:ngeType_(?:(?:Aud|Vis)ibility)|yType_(?:EndPoint|Infinite)|)|oundState_(?:B(?:etweenRounds|onus)|GameOver|Init|Pre(?:game|round)|R(?:estart|oundRunning)|Sta(?:lemate|rtGame)|TeamWin)|)|M(?:A(?:PLIST_FLAG_(?:CLEARARRAY|MAPSFOLDER|NO_DEFAULT)|SK_(?:ALL|(?:NPC|PLAYER)?(?:SOLID(?:_BRUSHONLY)?)|NPCWORLDSTATIC|OPAQUE(?:_AND_NPCS)?|S(?:HOT(?:_(?:HULL|PORTAL))?|PLITAREAPORTAL)|VISIBLE(?:_AND_NPCS)?|WATER)|X(?:PLAYERS|_(?:LIGHTSTYLES|(?:NAME|TARGET)_LENGTH)))|ENU(?:FLAG_(?:BUTTON_(?:EXIT(?:BACK)?|NOVOTE)|NO_SOUND)|_(?:ACTIONS_(?:ALL|DEFAULT)|NO_PAGINATION|TIME_FOREVER))|O(?:TDPANEL_TYPE_(?:FILE|INDEX|TEXT|URL)|VETYPE_(?:CUSTOM|FLY(?:GRAVITY)?|ISOMETRIC|LADDER|NO(?:CLIP|NE)|OBSERVER|PUSH|STEP|VPHYSICS|WALK))|a(?:pChange_(?:Instant|(?:Map|Round)End)|xClients)|enu(?:Action_(?:Cancel|Display(?:Item)?|DrawItem|End|S(?:elect|tart)|Vote(?:Cancel|End|Start)|)|Cancel_(?:Disconnected|Exit(?:Back)?|Interrupted|NoDisplay|Timeout)|End_(?:Cancelled|Exit(?:Back)?|Selected|Voting(?:Cancelled|Done))|S(?:ource_(?:External|No(?:ne|rmal)|RawPanel)|tyle_(?:Default|Radio|Valve))))|A(?:cces_(?:Effective|Real)|DM(?:FLAG_(?:BAN|C(?:H(?:A(?:NGEMAP|T)|EATS)|ON(?:FIG|VARS)|USTOM[1-6])|GENERIC|KICK|PASSWORD|R(?:CON|ESERVATION|OOT)|SLAY|UNBAN|VOTE)|INMENU_(?:(?:PLAYER|SERVER|VOTING)COMMANDS))|LL_VISIBLE_CONTENTS|PLRes_(?:(?:Silent)?Failure|Success)|UT(?:HMETHOD_(?:IP|NAME|STEAM)|OLOAD_EXTENSIONS)|ccess_(?:Effective|Real)|d(?:dress_Null|min(?:_(?:Ban|C(?:h(?:a(?:ngemap|t)|eats)|on(?:fig|vars)|ustom[1-6])|Generic|Kick|Password|R(?:CON|eservation|oot)|Slay|Unban|Vote)|Cache_(?:Admins|Groups|Overrides)|Flags_TOTAL))|uthId_(?:Engine|Steam(?:[23]|ID64)))|D(?:B(?:Bind_(?:Float|Int|String)|Prio_(?:High|Low|Normal)|Val_(?:Data|Error|Null|TypeMismatch))|ISPSURF_FLAG_(?:BUILDABLE|SURF(?:ACE|PROP[12])|WALKABLE)|MG_(?:A(?:CID|IRBOAT|LWAYSGIB)|B(?:LAST(?:_SURFACE)?|U(?:CKSHOT|LLET|RN))|C(?:LUB|R(?:IT|USH))|D(?:I(?:RECT|SSOLVE)|ROWN(?:RECOVER)?)|ENERGYBEAM|FALL|GENERIC|HALF_FALLOFF|IGNITE|N(?:E(?:RVEGAS|VERGIB)|OCLOSEDISTANCEMOD)|P(?:ARALYZE|HYSGUN|LASMA|OISON|REVENT_PHYSICS_FORCE)|R(?:ADI(?:ATION|US_MAX)|EMOVENORAGDOLL)|S(?:HOCK|L(?:ASH|OWBURN)|ONIC)|USE(?:DISTANCEMOD|_HITLOCATIONS)|VEHICLE)|ialogType_(?:AskConnect|Entry|M(?:enu|sg)|Text))|P(?:ARTITION_(?:NON_STATIC_EDICTS|S(?:OLID_EDICTS|TATIC_PROPS)|TRIGGER_EDICTS)|B_FIELD_NOT_REPEATED|CRE_(?:ANCHORED|CASELESS|DO(?:LLAR_ENDONLY|TALL)|EXTENDED|MULTILINE|NO(?:TEMPTY|_UTF8_CHECK)|U(?:CP|NGREEDY|TF8))|LA(?:TFORM_MAX_PATH|YER_FLAG_BITS)|a(?:ram_(?:A(?:ny|rray)|(?:Cell|Float)(?:ByRef)?|String|VarArgs)|th_SM)|l(?:Info_(?:Author|Description|Name|URL|Version)|ugin_(?:BadLoad|C(?:hanged|ontinue|reated)|E(?:rror|victed)|Failed|Handled|Loaded|Paused|Running|Stop|Uncompiled))|rop(?:Field_(?:Entity|Float|Integer|String(?:_T)?|Unsupported|V(?:ariant|ector))|_(?:Data|Send)))|I(?:N(?:VALID_(?:(?:ADMIN|GROUP|MESSAGE)_ID|ENT_REFERENCE|F(?:CVAR_FLAGS|UNCTION)|HANDLE|STRING_(?:INDEX|TABLE)|TOPMENUOBJECT)|_(?:A(?:LT[12]|TTACK(?:[23])?)|B(?:ACK|ULLRUSH)|CANCEL|DUCK|FORWARD|GRENADE[12]|JUMP|(?:MOVE)?LEFT|(?:MOVE)?RIGHT|R(?:ELOAD|UN)|S(?:CORE|PEED)|USE|W(?:ALK|EAPON[12])|ZOOM))|TEMDRAW_(?:CONTROL|D(?:EFAULT|ISABLED)|IGNORE|NOTEXT|RAWLINE|SPACER)|dentity_(?:Core|Extension|Plugin))|E(?:T_(?:Event|Hook|Ignore|Single)|ngine_(?:AlienSwarm|Bl(?:a(?:ckMesa|de)|oodyGoodTime)|C(?:S(?:GO|S)|ontagion)|D(?:O(?:DS|I|TA)|arkMessiah)|EYE|HL2DM|Insurgency|Left4Dead2?|NuclearDawn|Original|Portal2|S(?:DK2013|ourceSDK200[67])|TF2|Unknown)|ventHookMode_(?:Post(?:NoCopy)?|Pre))|V(?:DECODE_FLAG_(?:ALLOW(?:N(?:OTINGAME|ULL)|WORLD)|BYREF)|ENCODE_FLAG_COPYBACK|O(?:ICE_(?:LISTEN(?:ALL|TEAM)|MUTED|NORMAL|SPEAKALL|TEAM)|TE(?:FLAG_NO_REVOTES|INFO_(?:CLIENT_(?:I(?:NDEX|TEM))|ITEM_(?:INDEX|VOTES))))|oteCancel_(?:Generic|NoVotes))|N(?:ULL_(?:STRING|VECTOR)|etFlow_(?:Both|(?:Incom|Outgo)ing)|ominate_(?:A(?:dded|lreadyInVote)|InvalidMap|Replaced|VoteFull)|umberType_Int(?:8|16|32))|KvData_(?:Color|Float|Int|N(?:UMTYPES|one)|Ptr|String|UInt64|WString)|U(?:M_(?:(?:BitB|Protob)uf)|SERMSG_(?:BLOCKHOOKS|INITMSG|RELIABLE)|se_(?:O(?:ff|n)|Set|Toggle))|L(?:A(?:NG_SERVER|ST_VISIBLE_CONTENTS)|isten_(?:Default|No|Yes))|BANFLAG_(?:AUT(?:HID|O)|IP|NOKICK)|Override_Command(?:Group)?|QUERYCOOKIE_FAILED|__(?:DAT|TIM)E__)\b
+  ALL_CONSTANTS: (?:T(?:E(?:MP_REQUIRE_EXTENSIONS|_EXPLFLAG_(?:DRAWALPHA|NO(?:ADDITIVE|DLIGHTS|FIREBALL(?:SMOKE)?|NE|PARTICLES|SOUND)|ROTATE))|F(?:Class_(?:DemoMan|Engineer|Heavy|Medic|Pyro|S(?:cout|niper|oldier|py)|Unknown)|Cond(?:Duration_Infinite|_(?:A(?:fterburnImmune|irCurrent)|B(?:alloonHead|l(?:ast(?:Immune|Jumping)|eeding)|onked|u(?:ffed|lletImmune|rningPyro))|C(?:harging|loak(?:Flicker|ed)|ompetitive(?:Loser|Winner)|rit(?:C(?:anteen|ola)|DemoCharge|Hype|Mmmph|On(?:Damage|F(?:irstBlood|lagCapture)|Kill|Win)|RuneTemp))|D(?:azed|e(?:adRingered|fenseBuff(?:Mmmph|NoCritBlock|ed)|moBuff|)|isguis(?:e(?:Removed|d(?:AsDispenser)?)|ing)|odgeChance)|EyeaductUnderworld|F(?:ireImmune|ocusBuff|reezeInput)|G(?:as|rappl(?:ed(?:(?:By|To)Player)|ingHook(?:Bleeding|Latched|SafeFall)?))|H(?:a(?:lloween(?:BombHead|CritCandy|G(?:hostMode|iant)|InHell|Kart(?:Cage|Dash|NoTurn)?|QuickHeal|SpeedBoost|T(?:hriller|iny))|sRune)|ealing(?:Debuff)?)|InHealRadius|Jarated|K(?:ing(?:Aura|Rune)|nockedIntoAir|ritzkrieged)|LostFooting|M(?:VMBotRadiowave|arkedForDeath(?:Silent)?|e(?:digunDebuff|gaHeal|leeOnly)|i(?:lked|niCritOnKill))|NoHealingDamageBuff|O(?:bscuredSmoke|nFire|verhealed)|P(?:a(?:rachute(?:Deployed)?|sstime(?:Interception|PenaltyDebuff))|lague(?:Rune)?|reventDeath)|R(?:adiusHealOnDamage|e(?:genBuffed|programmed|strictToMelee)|ocketPack|une(?:Agility|Haste|Imbalance|Knockout|Precision|Re(?:gen|sist)|Strength|Vampire|Warlock))|S(?:apped|lowed|mall(?:B(?:(?:last|ullet)Resist)|FireResist)|p(?:awnOutline|eedBuffAlly)|tealthed(?:UserBuffFade)?|upernovaRune|wimming(?:Curse|NoEffects))|T(?:aunting|eleport(?:edGlow|ing)|mpDamageBonus)|U(?:ber(?:(?:B(?:last|ullet)|Fire)Resist|charge(?:Fading|d(?:Canteen|Hidden|OnTakeDamage)?))|nknown[12])|Zoomed))|Holiday_(?:AprilFools|Birthday|C(?:hristmas|ommunityUpdate)|EndOfTheLine|FullMoon|Halloween(?:OrFullMoon(?:OrValentines)?)?|Invalid|MeetThePyro|ValentinesDay)|Object(?:Mode_(?:E(?:ntrance|xit)|None)|_(?:CartDispenser|Dispenser|S(?:apper|entry)|Teleporter))|Resource(?:Names|_(?:B(?:ackstabs|uildingsDestroyed)|Captures|D(?:e(?:aths|fenses)|ominations)|Hea(?:dshots|lPoints)|Invulns|KillAssists|MaxHealth|P(?:ing|layerClass)|Re(?:supplyPoints|venge)|Score|T(?:eleports|otalScore)))|Team_(?:Blue|Red|Spectator|Unassigned)|WeaponSlot_(?:Building|Grenade|Item[12]|Melee|P(?:DA|rimary)|Secondary)|_(?:C(?:ONDFLAG_(?:B(?:LEEDING|ONKED|UFFED)|C(?:HARGING|LOAK(?:ED|FLICKER)|RITCOLA)|D(?:AZED|E(?:ADRINGERED|FENSEBUFFED|MOBUFF)|ISGUIS(?:ED|ING))|HEALING|INHEALRADIUS|JARATED|KRITZKRIEGED|M(?:ARKEDFORDEATH|EGAHEAL|ILKED)|NONE|O(?:NFIRE|VERHEALED)|REGENBUFFED|SLOWED|T(?:AUNTING|ELEPORT(?:GLOW|ING))|UBERCHARGE(?:D|FADE)|ZOOMED)|USTOM_(?:A(?:EGIS_ROUND|IR_STICKY_BURST|XTINGUISHER_BOOSTED)|B(?:A(?:CKSTAB|SEBALL)|LEEDING|OOTS_STOMP|URNING(?:_(?:ARROW|FLARE))?)|C(?:A(?:NNONBALL_PUSH|RRIED_BUILDING)|HARGE_IMPACT|LEAVER(?:_CRIT)?|OMBO_PUNCH|ROC)|D(?:E(?:CAPITATION(?:_BOSS)?|FENSIVE_STICKY)|RAGONS_FURY_(?:BONUS_BURNING|IGNITE))|EYEBALL_ROCKET|F(?:ISH_KILL|L(?:ARE_(?:EXPLOSION|PELLET)|YINGBURN))|G(?:IANT_HAMMER|OLD_WRENCH)|HEADSHOT(?:_DECAPITATION)?|KART|M(?:ERASMUS_(?:DECAPITATION|GRENADE|PLAYER_BOMB|ZAP)|INIGUN)|P(?:ENETRATE_(?:ALL_PLAYERS|HEADSHOT|MY_TEAM)|ICKAXE|LA(?:SMA(?:_(?:CHARGED|GIB))?|YER_SENTRY)|RACTICE_STICKY|UMPKIN_BOMB)|R(?:OCKET_DIRECTHIT|UNE_REFLECT)|S(?:APPER_RECORDER_DEATH|HOTGUN_REVENGE_CRIT|LAP_KILL|PELL_(?:B(?:ATS|LASTJUMP)|FIREBALL|LIGHTNING|M(?:ETEOR|IRV|ONOCULUS)|SKELETON|T(?:ELEPORT|INY))|T(?:ANDARD_STICKY|ICKBOMB_EXPLOSION)|UICIDE)|T(?:AUNT(?:ATK_GASBLAST|_(?:A(?:LLCLASS_GUITAR_RIFF|R(?:MAGEDDON|ROW_STAB))|BARBARIAN_SWING|ENGINEER_(?:ARM|SMASH)|FENCING|GR(?:AND_SLAM|ENADE)|H(?:ADOUKEN|IGH_NOON)|UBERSLICE))|ELEFRAG|HROWABLE(?:_KILL)?|RIGGER_HURT)|WRENCH_FIX))|DEATHFLAG_(?:A(?:SSISTER(?:DOMINATION|REVENGE)|USTRALIUM)|DEADRINGER|FIRSTBLOOD|GIBBED|INTERRUPTED|KILLER(?:DOMINATION|REVENGE)|MINIBOSS|PURGATORY)|FLAGEVENT_(?:CAPTURED|D(?:EFENDED|ROPPED)|PICKEDUP|RETURNED)|STUNFLAG(?:S_(?:BIGBONK|GHOSTSCARE|LOSERSTATE|(?:NORMAL|SMALL)BONK)|_(?:BONKSTUCK|CHEERSOUND|GHOSTEFFECT|LIMITMOVEMENT|NOSOUNDOREFFECT|S(?:LOWDOWN|OUND)|THIRDPERSON))|WEAPON_(?:B(?:AT(?:_(?:FISH|GIFTWRAP|WOOD))?|O(?:NESAW|TTLE)|REAKABLE_SIGN|U(?:FF_ITEM|ILDER))|C(?:ANNON|HARGED_SMG|L(?:EAVER|UB)|OMPOUND_BOW|RO(?:SSBOW|WBAR))|D(?:I(?:RECTHIT|SPENSER(?:_GUN)?)|RG_POMSON)|F(?:I(?:REAXE|STS)|LA(?:ME(?:THROWER(?:_ROCKET)?|_BALL)|REGUN))|GR(?:APPLINGHOOK|ENADE(?:LAUNCHER|_(?:C(?:ALTROP|LEAVER|ONCUSSION)|DEMOMAN|EMP|GAS|HEAL|JAR(?:_(?:GAS|MILK))?|MIRV(?:BOMB|_DEMOMAN)?|N(?:A(?:IL|PALM)|ORMAL)|ORNAMENT|PIPEBOMB|S(?:MOKE_BOMB|T(?:ICKY_BALL|UNBALL))|THROWABLE|WATERBALLOON)))|HA(?:NDGUN_SCOUT_(?:PRIMARY|SEC)|RVESTER_SAW)|INVIS|JAR(?:_(?:GAS|MILK))?|KNIFE|L(?:ASER_POINTER|IFELINE|UNCHBOX)|M(?:E(?:CHANICAL_ARM|DIGUN)|INIGUN)|N(?:AILGUN|ONE)|P(?:A(?:R(?:ACHUTE|TICLE_CANNON)|SSTIME_GUN)|DA(?:_(?:ENGINEER_(?:BUILD|DESTROY)|SPY(?:_BUILD)?))?|EP_BRAWLER_BLASTER|I(?:PEBOMBLAUNCHER|STOL(?:_SCOUT)?)|UMPKIN_BOMB)|R(?:AYGUN(?:_REVENGE)?|EVOLVER|OCKET(?:LAUNCHER|PACK))|S(?:CATTERGUN|ENTRY_(?:BULLET|R(?:EVENGE|OCKET))|HO(?:TGUN_(?:BUILDING_RESCUE|HWG|P(?:RIMARY|YRO)|SOLDIER)|VEL)|LAP|MG|NIPERRIFLE(?:_(?:CLASSIC|DECAP))?|ODA_POPPER|PELLBOOK(?:_PROJECTILE)?|TICK(?:BOMB|Y_BALL_LAUNCHER)|WORD|YRINGEGUN_MEDIC)|T(?:HROWABLE|RANQ)|WRENCH)))|IMER_(?:(?:DATA_)?HNDL_CLOSE|FLAG_NO_MAPCHANGE|REPEAT)|est(?:Context|Number)|opMenu(?:Action_(?:D(?:isplay(?:Option|Title)|rawOption)|RemoveObject|SelectOption)|Object_(?:Category|Item)|Position_(?:Last(?:Category|Root)|Start)))|S(?:DK(?:C(?:all_(?:Entity(?:List)?|GameRules|Player|Raw|Static)|onf_(?:Address|Signature|Virtual))|Hook_(?:CanBeAutobalanced|FireBulletsPost|G(?:etMaxHealth|roundEntChangedPost)|(?:Blocked|EndTouch|OnTakeDamage(?:Alive)?|(?:Post|Pre)?Think|Reload|S(?:pawn|tartTouch)|T(?:ouch|raceAttack)|Use|VPhysicsUpdate|Weapon(?:Can(?:SwitchTo|Use)|Drop|Equip|Switch))(?:Post)?|SetTransmit|ShouldCollide)|Library_(?:Engine|Server)|Pass_(?:By(?:Ref|Value)|P(?:lain|ointer))|T(?:OOLS_DISABLE_SOUNDAPI|ype_(?:Bool|CBase(?:Entity|Player)|Edict|Float|PlainOldData|QAngle|String|Vector)))|EEK_(?:CUR|END|SET)|M(?:C(?:Error_(?:Custom|Invalid(?:Property1|Section[1-5]|Tokens)|Okay|Stream(?:Error|Open)|TokenOverflow)|Parse_(?:Continue|Halt(?:Fail)?))|_(?:PARAM_(?:COPYBACK|STRING_(?:BINARY|COPY|UTF8))|REPLY_TO_C(?:HAT|ONSOLE)))|ND(?:ATTN_(?:IDLE|NO(?:NE|RMAL)|RICOCHET|STATIC)|CHAN_(?:AUTO|BODY|ITEM|REPLACE|ST(?:ATIC|REAM)|USER_BASE|VOICE(?:_BASE)?|WEAPON)|LEVEL_(?:AIRCRAFT|C(?:AR|ONVO)|D(?:ISHWASHER|RYER)|FRIDGE|GUNFIRE|H(?:ELICOPTER|OME)|LIBRARY|MINIBIKE|NO(?:NE|RMAL)|R(?:AIDSIREN|OCKET|USTLE)|S(?:CREAMING|NOWMOBILE)|TR(?:AFFIC|AIN)|WHISPER)|PITCH_(?:HIGH|LOW|NORMAL)|VOL_NORMAL|_(?:CHANGE(?:PITCH|VOL)|DELAY|NOFLAGS|S(?:HOULDPAUSE|P(?:AWNING|EAKER)|TOP(?:LOOPING)?)))|OU(?:ND_FROM_(?:(?:LOCAL_)?PLAYER|WORLD)|RCE(?:MOD_(?:PLUGINAPI_VERSION|V(?:ERSION|_(?:CSET|M(?:AJOR|INOR)|RE(?:LEASE|V)|TAG))|)|_SDK_(?:ALIENSWARM|BLOODYGOODTIME|CS(?:GO|S)|D(?:ARKMESSIAH|OTA)|E(?:PISODE(?:1|2(?:VALVE)?)|YE)|LEFT4DEAD2?|ORIGINAL|UNKNOWN)))|P_(?:ERROR_(?:A(?:BORTED|RRAY_(?:BOUNDS|TOO_BIG))|D(?:ECOMPRESSOR|IVIDE_BY_ZERO)|FILE_FORMAT|HEAP(?:L(?:EAK|OW)|MIN)|IN(?:DEX|STRUCTION_PARAM|VALID_(?:ADDRESS|INSTRUCTION|NATIVE)|)|MEMACCESS|N(?:ATIVE|O(?:NE|T(?:DEBUGGING|_(?:FOUND|RUNNABLE)))|)|PARAM(?:S_MAX)?|STACK(?:L(?:EAK|OW)|MIN)|TRACKER_BOUNDS)|PARAMFLAG_BYREF)|URF_(?:BUMPLIGHT|HI(?:NT|TBOX)|LIGHT|NO(?:CHOP|D(?:ECALS|RAW)|LIGHT|PORTAL|SHADOWS)|SK(?:IP|Y(?:2D)?)|TR(?:ANS|IGGER)|WARP)|ort_(?:(?:A|De)scending|Float|Integer|Random|String))|C(?:O(?:MMAND_(?:FILTER_(?:ALIVE|CONNECTED|DEAD|NO_(?:BOTS|IMMUNITY|MULTI))|TARGET_(?:AMBIGUOUS|EMPTY_FILTER|IMMUNE|NO(?:NE|T_(?:ALIVE|DEAD|HUMAN|IN_GAME))))|NTENTS_(?:A(?:REAPORTAL|UX)|CURRENT_(?:0|180|270|90|DOWN|UP)|DE(?:BRIS|TAIL)|EMPTY|GRATE|HITBOX|IGNORE_NODRAW_OPAQUE|LADDER|M(?:IST|O(?:NSTER(?:CLIP)?|VEABLE))|O(?:PAQUE|RIGIN)|PLAYERCLIP|S(?:LIME|OLID)|T(?:E(?:AM[12]|STFOGVOLUME)|RANSLUCENT)|UNUSED[56]|W(?:ATER|INDOW)))|S(?:RoundEnd_(?:BombDefused|CT(?:S(?:toppedEscape|urrender)|Win|sReachedHostage)|Draw|GameStart|Hostages(?:Not)?Rescued|T(?:arget(?:Bomb|Sav)ed|errorist(?:Win|s(?:(?:Not)?Escaped|Planted|S(?:topped|urrender))))|VIP(?:(?:Not)?Escaped|Killed))|Weapon_(?:A(?:K47|SSAULTSUIT|UG|WP|XE)|B(?:AYONET|IZON|REACHCHARGE)|C(?:4|UTTERS|Z75A)|D(?:E(?:AGLE|COY|FUSER)|IVERSION)|ELITE|F(?:AMAS|I(?:REBOMB|STS|VESEVEN)|LASHBANG|RAGGRENADE)|G(?:3SG1|ALIL(?:AR)?|LOCK)|H(?:AMMER|E(?:A(?:LTHSHOT|VYASSAULTSUIT)|GRENADE)|KP2000)|INCGRENADE|K(?:EVLAR|NIFE(?:_(?:BUTTERFLY|F(?:ALCHION|LIP)|G(?:G|HOST|UT|YPSY_JACKKNIFE)|KARAMBIT|M9_BAYONET|PUSH|S(?:TILETTO|URVIVAL_BOWIE)|T(?:ATICAL)?|URSUS|WIDOWMAKER))?)|M(?:249|3|4A1(?:_SILENCER)?|A(?:C10|G7|X_WEAPONS(?:_NO_KNIFES)?)|ELEE|OLOTOV|P(?:5NAVY|[79]))|N(?:EGEV|IGHTVISION|O(?:NE|VA))|P(?:2(?:28|50)|90)|REVOLVER|S(?:AWEDOFF|C(?:AR(?:17|20)|OUT)|G55[026]|HIELD|MOKEGRENADE|NOWBALL|PANNER|SG08)|T(?:A(?:BLET|GGRENADE|SER)|EC9|MP)|UMP45|USP(?:_SILENCER)?|XM1014)|_(?:DMG_HEADSHOT|SLOT_(?:C4|GRENADE|KNIFE|PRIMARY|SECONDARY)|TEAM_(?:CT|NONE|SPECTATOR|T))|)|o(?:mmand_(?:Allow|Deny)|nVar(?:Bound_(?:Low|Upp)er|Query_(?:Not(?:Found|Valid)|Okay|Protected))|okie(?:Access_(?:P(?:r(?:ivate|otected)|ublic))|Menu(?:Action_(?:(?:Display|Select)Option)|_(?:(?:OnOff|YesNo)(?:_Int)?)|))))|F(?:BEAM_(?:END(?:ENTITY|VISIBLE)|F(?:ADE(?:IN|OUT)|OREVER)|HALOBEAM|ISACTIVE|NOTILE|ONLYNOISEONCE|S(?:HADE(?:IN|OUT)|INENOISE|OLID|TART(?:ENTITY|VISIBLE))|USE_HITBOXES)|CVAR_(?:A(?:CCESSIBLE_FROM_THREADS|RCHIVE(?:_(?:GAMECONSOLE|XBOX))?)|C(?:HEAT|LIENT(?:CMD_CAN_EXECUTE|DLL))|D(?:E(?:MO|VELOPMENTONLY)|ONTRECORD)|GAMEDLL|HIDDEN|MATERIAL_SYSTEM(?:_THREAD)?|N(?:EVER_AS_STRING|O(?:NE|T(?:IFY|_CONNECTED)))|PLUGIN|(?:R(?:INTABLEONLY|OTECTED))|RE(?:L(?:EASE|OAD_(?:MATERIALS|TEXTURES))|PLICATED)|S(?:ERVER_CAN(?:NOT_QUERY|_EXECUTE)|PONLY|S(?:_ADDED)?|)|U(?:N(?:LOGGED|REGISTERED)|SERINFO))|EATURECAP_(?:COMMANDLISTENER|PLAYERRUNCMD_11PARAMS)|L(?:OAT_PI|_(?:A(?:IMTARGET|TCONTROLS)|BASEVELOCITY|C(?:LIENT|ONVEYOR)|D(?:ISSOLVING|ONTTOUCH|UCKING)|E(?:DICT_(?:ALWAYS|CHANGED|D(?:IRTY_PVS_INFORMATION|ONTSEND)|F(?:REE|ULL(?:CHECK)?)|P(?:ENDING_DORMANT_CHECK|VSCHECK))|P2V_UNKNOWN1)|F(?:AKECLIENT|LY|R(?:EEZING|OZEN)|ULL_EDICT_CHANGED)|G(?:ODMODE|R(?:APHED|ENADE))|IN(?:RAIN|WATER)|KILLME|N(?:OTARGET|PC)|O(?:BJECT|N(?:FIRE|GROUND|TRAIN))|PARTIALGROUND|S(?:T(?:ATICPROP|EPMOVEMENT)|WIM)|TRANSRAGDOLL|UNBLOCKABLE_BY_PLAYER|W(?:ATERJUMP|ORLDBRUSH)))|PERM_[GOU]_(?:EXEC|READ|WRITE)|eature(?:Status_(?:Available|Un(?:available|known))|Type_(?:Capability|Native))|i(?:le(?:T(?:ime_(?:Created|Last(?:Access|Change))|ype_(?:Directory|File|Unknown)))|ndMap_(?:(?:Not)?Found|FuzzyMatch|NonCanonical|PossiblyAvailable)))|R(?:E(?:GEX_ERROR_(?:ASSERT|BAD(?:BR|COUNT|ENDIANNESS|LENGTH|M(?:AGIC|ODE)|NEWLINE|O(?:FFSET|PTION)|PA(?:RTIAL|T)|RPT|UTF8(?:_OFFSET)?)|CALLOUT|DFA_(?:BADRESTART|RECURSE|U(?:COND|ITEM|MLIMIT)|WSSIZE)|E(?:BRAC[EK]|C(?:OLLATE|TYPE)|ESCAPE|MPTY|PAREN|RANGE|S(?:IZE|PACE|UBREG))|IN(?:TERNAL|VARG)|JIT_(?:BADOPTION|STACKLIMIT)|MATCHLIMIT|NO(?:MATCH|MEMORY|NE|SUBSTRING)|NULL(?:WSLIMIT)?|PARTIAL|RECURS(?:ELOOP|IONLIMIT)|SHORTUTF8|UNKNOWN_OPCODE)|NDER(?:FX_(?:CLAMP_MIN_SCALE|DISTORT|E(?:NV_(?:RAIN|SNOW)|XPLODE)|F(?:ADE_(?:FAST|SLOW)|LICKER_(?:FAST|SLOW))|GLOWSHELL|HOLOGRAM|MAX|NO(?:NE|_DISSIPATION)|PULSE_(?:FAST(?:_WIDER?)?|SLOW(?:_WIDE)?)|RAGDOLL|S(?:OLID_(?:FAST|SLOW)|POTLIGHT|TROBE_(?:FAST(?:ER)?|SLOW)))|_(?:ENVIRONMENTAL|GLOW|NO(?:NE|RMAL)|TRANS(?:A(?:DD(?:FRAMEBLEND)?|LPHA(?:ADD)?)|COLOR|TEXTURE)|WORLDGLOW))|QUIRE_(?:EXTENSIONS|PLUGIN))|a(?:ngeType_(?:(?:Aud|Vis)ibility)|yType_(?:EndPoint|Infinite)|)|oundState_(?:B(?:etweenRounds|onus)|GameOver|Init|Pre(?:game|round)|R(?:estart|oundRunning)|Sta(?:lemate|rtGame)|TeamWin)|)|M(?:A(?:PLIST_FLAG_(?:CLEARARRAY|MAPSFOLDER|NO_DEFAULT)|SK_(?:ALL|(?:NPC|PLAYER)?(?:SOLID(?:_BRUSHONLY)?)|NPCWORLDSTATIC|OPAQUE(?:_AND_NPCS)?|S(?:HOT(?:_(?:HULL|PORTAL))?|PLITAREAPORTAL)|VISIBLE(?:_AND_NPCS)?|WATER)|X(?:PLAYERS|_(?:LIGHTSTYLES|(?:NAME|TARGET)_LENGTH)))|ENU(?:FLAG_(?:BUTTON_(?:EXIT(?:BACK)?|NOVOTE)|NO_SOUND)|_(?:ACTIONS_(?:ALL|DEFAULT)|NO_PAGINATION|TIME_FOREVER))|O(?:TDPANEL_TYPE_(?:FILE|INDEX|TEXT|URL)|VETYPE_(?:CUSTOM|FLY(?:GRAVITY)?|ISOMETRIC|LADDER|NO(?:CLIP|NE)|OBSERVER|PUSH|STEP|VPHYSICS|WALK))|a(?:pChange_(?:Instant|(?:Map|Round)End)|xClients)|enu(?:Action_(?:Cancel|Display(?:Item)?|DrawItem|End|S(?:elect|tart)|Vote(?:Cancel|End|Start)|)|Cancel_(?:Disconnected|Exit(?:Back)?|Interrupted|NoDisplay|Timeout)|End_(?:Cancelled|Exit(?:Back)?|Selected|Voting(?:Cancelled|Done))|S(?:ource_(?:External|No(?:ne|rmal)|RawPanel)|tyle_(?:Default|Radio|Valve))))|A(?:cces_(?:Effective|Real)|DM(?:FLAG_(?:BAN|C(?:H(?:A(?:NGEMAP|T)|EATS)|ON(?:FIG|VARS)|USTOM[1-6])|GENERIC|KICK|PASSWORD|R(?:CON|ESERVATION|OOT)|SLAY|UNBAN|VOTE)|INMENU_(?:(?:PLAYER|SERVER|VOTING)COMMANDS))|LL_VISIBLE_CONTENTS|PLRes_(?:(?:Silent)?Failure|Success)|UT(?:HMETHOD_(?:IP|NAME|STEAM)|OLOAD_EXTENSIONS)|ccess_(?:Effective|Real)|d(?:dress_Null|min(?:_(?:Ban|C(?:h(?:a(?:ngemap|t)|eats)|on(?:fig|vars)|ustom[1-6])|Generic|Kick|Password|R(?:CON|eservation|oot)|Slay|Unban|Vote)|Cache_(?:Admins|Groups|Overrides)|Flags_TOTAL))|uthId_(?:Engine|Steam(?:[23]|ID64)))|D(?:B(?:Bind_(?:Float|Int|String)|Prio_(?:High|Low|Normal)|Val_(?:Data|Error|Null|TypeMismatch))|ISPSURF_FLAG_(?:BUILDABLE|SURF(?:ACE|PROP[12])|WALKABLE)|MG_(?:A(?:CID|IRBOAT|LWAYSGIB)|B(?:LAST(?:_SURFACE)?|U(?:CKSHOT|LLET|RN))|C(?:LUB|R(?:IT|USH))|D(?:I(?:RECT|SSOLVE)|ROWN(?:RECOVER)?)|ENERGYBEAM|FALL|GENERIC|HALF_FALLOFF|IGNITE|N(?:E(?:RVEGAS|VERGIB)|OCLOSEDISTANCEMOD)|P(?:ARALYZE|HYSGUN|LASMA|OISON|REVENT_PHYSICS_FORCE)|R(?:ADI(?:ATION|US_MAX)|EMOVENORAGDOLL)|S(?:HOCK|L(?:ASH|OWBURN)|ONIC)|USE(?:DISTANCEMOD|_HITLOCATIONS)|VEHICLE)|ialogType_(?:AskConnect|Entry|M(?:enu|sg)|Text))|P(?:ARTITION_(?:NON_STATIC_EDICTS|S(?:OLID_EDICTS|TATIC_PROPS)|TRIGGER_EDICTS)|B_FIELD_NOT_REPEATED|CRE_(?:ANCHORED|CASELESS|DO(?:LLAR_ENDONLY|TALL)|EXTENDED|MULTILINE|NO(?:TEMPTY|_UTF8_CHECK)|U(?:CP|NGREEDY|TF8))|LA(?:TFORM_MAX_PATH|YER_FLAG_BITS)|a(?:ram_(?:A(?:ny|rray)|(?:Cell|Float)(?:ByRef)?|String|VarArgs)|th_SM)|l(?:Info_(?:Author|Description|Name|URL|Version)|ugin_(?:BadLoad|C(?:hanged|ontinue|reated)|E(?:rror|victed)|Failed|Handled|Loaded|Paused|Running|Stop|Uncompiled))|rop(?:Field_(?:Entity|Float|Integer|String(?:_T)?|Unsupported|V(?:ariant|ector))|_(?:Data|Send)))|I(?:N(?:VALID_(?:(?:ADMIN|GROUP|MESSAGE)_ID|ENT_REFERENCE|F(?:CVAR_FLAGS|UNCTION)|HANDLE|STRING_(?:INDEX|TABLE)|TOPMENUOBJECT)|_(?:A(?:LT[12]|TTACK(?:[23])?)|B(?:ACK|ULLRUSH)|CANCEL|DUCK|FORWARD|GRENADE[12]|JUMP|(?:MOVE)?LEFT|(?:MOVE)?RIGHT|R(?:ELOAD|UN)|S(?:CORE|PEED)|USE|W(?:ALK|EAPON[12])|ZOOM))|TEMDRAW_(?:CONTROL|D(?:EFAULT|ISABLED)|IGNORE|NOTEXT|RAWLINE|SPACER)|dentity_(?:Core|Extension|Plugin))|E(?:T_(?:Event|Hook|Ignore|Single)|ngine_(?:AlienSwarm|Bl(?:a(?:ckMesa|de)|oodyGoodTime)|C(?:S(?:GO|S)|ontagion)|D(?:O(?:DS|I|TA)|arkMessiah)|EYE|HL2DM|Insurgency|Left4Dead2?|NuclearDawn|Original|Portal2|S(?:DK2013|ourceSDK200[67])|TF2|Unknown)|ventHookMode_(?:Post(?:NoCopy)?|Pre))|V(?:DECODE_FLAG_(?:ALLOW(?:N(?:OTINGAME|ULL)|WORLD)|BYREF)|ENCODE_FLAG_COPYBACK|O(?:ICE_(?:LISTEN(?:ALL|TEAM)|MUTED|NORMAL|SPEAKALL|TEAM)|TE(?:FLAG_NO_REVOTES|INFO_(?:CLIENT_(?:I(?:NDEX|TEM))|ITEM_(?:INDEX|VOTES))))|oteCancel_(?:Generic|NoVotes))|N(?:ULL_(?:STRING|VECTOR)|etFlow_(?:Both|(?:Incom|Outgo)ing)|ominate_(?:A(?:dded|lreadyInVote)|InvalidMap|Replaced|VoteFull)|umberType_Int(?:8|16|32))|KvData_(?:Color|Float|Int|N(?:UMTYPES|one)|Ptr|String|UInt64|WString)|U(?:M_(?:(?:BitB|Protob)uf)|SERMSG_(?:BLOCKHOOKS|INITMSG|RELIABLE)|se_(?:O(?:ff|n)|Set|Toggle))|L(?:A(?:NG_SERVER|ST_VISIBLE_CONTENTS)|isten_(?:Default|No|Yes))|BANFLAG_(?:AUT(?:HID|O)|IP|NOKICK)|Override_Command(?:Group)?|QUERYCOOKIE_FAILED|__(?:DAT|TIM)E__)\b
 
 
 
@@ -49,15 +51,19 @@ contexts:
     # - include: funcenum
     - include: native-forward
     - include: public
-    - include: functions
-    # - include: variables
+    - include: variable-decl-oldsyntax
+    - include: function-decl # no multiline because this sucks to match.
+    - include: variable-decl
+    - include: expressions
 
   expressions:
     - include: early-expressions
     - include: late-expressions
 
   early-expressions:
+    - include: preprocessor
     - include: comments
+    - include: variable-decl-oldsyntax # this has to show up before 'new' is introduced
     - include: unique-keywords
     - include: case-default
     - include: constants
@@ -66,7 +72,7 @@ contexts:
     - include: parens
     - include: brackets
     - include: block
-    - include: casts
+    - include: retag
     - include: accessor
     - match: ','
       scope: punctuation.separator.sp
@@ -75,6 +81,10 @@ contexts:
 
   late-expressions:
     - include: function-call
+    - match: \b(?:static\b|const\b)
+      scope: storage.modifier.sp
+    - include: variable-decl
+
     - match: ';'
       scope: punctuation.terminator.sp
 
@@ -240,7 +250,7 @@ contexts:
             6: punctuation.definition.string.end.sp
           set: preprocessor_eol
 
-        - match: '\b(unused)([ \t]+{{identifier}}\b)?'
+        - match: '\b(unused)([ \t]+{{identifier}})?'
           captures:
             1: keyword.control.import.sp
             2: variable.other.sp
@@ -286,9 +296,11 @@ contexts:
         - match: \bdefined\b
           scope: keyword.control.import.define.sp
           push:
-            - match: '\b{{identifier}}\b'
+            - match: '{{identifier}}'
               scope: variable.other.constant.sp
               pop: true
+            - match: '{{end_of_line}}'
+              pop: 2
         - include: constants
         - include: operators
         - match: '{{end_of_line}}'
@@ -303,7 +315,7 @@ contexts:
         - meta_scope: meta.preprocessor.sp
         - include: preprocessor-line-continuation
         - include: preprocessor-comments
-        - match: '\b{{identifier}}\b'
+        - match: '{{identifier}}'
           scope: variable.other.constant.sp
           push:
             - include: preprocessor-line-continuation
@@ -389,7 +401,7 @@ contexts:
           pop: true
         - include: preprocessor-line-continuation
         - include: preprocessor-comments
-
+### enum
   enum:
     - match: '(?<=^|[;\)\}]|\*\/)\s*enum\b'
       scope: storage.type.enum.sp keyword.declaration.enum.sp
@@ -428,7 +440,7 @@ contexts:
             - match: (?=\S)
               fail: enum_begin
 
-    - match: (?:\b({{identifier}})\s*(:)\s*)?\b({{identifier}}\b)(?:\s*(:))?
+    - match: (?:({{identifier}})\s*(:)\s*)?({{identifier}})(?:\s*(:))?
       captures:
         1: storage.type.sp
         2: punctuation.separator.sp
@@ -443,7 +455,7 @@ contexts:
 
   enum_struct_type:
     - include: comments
-    - match: '\b(?:{{identifier}})\b'
+    - match: '{{identifier}}'
       scope: entity.name.struct.enum.sp
       set:
         - match: \{
@@ -495,13 +507,13 @@ contexts:
       scope: punctuation.section.braces.end.sp
       pop: 3
 
-    - match: '\b(?:{{identifier}})\b\s*:'
+    - match: '{{identifier}}\s*:'
       fail: enum_contents_begin
 
     - match: ','
       scope: punctuation.separator.sp
 
-    - match: '\b(?:{{identifier}})\b'
+    - match: '{{identifier}}'
       scope: entity.name.constant.enum.sp
       push:
         - include: comments
@@ -542,7 +554,7 @@ contexts:
     - match: ','
       scope: punctuation.separator.sp
 
-    - match: '\b({{identifier}})\s*(:)'
+    - match: '({{identifier}})\s*(:)'
       captures:
         1: storage.type.sp
         2: punctuation.separator.sp
@@ -561,7 +573,7 @@ contexts:
     - match: '(?=,|\})'
       pop: true
 
-    - match: '\b(?:{{identifier}})\b'
+    - match: '{{identifier}}'
       scope: variable.other.member.sp
       set:
         - include: comments
@@ -591,7 +603,7 @@ contexts:
     - match: ';'
       scope: punctuation.terminator.sp
 
-    - match: '^\s*((?:(?:public|static|const)\s+)*)(?={{identifier}}\b)'
+    - match: '^\s*((?:(?:public|static|const)\s+)*)(?={{identifier}})'
       captures:
         1: invalid.illegal.syntax.sp
       branch_point: enum_struct_variable_begin
@@ -608,7 +620,7 @@ contexts:
     - include: preprocessor
 
   enum_struct_variable:
-    - match: \b{{identifier}}\b
+    - match: '{{identifier}}'
       scope: storage.type.sp
       push:
         - include: comments
@@ -624,7 +636,7 @@ contexts:
           pop: 2
         - match: '(?=^\s*{{identifier}}\s+[[:alpha:]_\s])|[^[:alpha:]_\s]'
           pop: 2
-        - match: '\b(?:{{identifier}})\b'
+        - match: '{{identifier}}'
           scope: variable.other.member.sp
           set:
             - match: (?=\})
@@ -642,10 +654,10 @@ contexts:
               pop: 2
 
   enum_struct_function:
-    - match: \b{{identifier}}\b
+    - match: '{{identifier}}'
       scope: meta.function.return-type.sp storage.type.sp
       push:
-        - match: '\b(?:{{identifier}})\b'
+        - match: '{{identifier}}'
           scope: meta.function.sp entity.name.function.sp
           set:
             - match: \(
@@ -656,7 +668,7 @@ contexts:
                   scope: punctuation.section.group.end.sp
                   set:
                     - match: (?=\{)
-                      set: function-definition-body-enum
+                      set: enum-function-definition-body
                     - include: comments
                     - match: '(?=\s*[[:alpha:]_]|\})'
                       pop: 2
@@ -665,7 +677,7 @@ contexts:
             - match: (?=\S)
               fail: enum_struct_variable_begin
 
-  function-definition-body-enum:
+  enum-function-definition-body:
     - meta_content_scope: meta.function.sp
     - match: '\{'
       scope: meta.block.sp punctuation.section.block.begin.sp
@@ -682,6 +694,7 @@ contexts:
       scope: invalid.illegal.syntax.sp
       pop: true
 
+### methodmap
   methodmap:
     - match: '(?<=^|[;\)\}]|\*\/)\s*methodmap\b'
       scope: storage.modifier.sp
@@ -722,7 +735,7 @@ contexts:
 
   methodmap-body:
     - include: comments
-    - include: function-definition-body-methodmap
+    - include: methodmap-function-definition-body
 
     - match: '(?<=^|[;\)\}]|\*\/)\s*public\b'
       scope: storage.modifier.sp
@@ -736,7 +749,7 @@ contexts:
           - match: '\b(?:const)\b'
             scope: invalid.illegal.sp
 
-          - match: \b{{identifier}}\b
+          - match: '{{identifier}}'
             scope: meta.function.return-type.sp storage.type.sp
             push:
               - match: (?=\() # constructor
@@ -745,7 +758,7 @@ contexts:
               - match: (?={{identifier}})
                 branch_point: methodmap_func_name_begin
                 branch:
-                  - - match: '\b{{identifier}}\b'
+                  - - match: '{{identifier}}'
                       scope: meta.function.sp entity.name.function.sp
                       push:
                         - match: \(
@@ -771,7 +784,7 @@ contexts:
         - - meta_scope: meta.function.sp
           - match: '\b(?:native|static)\b'
             scope: storage.modifier.sp
-          - match: \b{{identifier}}\b
+          - match: '{{identifier}}'
             scope: entity.name.function.constructor.sp
             push:
               - match: \(
@@ -796,12 +809,12 @@ contexts:
       branch:
         - - match: '(?=\s*\b(public|property)\b|\}|[^[:alpha:]_\s])'
             pop: true
-          - match: \b{{identifier}}\b
+          - match: '{{identifier}}'
             scope: storage.type.sp
             push:
               - match: '(?=\s*\b(public|property)\b|\}|[^[:alpha:]_\s])'
                 pop: 2
-              - match: \b{{identifier}}\b
+              - match: '{{identifier}}'
                 scope: entity.name.trait.sp
                 set:
                 - match: \{
@@ -848,7 +861,7 @@ contexts:
                         - include: comments
                     - match: ';'
                       scope: punctuation.terminator.sp
-                    - include: function-definition-body-methodmap
+                    - include: methodmap-function-definition-body
                     - include: comments
                 - include: comments
         - - match: ''
@@ -856,7 +869,7 @@ contexts:
 
     - include: preprocessor
 
-  function-definition-body-methodmap:
+  methodmap-function-definition-body:
     - meta_content_scope: meta.function.sp
     - match: '\{'
       scope: meta.block.sp punctuation.section.block.begin.sp
@@ -880,13 +893,14 @@ contexts:
 
         - include: expressions
 
+### public callbacks
   public:
     - match: (?<=^|[;\)\}]|\*\/)\s*public\b
       scope: storage.modifier.sp
       branch_point: public_begin
       branch:
         # public function, no type
-        - - match: \b{{identifier}}\b
+        - - match: '{{identifier}}'
             scope: meta.function.sp support.function.sp
             push:
               - meta_content_scope: meta.function.parameters.sp
@@ -916,7 +930,7 @@ contexts:
                 fail: public_begin
 
         # public typed function
-        - - match: (\b{{identifier}}\b)(?:\s*(:))?
+        - - match: ({{identifier}})(?:\s*(:))?
             captures:
               0: meta.function.return-type.sp
               1: storage.type.sp
@@ -962,7 +976,7 @@ contexts:
             fail: public_begin
 
          # struct
-        - - match: (\b{{identifier}}\b)(?:\s*(:))?
+        - - match: ({{identifier}})(?:\s*(:))?
             captures:
               1: storage.type.sp
               2: punctuation.separator.sp
@@ -981,7 +995,7 @@ contexts:
                             scope: punctuation.section.block.end.sp
                             pop: 2
 
-                          - match: (\b{{identifier}}\b)
+                          - match: ({{identifier}})
                             captures:
                               1: variable.other.member.sp
                             push:
@@ -992,13 +1006,13 @@ contexts:
                                     pop: true
                                   - include: expressions
 
-                                  - match: \s*(?=\b{{identifier}}\s*=)
+                                  - match: \s*(?={{identifier}}\s*=)
                                     scope: invalid.illegal.missing-comma.sp
                                     pop: true
 
                                   - include: preprocessor
 
-                              - match: \s*(?=\b{{identifier}}\s*=)
+                              - match: \s*(?={{identifier}}\s*=)
                                 scope: invalid.illegal.missing-comma.sp
                                 pop: true
 
@@ -1026,60 +1040,14 @@ contexts:
         - - match: ''
             pop: true
 
-
-  # # this shit's a mess.
-  # global-declaration:
-  #   - match: (?=\b{{identifier}}\b)
-  #     branch_point: function-decl-begin
-  #     branch:
-  #       - - match: (?=\s*(public|stock|static|enum|struct|methodmap|typedef|typeset|new|decl)\b)
-  #           pop: true
-
-  #         - match: (\b{{identifier}}\b)(\s*(:))?
-  #           captures:
-  #             1: storage.type.sp
-  #             2: punctuation.separator.sp
-  #           push:
-  #             - match: \b{{identifier}}\b
-  #               scope: entity.name.function.sp
-  #               set:
-  #                 - match: \(
-  #                   scope: punctuation.section.group.begin.sp
-  #                   set:
-  #                     - match: \)
-  #                       scope: punctuation.section.group.end.sp
-  #                       branch_point: function-def-begin
-  #                       branch:
-  #                         - - include: comments
-  #                           - match: \{
-  #                             scope: meta.block.sp punctuation.section.block.begin.sp
-  #                             set:
-  #                               - match: \}
-  #                                 scope: meta.function.sp meta.block.sp punctuation.section.block.end.sp
-  #                                 pop: 3
-  #                               - include: expressions
-  #                           - match: \S
-  #                             push:
-  #                               - match: ''
-  #                                 fail: function-def-begin
-  #                         - - match: ''
-  #                             pop: 3
-  #                     - include: function-params
-
-  #                 - match: (?=\S)
-  #                   fail: function-decl-begin
-  #             - match: (?=\S)
-  #               fail: function-call-begin
-  #       - - match: ''
-  #           pop: true
-
+### typedef
   typedef:
     - match: (?<=^|[;\)\}]|\*\/)\s*typedef\b
       scope: keyword.declaration.sp
       branch_point: typedef_begin
       branch:
         - - include: comments
-          - match: '\b({{identifier}})\b'
+          - match: '{{identifier}}'
             scope: entity.name.type.sp
             push:
               - include: comments
@@ -1102,7 +1070,7 @@ contexts:
       branch:
         - - include: comments
 
-          - match: '\b({{identifier}})\b'
+          - match: '{{identifier}}'
             scope: storage.type.sp
             push:
               - include: comments
@@ -1131,7 +1099,7 @@ contexts:
       branch:
         - - include: comments
 
-          - match: '\b(?:{{identifier}})\b'
+          - match: '{{identifier}}'
             scope: entity.name.type.sp
             push:
               - include: comments
@@ -1163,7 +1131,7 @@ contexts:
             pop: true
           - match: '\bfunction\b'
             fail: typeset_function_begin
-          - match: '\b(?:{{identifier}})\b'
+          - match: '{{identifier}}'
             scope: storage.type.sp
             push:
               - match: \(
@@ -1188,7 +1156,7 @@ contexts:
       pop: true
     - match: '\bfunction\b'
       fail: typeset_function_begin
-    - match: '\b{{identifier}}\b'
+    - match: '{{identifier}}'
       scope: storage.type.sp
       push:
         - include: comments
@@ -1205,18 +1173,19 @@ contexts:
         - match: (?=\S)
           pop: 2
 
+### natives and forwards
   native-forward:
     - match: '(?<=^|[;\)\}]|\*\/)\s*(?:native|forward)'
       scope: storage.type.function keyword.declaration.function
       branch_point: native-forward-begin
       branch:
         # Typed eg - native int f(...) or forward bool:f(...)
-        - - match: '\b({{identifier}})\b(?:\s*(:))?'
+        - - match: '({{identifier}})(?:\s*(:))?'
             captures:
               1: meta.function.return-type.sp storage.type.sp
               2: punctuation.separator.sp
             push:
-              - match: \b{{identifier}}\b
+              - match: '{{identifier}}'
                 scope: meta.function.sp entity.name.function.sp
                 set:
                   - match: \(
@@ -1254,94 +1223,6 @@ contexts:
         - - match: ''
             pop: true
 
-  functions:
-    - match: \bstock\b
-      scope: keyword.declaration.sp
-
-    - match: \bstatic\b
-      scope: storage.modifier.sp
-
-    - match: (?=\b{{identifier}}\b)
-      branch_point: function-begin
-      branch:
-        - - match: '{{global_decl_lookahead}}'
-            pop: true
-
-          - match: '\b({{identifier}})\b(?:\s*(:))?'
-            captures:
-              1: storage.type.sp
-              2: punctuation.separator.sp
-            push:
-              - match: '{{global_decl_lookahead}}'
-                fail: function-begin
-
-              - include: brackets
-
-              - match: \b{{identifier}}\b
-                scope: entity.name.function.sp
-                set:
-                  - match: (?=\()
-                    set:
-                      - match: \(
-                        scope: meta.function.parameters.sp punctuation.section.group.begin.sp
-                        set:
-                          - match: \)
-                            scope: punctuation.section.group.end.sp
-                            set:
-                              - match: (?=\{)
-                                set:
-                                  - match: \{
-                                    scope: punctuation.section.braces.begin.sp
-                                    set:
-                                      - match: \}
-                                        scope: punctuation.section.braces.end.sp
-                                        pop: 2
-                                      - include: expressions
-
-                              - include: comments
-                              - match: (?=\S)
-                                pop: 2
-
-                          - include: function-params
-
-                  - match: (?=\S)
-                    fail: function-begin
-
-              - match: \S
-                fail: function-begin
-
-        - - match: \b{{identifier}}\b
-            scope: entity.name.function.sp
-            push:
-              - match: (?=\()
-                set:
-                  - match: \(
-                    scope: meta.function.parameters.sp punctuation.section.group.begin.sp
-                    set:
-                      - match: \)
-                        scope: punctuation.section.group.end.sp
-                        set:
-                          - match: (?=\{)
-                            set:
-                              - match: \{
-                                scope: punctuation.section.braces.begin.sp
-                                set:
-                                  - match: \}
-                                    scope: punctuation.section.braces.end.sp
-                                    pop: 2
-                                  - include: expressions
-                          - include: comments
-                          - match: (?=\S)
-                            pop: 2
-
-                      - include: function-params
-
-              - match: (?=\S)
-                fail: function-begin
-
-        - - match: ''
-            pop: true
-
   function-params:
     - match: (?=\S)
       branch_point: function_param_begin
@@ -1361,14 +1242,14 @@ contexts:
         1: invalid.illegal.sp
     - match: \bconst\b\s*
       scope: storage.modifier.sp
-    - match: \b({{identifier}})\s*(:)
+    - match: ({{identifier}})\s*(:)
       captures:
         1: storage.type.sp
         2: punctuation.separator.sp
       push:
         - match: (?=,|\))
           pop: true
-        - match: \b({{identifier}})\b
+        - match: '{{identifier}}'
           scope: variable.parameter.sp
           set:
             - match: (?=,|\))
@@ -1381,7 +1262,7 @@ contexts:
                   pop: true
                 - include: expressions
 
-                - match: \b{{identifier}}\b
+                - match: '{{identifier}}'
                   scope: variable.other.constant.sp
 
             - include: comments
@@ -1404,7 +1285,7 @@ contexts:
         - match: '\.{1,2}'
         - include: comments
 
-    - match: \b({{identifier}})\b
+    - match: '{{identifier}}'
       scope: variable.parameter.sp
       push:
         - match: (?=,|\))
@@ -1416,7 +1297,7 @@ contexts:
             - match: '(?=,|\))'
               pop: true
             - include: expressions
-            - match: \b{{identifier}}\b
+            - match: '{{identifier}}'
               scope: variable.other.constant.sp
 
         - include: comments
@@ -1436,7 +1317,7 @@ contexts:
       pop: true
     - match: '\bconst\b'
       scope: storage.modifier.sp
-    - match: '\b{{identifier}}\b'
+    - match: '{{identifier}}'
       scope: storage.type.sp
       push:
         - match: (?=,|\))
@@ -1470,7 +1351,7 @@ contexts:
           scope: keyword.operator.reference.sp
           captures:
             1: invalid.illegal.sp
-        - match: '\b{{identifier}}\b'
+        - match: '{{identifier}}'
           scope: variable.parameter.sp
           set:
             - match: (?=,|\))
@@ -1482,7 +1363,7 @@ contexts:
                 - match: '(?=,|\))'
                   pop: true
                 - include: expressions
-                - match: \b{{identifier}}\b
+                - match: '{{identifier}}'
                   scope: variable.other.constant.sp
             - include: comments
             - match: (?=\S)
@@ -1498,192 +1379,13 @@ contexts:
     - match: '[^[;&,\)\s]]+'
       scope: invalid.illegal.sp
 
-  variables:
-    # assuming people use this only for variables and not other other crap.
-    - match: \bg_{{identifier}}\b
-      scope: variable.other.readwrite.sp
-
-    - match: \b(static|const)\b
-      scope: storage.modifier.sp
-
-    - match: (?<=^|[;\(\)\{\}]|\*\/)(?=\s*\b(new|decl)\b)
-      push: variables-old-syntax
-
-    # lets do some more messy branch crap to try to match variable delcarations
-    - match: (?<=^|[;,\(\)\{\}]|\*\/|\bstatic\b|\bconst\b)(?=\s*\b{{identifier}}\b)
-      branch_point: variable_begin
-      branch:
-        - - match: (?=\s*(public|stock|enum|struct|methodmap|typedef|typeset)\b)
-            pop: true
-
-          - match: (?=\s*\b(?:if|else|for|while|do|return|switch|case|new|decl|continue|break|delete|static|const)\b)
-            pop: true
-
-          - match: \b({{identifier}})(?=\s*\.{3})
-            scope: variable.other.constant.sp
-
-          - match: '\s*\b(?:(this)|([A-Z][A-Z_\d]+)|([A-Z]\w+)|({{identifier}}))\b\s*(?=\.)'
-            captures:
-              1: variable.language.sp
-              2: variable.other.constant.sp
-              3: storage.type.sp
-              4: variable.other.readwrite.sp
-            pop: true
-
-          - match: '(?<!\bstock\b|\bconst\b)\s*\b{{identifier}}\b\s*(?=\[)'
-            scope: variable.other.readwrite.sp
-            pop: true
-
-          - match: '\b{{identifier}}\b'
-            scope: storage.type.sp
-            push:
-              - match: (?=\s*\()
-                fail: variable_begin
-
-              - match: '(?=^\s*\b{{identifier}}\s+{{identifier}})'
-                fail: variable_begin
-
-              - match: (?=\s*;)
-                pop: 2
-
-              - match: '\s*\b({{identifier}})\b'
-                captures:
-                  1: variable.other.readwrite.sp
-                push:
-                  - match: \(
-                    fail: variable_begin
-
-                  - include: brackets
-                  - match: (?=\s*;)
-                    pop: 3
-                  - match: (?=\s*\S)
-                    pop: 3
-
-              - match: (?=\s*[^[:alpha:]_\s])
-                fail: variable_begin
-
-          - match: (?=\s*[^[:alpha:]_\s])
-            pop: true
-
-          # - include: variables-old-syntax
-
-        - - match: \b{{identifier}}\b
-            scope: variable.other.readwrite.sp
-            push:
-              - match: (?=[=\*\\^\&\!\+\-])
-                pop: 2
-              - include: comments
-              - match: (?=\S)
-                fail: variable_begin
-          - match: (?=\S)
-            pop: true
-
-        - - match: \b{{identifier}}\b
-            scope: variable.function.sp
-            push:
-              - match: (?=\s*\b(?:if|else|for|while|do|return|switch|case|continue|break|delete|new|decl|static|const)\b)
-                fail: variable_begin
-              - match: \(
-                scope: meta.group.sp punctuation.section.group.begin.sp
-                set:
-                  - match: \)
-                    scope: meta.group.sp punctuation.section.group.end.sp
-                    pop: 2
-                  - include: expressions
-              - match: (?=[^[\s\(]])
-                fail: variable_begin
-
-          - match: (?=\S)
-            fail: variable_begin
-
-        - - match: ''
-            pop: true
-
-    - match: (\b{{identifier}})\s*(:)\s*({{identifier}}\b)(?!\s*\()
-      captures:
-        1: storage.type.sp
-        2: punctuation.separator.sp
-        3: variable.other.readwrite.sp
-
-    # - include: variables-old-syntax
-
-  # old syntax.
-  variables-old-syntax:
-    - match: (?:\b(new|decl)\b|(?:\b(static|const)\b)+)
-      captures:
-        1: keyword.declaration.sp
-        2: storage.modifier.sp
-      set:
-        - match: (?=\s*\b(?:if|else|for|while|do|return|switch|case|continue|break|delete|new|decl|static|const)\b)
-          pop: true
-
-        - match: ','
-          scope: punctuation.separator.sp
-
-        - match: (?=\s*;)
-          pop: true
-
-        - match: '(?=^\s*\b{{identifier}}\s+{{identifier}})'
-          pop: true
-
-        - match: '\b({{identifier}})\b\s*(:)'
-          captures:
-            1: storage.type.sp
-            2: punctuation.separator.sp
-          push:
-            - match: '\b{{identifier}}\b'
-              scope: variable.other.readwrite.sp
-              set:
-                - match: (?=\s*[,;])
-                  pop: true
-
-                - include: brackets
-
-                - match: '\s*(=)'
-                  captures:
-                    1: keyword.operator.assignment.sp
-                  set:
-                    - match: (?=\s*[;,])
-                      pop: true
-                    - match: (?=\s*(?:if|else|for|while|do|return|switch|case|continue|break|delete|decl|static|const)\b)
-                      pop: 2
-                    - match: '(?=^\s*\b{{identifier}}\s+{{identifier}})'
-                      pop: 2
-
-                    - include: expressions
-
-            - match: (?=\s*\S)
-              pop: true
-
-        - match: '\b{{identifier}}\b'
-          scope: variable.other.readwrite.sp
-          push:
-            - match: (?=\s*[,;])
-              pop: true
-
-            - include: brackets
-
-            - match: '\s*(=)'
-              captures:
-                1: keyword.operator.assignment.sp
-              set:
-                - match: (?=\s*[;,])
-                  pop: true
-                - match: (?=\s*(?:if|else|for|while|do|return|switch|case|continue|break|delete|decl|static|const)\b)
-                  pop: 2
-                - match: '(?=^\s*\b{{identifier}}\s+{{identifier}})'
-                  pop: 2
-                - include: expressions
-            - match: (?=\s*\S)
-              pop: true
-
   accessor:
-    - match: (\b{{identifier}}\b)\s*(::)
+    - match: ({{identifier}})\s*(::)
       captures:
         1: storage.type
         2: punctuation.accessor.double-colon.sp
       push:
-        - match: \s*\b{{identifier}}\b
+        - match: \s*{{identifier}}
           scope: variable.other.member.sp
           pop: true
         - match: (?=\s*\S)
@@ -1695,7 +1397,7 @@ contexts:
     - match: \.
       scope: punctuation.accessor.dot.sp
       push:
-        - match: '\b({{identifier}})\s*(?=\()'
+        - match: '({{identifier}})\s*(?=\()'
           scope: variable.function.sp
           set:
             - match: \(
@@ -1706,7 +1408,7 @@ contexts:
                   pop: true
                 - include: expressions
 
-        - match: '\b{{identifier}}\b'
+        - match: '{{identifier}}'
           scope: variable.other.member.sp
           pop: true
 
@@ -1716,23 +1418,25 @@ contexts:
     - match: \.(?!\.)
       scope: punctuation.accessor.sp
 
-    - match: \b({{identifier}})(?=\s*\.{3})
+    - match: '{{identifier}}(?=\s*\.{3})'
       scope: variable.other.constant.sp
 
-    - match: \b(?:([A-Z][A-Z_\d]+)|([A-Z]\w+)|({{identifier}}))(?=\s*\.)
+    - match: \b(?:([A-Z][A-Z_\d]+)|([A-Z]\w+))(?=\s*\.)
       captures:
         1: variable.other.constant.sp
         2: storage.type.sp
-        3: variable.other.readwrite.sp
+        # 3: variable.other.readwrite.sp
 
   function-call:
-    - match: (?=\s*\b{{identifier}}\b\s*)
+    - match: (?={{identifier}}\s*\()
       branch_point: function-call-begin
       branch:
-        - - match: (?=\s*(?:if|else|for|while|do|return|switch|case|continue|break|delete|new|decl|static|const|sizeof)\b)
+        - - match: '(?={{local_lookahead}})'
             pop: true
+
           - meta_content_scope: meta.function-call.sp
-          - match: '\b{{identifier}}\b'
+
+          - match: '{{identifier}}'
             scope: variable.function.sp
             push:
               - match: (?=\()
@@ -1806,12 +1510,12 @@ contexts:
         - match: ':'
           scope: punctuation.separator.sp
           pop: true
-        - match: \b{{identifier}}\b
+        - match: '{{identifier}}'
           scope: variable.other.constant
 
         - include: expressions
 
-  casts:
+  retag:
     - match: \bview_as\b
       scope: keyword.operator.word.viewas.sp
       push:
@@ -1822,15 +1526,15 @@ contexts:
               scope: punctuation.section.generic.end.sp
               pop: true
 
-            - match: '\b(?:{{identifier}})\b'
+            - match: '{{identifier}}'
               scope: storage.type.sp
 
-            # - include: expressions
         - include: comments
 
         - match: (?=\S)
           pop: true
-    - match: '(\b{{identifier}}\b)\s*(:)(?!\s*:)'
+
+    - match: '({{identifier}})\s*(:)(?!\s*:)'
       captures:
         1: storage.type.sp
         2: punctuation.separator.sp
@@ -1896,7 +1600,19 @@ contexts:
       scope: keyword.control.sp
     - match: '\b(?:sizeof|cellsof|tagof)\b'
       scope: keyword.operator.word.sp
-    - match: \b(?:delete|new)\b
+    - match: \b(new)\b
+      scope: keyword.control.sp
+      push:
+        - match: '{{identifier}}(?=\s*\()'
+          scope: support.class.sp
+          pop: true
+        - match: '{{identifier}}(?=\s*\[)'
+          scope: storage.type.sp
+          pop: true
+        - match: (?=\S)
+          pop: true
+
+    - match: \b(?:delete)\b
       scope: keyword.control.sp
     - match: '\bthis\b'
       scope: variable.language
@@ -1946,9 +1662,167 @@ contexts:
         1: punctuation.definition.keyword.sp
         2: keyword.other.documentation.param.sp
         3: variable.parameter.sp
-
-    - include: comment_keywords
-
-  comment_keywords:
-    - match: '\b(TODO|ToDo|FixMe|FIXME|NOTE|BUG|XXX|HACK|IDEA)\b(?:\s*([-:]))?'
+    - match: '\b(TODO|ToDo|FixMe|FIXME|NOTE|BUG|XXX|HACK|IDEA)\b(?:\s*[-:])?'
       scope: keyword.other.documentation.note.sp
+
+# Warning - Ugly zone ahead. Variable and function declarations. Shit's a mess.
+# im neglecting static old syntax variable decl for my own sanity.
+  variable-decl-oldsyntax:
+    - match: (?<=^|[;\(\{\}]|\*\/)\s*(?:\b(new|decl)\b)
+      scope: keyword.declaration.sp
+      push:
+        - match: ','
+          scope: punctuation.separator.sp
+        - match: '{{invalid_var_lookahead}}'
+          pop: true
+
+        - match: '({{identifier}})\s*(:)'
+          captures:
+            1: storage.type.sp
+            2: punctuation.separator.sp
+          push:
+            - match: '{{invalid_var_lookahead}}'
+              pop: true
+
+            - match: '{{identifier}}'
+              scope: variable.other.readwrite.sp
+              set:
+                - match: '{{invalid_var_lookahead}}'
+                  pop: true
+                - include: brackets
+                - match: '='
+                  scope: keyword.operator.assignment.sp
+                  set:
+                    - match: '(?=,)'
+                      pop: true
+
+                    - match: '{{invalid_var_lookahead}}'
+                      pop: true
+                    - include: expressions
+
+                    - match: '{{identifier}}'
+                      scope: variable.other.constant.sp
+                - include: comments
+            - include: comments
+
+        - match: '{{identifier}}'
+          scope: variable.other.readwrite.sp
+          push:
+            - match: (?=,)
+              pop: true
+            - include: brackets
+            - match: '{{invalid_var_lookahead}}'
+              pop: true
+            - match: '='
+              scope: keyword.operator.assignment.sp
+              set:
+                - match: '(?=,)'
+                  pop: true
+                - match: '{{invalid_var_lookahead}}'
+                  pop: true
+                - include: expressions
+                - match: '{{identifier}}'
+                  scope: variable.other.constant.sp
+            - include: comments
+            - match: '(?=[[:alpha:]_\.])'
+              pop: true
+        - include: comments
+
+        - match: \S+
+          scope: invalid.illegal.sp
+
+  variable-decl:
+    - match: '(?<=^|[;\(\{\}]|\*\/|\bstatic\b|\bconst\b)(?=\s*(?!{{local_lookahead}}|{{global_decl_lookahead}})({{identifier}})(?!\s*[^\w\s]))'
+      branch_point: var_decl_begin
+      branch:
+        - - match: '{{identifier}}'
+            scope: storage.type.sp
+            push:
+              - match: '{{invalid_var_lookahead}}'
+                pop: 2
+
+              - match: (?={{identifier}})
+                push:
+                  - match: ','
+                    scope: punctuation.separator.sp
+
+                  - match: '{{invalid_var_lookahead}}'
+                    pop: 3
+
+                  - match: '{{identifier}}'
+                    scope: variable.other.readwrite.sp
+                    push:
+                      - match: (?=,)
+                        pop: true
+
+                      - include: brackets
+
+                      - match: (?=\s*{{identifier}})
+                        pop: 4
+
+                      - match: '{{invalid_var_lookahead}}'
+                        pop: 4
+                      - match: '='
+                        scope: keyword.operator.assignment.sp
+                        set:
+                          - match: '(?=,)'
+                            pop: true
+                          - match: '{{invalid_var_lookahead}}'
+                            pop: 4
+                          - include: expressions
+
+                      - include: comments
+                      - match: '(?=[[:alpha:]_\.])'
+                        pop: true
+
+                  - include: comments
+              - include: comments
+              - match: (?=\S)
+                fail: var_decl_begin
+
+        - - match: ''
+            pop: true
+
+
+  function-decl:
+    - match: \bstock\b
+      scope: keyword.declaration.sp
+
+    - match: \b(?:static\b|const\b)
+      scope: storage.modifier.sp
+
+    - match: (?:({{identifier}})\s*?(?:(:)|(\[)((?:\s*[^\]\s]+\s*)*)\s*(\]))?\s*)?({{identifier}})\s*(?=\()
+      captures:
+        1: storage.type.sp
+        2: punctuation.separator.sp
+        3: punctuation.section.brackets.begin.sp
+        4: invalid.illegal.sp
+        5: punctuation.section.brackets.end.sp
+        6: entity.name.function.sp
+      push:
+        - match: \(
+          scope: punctuation.section.group.begin.sp
+          set:
+            - meta_content_scope: meta.function.parameters.sp
+            - match: \)
+              scope: punctuation.section.group.end.sp
+              set:
+                - match: (?=\{)
+                  set:
+                    - meta_content_scope: meta.function.sp
+                    - match: \{
+                      scope: meta.block.sp punctuation.section.block.begin.sp
+                      set:
+                        - meta_content_scope: meta.function.sp meta.block.sp
+                        - match: \}
+                          scope: meta.function.sp meta.block.sp punctuation.section.block.end.sp
+                          pop: true
+                        - include: expressions
+
+                - include: comments
+                - match: (?=[^\/\{\s]|$)
+                  set:
+                    - match: '$'
+                      pop: true
+
+            - include: function-params
