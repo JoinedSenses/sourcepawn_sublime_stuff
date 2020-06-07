@@ -1664,7 +1664,7 @@ contexts:
     - match: \breturn\b
       scope: keyword.control.flow.return.sp
     - match: '\b({{control_keywords}})\b'
-      scope: keyword.control.sp
+      scope: keyword.control.conditional.sp
     - match: '\b(?:sizeof|cellsof|tagof)\b'
       scope: keyword.operator.word.sp
     - match: \b(new)\b
@@ -1907,7 +1907,7 @@ contexts:
         1: variable.other.constant.sp
         2: storage.type.sp
         3: variable.other.readwrite.sp
-    - match: '{{identifier}}(?=\s*(?:[\+\-\*/^&%!]?=|\[))'
+    - match: '{{identifier}}(?=\s*(?:[\+\-\*/^&%!]?=|[\[\<\>]))'
       scope: variable.other.readwrite.sp
 
   # variable-usage-late: # assumptions based on general var naming patterns
