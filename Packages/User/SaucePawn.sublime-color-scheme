@@ -119,21 +119,22 @@
 		},
 		{
 			"scope": "keyword.control",
-			"foreground": "#ff624a",
+			"foreground": "#ef7c66",
 			// "font_style": "bold",
 		},
 		{
 			"scope": "keyword.control.flow",
-			"foreground": "#ff624a",
-			"font_style": "bold italic",
+			"foreground": "#ef7c66",
+			"font_style": "italic",
 		},
 		{
 			"scope": "keyword.control.conditional",
-			"foreground": "#ff624a",
+			"foreground": "#ef7c66",
+			"font_style": ""
 		},
 		{
 			"scope": "keyword.control.import",
-			"foreground": "#ff624a",
+			"foreground": "#d95f4c",
 			"font_style": "italic",
 		},
 		{
@@ -152,6 +153,10 @@
 		{
 			"scope": "keyword.operator.logical",
 			"foreground": "#e80202",
+		},
+		{
+			"scope": "keyword.operator.word",
+			"foreground":"#e37766"
 		},
 		{
 			"scope": "keyword.other",
@@ -210,12 +215,12 @@
 		{
 			"scope": "punctuation.section",
 			"foreground": "#96b1d3",
-			"font_style": "bold",
+			"font_style": "",
 		},
 		{
 			"scope": "punctuation.section.braces",
 			"foreground": "#ccdfff",
-			"font_style": "bold",
+			// "font_style": "bold",
 		},
 		{
 			"scope": "punctuation.section.brackets",
@@ -295,8 +300,8 @@
 		},
 		{
 			"scope": "variable.function",
-			"foreground": "#aed7fc",
-			"font_style": "bold"
+			"foreground": "#c0e0f0",
+			"font_style": ""
 		},
 		{
 			"scope": "variable.language",
