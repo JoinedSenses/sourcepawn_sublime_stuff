@@ -65,7 +65,7 @@
 		},
 		{
 			"scope": "entity.name.function",
-			"foreground": "#c2c5f9",
+			"foreground": "#a7abfc", // c2c5f9
 			"font_style": "bold italic"
 		},
 		{
@@ -215,7 +215,7 @@
 		{
 			"scope": "punctuation.section",
 			"foreground": "#96b1d3",
-			"font_style": "",
+			"font_style": "bold",
 		},
 		{
 			"scope": "punctuation.section.braces",
@@ -280,7 +280,7 @@
 		},
 		{
 			"scope": "support.function",
-			"foreground": "#c2c5f9",
+			"foreground": "#a7abfc",
 			"font_style": "bold"
 		},
 		{
@@ -300,8 +300,8 @@
 		},
 		{
 			"scope": "variable.function",
-			"foreground": "#c0e0f0",
-			"font_style": ""
+			"foreground": "#6fcdfc",
+			"font_style": "bold"
 		},
 		{
 			"scope": "variable.language",
@@ -315,7 +315,7 @@
 		},
 		{
 			"scope": "variable.other.constant",
-			"foreground": "#35dbc1",
+			"foreground": "#b7cf97",
 			"font_style":"italic"
 		},
 		{
