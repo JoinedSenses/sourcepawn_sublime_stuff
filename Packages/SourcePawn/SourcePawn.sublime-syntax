@@ -1827,6 +1827,8 @@ contexts:
                     push:
                       - match: (?=,)
                         pop: true
+                      - match: (?=\s*\()
+                        fail: var_decl_begin
 
                       - include: brackets
 
@@ -1853,6 +1855,10 @@ contexts:
                   - include: comments
 
               - include: comments
+
+              - match: '{{invalid_var_lookahead}}'
+                fail: var_decl_begin
+
               - match: (?=\S)
                 fail: var_decl_begin
 
@@ -1867,7 +1873,7 @@ contexts:
     - match: \b(?:static\b|const\b)
       scope: storage.modifier.sp
 
-    - match: (?:({{identifier}})\s*?(?:(:)|(\[)((?:\s*[^\]\s]+\s*)*)\s*(\]))?\s*)?({{identifier}})\s*(?=\()
+    - match: \s*(?:({{identifier}})\s*?(?:(:)|(\[)((?:\s*[^\]\s]+\s*)*)\s*(\]))?\s*)?({{identifier}})\s*(?=\()
       captures:
         1: storage.type.sp
         2: punctuation.separator.sp

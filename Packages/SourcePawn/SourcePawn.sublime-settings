@@ -5,6 +5,16 @@
 		"inc"
 	],
 
+    "word_separators": "./\\()\"':,;<>~!@#$%^&*|+=[]{}`~?",
+    "smart_indent": true,
+    "detect_indentation": true,
+    "tab_size": 4,
+    "draw_indent_guides": false,
+
+    "auto_complete_include_snippets": "true",
+    "auto_complete_preserve_order":"none",
+    "auto_complete_delay": "200"
     // "auto_complete": true,
     // "auto_complete_selector": "source"
+
 }
