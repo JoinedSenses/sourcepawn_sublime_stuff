@@ -1,11 +1,11 @@
 <snippet>
 	<content><![CDATA[
-switch (${1: }) {
+do {
 	$0
-}
+} while (${1: })
 ]]></content>
 	<!-- Optional: Set a tabTrigger to define how to trigger the snippet -->
-	<tabTrigger>switch</tabTrigger>
+	<tabTrigger>do</tabTrigger>
 	<!-- Optional: Set a scope to limit where the snippet will trigger -->
 	<scope>source.sp</scope>
 </snippet>

@@ -4,7 +4,7 @@
 	<key>name</key>
 	<string>Symbol List</string>
 	<key>scope</key>
-	<string><![CDATA[(source.sp) & (entity.name.class | entity.name.struct | entity.name.union | entity.name.enum | entity.name.constant)]]></string>
+	<string><![CDATA[(source.sp) & (entity.name.class | entity.name.struct | entity.name.union | entity.name.enum | entity.name.constant | entity.name.function)]]></string>
 	<key>settings</key>
 	<dict>
 		<key>showInSymbolList</key>
