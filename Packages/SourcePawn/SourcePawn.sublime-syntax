@@ -1465,6 +1465,9 @@ contexts:
     - match: \.
       scope: punctuation.accessor.dot.sp
       push:
+        - match: (?=\s*{{identifier}}[ \t]{{identifier}})
+          pop: true
+
         - match: '({{identifier}})\s*(?=\()'
           scope: variable.function.sp
           set:
