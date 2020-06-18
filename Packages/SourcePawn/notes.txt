@@ -1,0 +1,23 @@
+"sublime_text": ">4070"
+
+2:20 PM] OdatNurd:
+>>> panel = window.create_output_panel('my_panel', unlisted=True)
+>>> panel.assign_syntax("Packages/Python/Python.sublime-syntax")
+>>> panel.run_command("append", {"characters": "import sublime"})
+>>> panel.scope_name(0)
+'source.python meta.statement.import.python keyword.control.import.python '
+[2:21 PM] OdatNurd: also this may be a handy addition:
+[2:21 PM] OdatNurd:
+>>> panel.extract_tokens_with_scopes(sublime.Region(0, len(panel)))
+[((0, 6), 'source.python meta.statement.import.python keyword.control.import.python '), ((6, 7), 'source.python meta.statement.import.python '), ((7, 14), 'source.python meta.statement.import.python meta.qualified-name.python meta.generic-name.python ')]
+[2:22 PM] JoinedSenses: alright, thank you. another question. ive managed to grab a bunch of regions that consist of lets say, variable declarations. is there api to maybe split it up or grab all words within that region that are something like variable.other.readwrite
+[2:22 PM] OdatNurd: i.e. grab individual tokens with scopes applied over a region, which here is the whole panel content but you could target that
+[2:23 PM] OdatNurd: view.substr() gives you the text of any particular region as a string
+[2:24 PM] JoinedSenses: yeah, i've got the entire region as a string. trying to find a way to pull certain words from it
+[2:24 PM] OdatNurd: if you have say a region that covers a whole function and you just want the variables defined inside that, then you would need to do something like call view.find_by_selector('variable.other.readwrite') to get all of the variables, and then determine which of those results is inside of the region that wraps the function
+[2:24 PM] OdatNurd: region.contains() will tell you if one region contains another one
+[2:24 PM] JoinedSenses: cool thanks. that was my backup plan
+[2:25 PM] JoinedSenses: trying to do two things, get the type of variables and also only add variables in global and current local scope for autocompletion
+[2:26 PM] OdatNurd: depending on what you're trying to do, you could also combine this with the above; fill the hidden output panel with the function delcaration and then you're good to go. That may or may not be handy based on where and when you need the info though; also it requires that the syntax could still highlight things properly with only partial content, etc
+[2:26 PM] JoinedSenses: alright. i saved those references and will see if i can make sense/use of it
+[2:26 PM] JoinedSenses: thank you

@@ -1,0 +1,46 @@
+[
+    {
+        "caption": "Preferences",
+        "mnemonic": "n",
+        "id": "preferences",
+        "children":
+        [
+            {
+                "caption": "Package Settings",
+                "mnemonic": "P",
+                "id": "package-settings",
+                "children":
+                [
+                    {
+                        "caption": "SourcePawn Completions",
+                        "children":
+                        [
+                            {
+                                "command": "open_file",
+                                "args": {"file": "${packages}/SourcePawn Completions/SourcePawn Completions.sublime-settings"},
+                                "caption": "Settings - Default"
+                            },
+                            {
+                                "command": "open_file",
+                                "args": {"file": "${packages}/User/SourcePawn Completions.sublime-settings"},
+                                "caption": "Settings - User"
+                            },
+                            { "caption": "-" },
+                            {
+                                "command": "open_file",
+                                "args": {"file": "${packages}/SourcePawn Completions/SourcePawn.sublime-build.example"},
+                                "caption": "Build system - Example"
+                            },
+                            {
+                                "command": "open_file",
+                                "args": {"file": "${packages}/User/SourcePawn.sublime-build"},
+                                "caption": "Build system - User"
+                            },
+                            { "caption": "-" }
+                        ]
+                    }
+                ]
+            }
+        ]
+    }
+]

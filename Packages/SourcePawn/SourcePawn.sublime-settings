@@ -13,9 +13,6 @@
 
     "auto_complete_include_snippets": "true",
     "auto_complete_preserve_order":"some",
-    // "auto_complete_delay": "200",
     "auto_complete_selector": "source - comment - string.quoted",
-    // "auto_complete": true,
-    // "auto_complete_selector": "source"
 
 }
