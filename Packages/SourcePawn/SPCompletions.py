@@ -59,9 +59,8 @@ class SPCompletions(sublime_plugin.EventListener):
     def on_activated(self, view):
         if not self.is_sourcepawn_file(view):
             return
-        if not view.file_name():
-            return
-        if not view.file_name() in nodes:
+        file_name = view.file_name()
+        if file_name is not None and file_name and not file_name in nodes:
             add_to_queue(view)
 
 
@@ -104,11 +103,14 @@ class SPCompletions(sublime_plugin.EventListener):
 
 
     def on_query_completions(self, view, prefix, locations):
-        print('queried')
-        # view.settings().set('auto_complete_preserve_order', 'strict')
+        # print('queried')
         if not view.match_selector(locations[0], 'source.sp -string -comment -constant') \
         and not view.match_selector(locations[0], 'source.inc -string -comment -constant'):
-            return (None, sublime.INHIBIT_WORD_COMPLETIONS|sublime.INHIBIT_EXPLICIT_COMPLETIONS)
+            return []
+
+        file_name = view.file_name()
+        if file_name is None:
+            return []
 
         point = locations[0]-1;
         pointFound = False
@@ -123,6 +125,17 @@ class SPCompletions(sublime_plugin.EventListener):
                 pointFound = True
 
         if pointFound:
+            current_node = nodes[file_name]
+
+            classes = self.generate_classes(file_name)
+            print('classes:')
+            keys = classes.keys()
+            if keys:
+                for key in classes.keys():
+                    print(' ' + key)
+            else:
+                print(' none')
+
             print('point found')
             wordpoint = point-1
             char = view.substr(point-1)
@@ -148,33 +161,51 @@ class SPCompletions(sublime_plugin.EventListener):
 
             if not char.isalpha():
                 print('Could not find valid char: ' + char)
-                return (None, sublime.INHIBIT_WORD_COMPLETIONS|sublime.INHIBIT_EXPLICIT_COMPLETIONS)
+                return (
+                    None,
+                    sublime.INHIBIT_WORD_COMPLETIONS|
+                    sublime.INHIBIT_EXPLICIT_COMPLETIONS
+                )
 
             print('Found valid char')
 
             var_region = view.word(wordpoint)
             var = view.substr(var_region).strip()
             print('variable is: ' + var)
+
             if not var:
-                return (None, sublime.INHIBIT_WORD_COMPLETIONS|sublime.INHIBIT_EXPLICIT_COMPLETIONS)
+                return (
+                    None,
+                    sublime.INHIBIT_WORD_COMPLETIONS|
+                    sublime.INHIBIT_EXPLICIT_COMPLETIONS
+                )
 
             if re.match(r'\b[a-zA-Z_]\w*\b', var):
                 # check if static access
                 varstatic = var + '.static'
-                if varstatic in classes.keys():
-                    if classes[varstatic]:
+                # if varstatic in all_classes.keys():
+                c = current_node.find_class(varstatic)
+                if c is not None:
+                    if c:
                         return (
-                            classes[varstatic],
-                            sublime.INHIBIT_WORD_COMPLETIONS|sublime.INHIBIT_EXPLICIT_COMPLETIONS|sublime.INHIBIT_REORDER
+                            c,
+                            sublime.INHIBIT_WORD_COMPLETIONS|
+                            sublime.INHIBIT_EXPLICIT_COMPLETIONS|
+                            sublime.INHIBIT_REORDER
                         )
-                    return (None, sublime.INHIBIT_WORD_COMPLETIONS|sublime.INHIBIT_EXPLICIT_COMPLETIONS)
+                    return (
+                        None,
+                        sublime.INHIBIT_WORD_COMPLETIONS|
+                        sublime.INHIBIT_EXPLICIT_COMPLETIONS
+                    )
 
                 # check if local
                 print(view.scope_name(point))
                 begin = var_region.begin() - 1
                 while view.match_selector(begin, 'source.sp meta.function | meta.function.parameters'):
                     begin -= 1;
-                begin += 2
+                begin += 1
+
                 region = view.substr(sublime.Region(begin, point))
                 if region:
                     print('Found beginning at {}'.format(begin))
@@ -184,11 +215,21 @@ class SPCompletions(sublime_plugin.EventListener):
                     m = re.search(r'\b([a-zA-Z_]\w+)\b\s+\b{}\b'.format(var), region)
                     if m:
                         retval = m.group(1)
-                        if retval in classes.keys():
+                        # if retval in all_classes.keys():
+                        c = current_node.find_class(retval)
+                        if c is not None:
                             print('type found: ' + retval)
+                            if c:
+                                return (
+                                    c,
+                                    sublime.INHIBIT_WORD_COMPLETIONS|
+                                    sublime.INHIBIT_EXPLICIT_COMPLETIONS|
+                                    sublime.INHIBIT_REORDER
+                                )
                             return (
-                                classes[retval],
-                                sublime.INHIBIT_WORD_COMPLETIONS|sublime.INHIBIT_EXPLICIT_COMPLETIONS|sublime.INHIBIT_REORDER
+                                None,
+                                sublime.INHIBIT_WORD_COMPLETIONS|
+                                sublime.INHIBIT_EXPLICIT_COMPLETIONS
                             )
 
                     # output text to a new view, apply syntax,
@@ -196,19 +237,35 @@ class SPCompletions(sublime_plugin.EventListener):
                     panel = window.create_output_panel('temp_check_sp', unlisted=True)
                     panel.assign_syntax('Packages/SourcePawn/SourcePawn.sublime-syntax')
                     panel.run_command('append', {'characters': region})
+
                     for r in panel.find_by_selector('source.sp meta.variable.sp'):
                         region = re.sub('[ \t]{2,}', ' ', panel.substr(r).strip().replace('\n', ''))
+
                         print(region)
+
                         m = re.search(r'^([a-zA-Z_]\w+)\b', region)
                         if m:
                             retval = m.group(1)
-                            if re.search(r'(?:{}|,) +{}'.format(retval, var), region) and retval in classes.keys():
+                            if re.search(r'(?:{}|,) +{}'.format(retval, var), region):
                                 print('Found local type. It\'s {}'.format(retval))
+
                                 window.destroy_output_panel('temp_check_sp')
-                                return (
-                                    classes[retval],
-                                    sublime.INHIBIT_WORD_COMPLETIONS|sublime.INHIBIT_EXPLICIT_COMPLETIONS|sublime.INHIBIT_REORDER
-                                )
+
+                                c = current_node.find_class(retval)
+                                if c is not None:
+                                    if c:
+                                        return (
+                                            all_classes[retval],
+                                            sublime.INHIBIT_WORD_COMPLETIONS|
+                                            sublime.INHIBIT_EXPLICIT_COMPLETIONS|
+                                            sublime.INHIBIT_REORDER
+                                        )
+                                    return (
+                                        None,
+                                        sublime.INHIBIT_WORD_COMPLETIONS|
+                                        sublime.INHIBIT_EXPLICIT_COMPLETIONS
+                                    )
+
                     window.destroy_output_panel('temp_check_sp')
 
                 # check if global
@@ -220,18 +277,36 @@ class SPCompletions(sublime_plugin.EventListener):
                         m = re.search(r'^([a-zA-Z_]\w+)\b', region)
                         if m:
                             retval = m.group(1)
-                            if re.search(r'(?:{}|,) +{}'.format(retval, var), region) and retval in classes.keys():
+                            if re.search(r'(?:{}|,) +{}'.format(retval, var), region):
+
                                 print('Found type. It\'s {}'.format(retval))
+                                c = current_node.find_class(retval)
+                                if c is not None:
+                                    if c:
+                                        return (
+                                            c,
+                                            sublime.INHIBIT_WORD_COMPLETIONS|
+                                            sublime.INHIBIT_EXPLICIT_COMPLETIONS|
+                                            sublime.INHIBIT_REORDER
+                                        )
+                                    return (
+                                        None,
+                                        sublime.INHIBIT_WORD_COMPLETIONS|
+                                        sublime.INHIBIT_EXPLICIT_COMPLETIONS
+                                    )
 
-                                return (
-                                    classes[retval],
-                                    sublime.INHIBIT_WORD_COMPLETIONS|sublime.INHIBIT_EXPLICIT_COMPLETIONS|sublime.INHIBIT_REORDER
-                                )
-
-            return (None, sublime.INHIBIT_WORD_COMPLETIONS|sublime.INHIBIT_EXPLICIT_COMPLETIONS)
+            return ( # Found a dot but unknown type
+                None,
+                sublime.INHIBIT_WORD_COMPLETIONS|
+                sublime.INHIBIT_EXPLICIT_COMPLETIONS
+            )
 
         # return (self.generate_funcset(view.file_name()), sublime.INHIBIT_WORD_COMPLETIONS | sublime.INHIBIT_EXPLICIT_COMPLETIONS)
-        return (self.generate_funcset(view.file_name()), sublime.INHIBIT_WORD_COMPLETIONS|sublime.INHIBIT_REORDER)
+        return (
+            self.generate_funcset(file_name),
+            sublime.INHIBIT_WORD_COMPLETIONS|
+            sublime.INHIBIT_REORDER
+        )
 
 
     def generate_funcset(self, file_name):
@@ -254,6 +329,29 @@ class SPCompletions(sublime_plugin.EventListener):
 
         funcset.update(node.funcs)
 
+    def generate_classes(self, file_name):
+        classes = dict(
+            {
+                'Handle': [('Close()\t(function: void) [handles]', 'Close()')],
+                'Handle.static':[]
+            }
+        )
+
+        visited = set()
+
+        node = nodes[file_name]
+        self.generate_classes_recur(node, classes, visited)
+        return classes
+
+    def generate_classes_recur(self, node, classes, visited):
+        if node in visited:
+            return
+
+        visited.add(node)
+        for child in node.children:
+            self.generate_classes_recur(child, classes, visited)
+
+        classes.update(node.classes)
 
 def _settings_filename():
     return 'SourcePawn Completions.sublime-settings'
@@ -302,7 +400,9 @@ def add_to_queue_forward(view):
 def add_to_queue(view):
     # The view can only be accessed from the main thread, so run the regex
     # now and process the results later
-    to_process.put((view.file_name(), view.substr(sublime.Region(0, view.size()))))
+    file_name = view.file_name()
+    if file_name is not None:
+        to_process.put((file_name, view.substr(sublime.Region(0, view.size()))))
 
 
 def add_include_to_queue(file_name):
@@ -381,10 +481,13 @@ class ProcessQueueThread(watchdog.utils.DaemonThread):
         (current_node, node_added) = get_or_add_node(view_file_name)
 
         base_includes = set()
-
         includes = includes_re.findall(view_buffer)
 
+        self.load_from_file(view_file_name, 'sourcemod', current_node, current_node, base_includes)
+
         for include in includes:
+            if include == 'sourcemod':
+                continue
             self.load_from_file(view_file_name, include, current_node, current_node, base_includes)
 
         for removed_node in current_node.children.difference(base_includes):
@@ -404,7 +507,10 @@ class ProcessQueueThread(watchdog.utils.DaemonThread):
             print ('Processing Include File %s' % file_name)
             includes = includes_re.findall(f.read())
 
+        self.load_from_file(view_file_name, 'sourcemod', current_node, current_node, base_includes)
         for include in includes:
+            if include == 'sourcemod':
+                continue
             self.load_from_file(file_name, include, current_node, current_node, base_includes)
 
         for removed_node in current_node.children.difference(base_includes):
@@ -464,6 +570,11 @@ def get_or_add_node(file_name):
 
     return (node, False)
 
+# class SPObj:
+#     def __init__(self):
+#         self.name = ''
+#         self.properties = dict() # name: ret
+#         self.functions = dict() # name: ret
 
 class Node:
     def __init__(self, file_name):
@@ -471,6 +582,8 @@ class Node:
         self.children = set()
         self.parents = set()
         self.funcs = set()
+        self.classes = dict()
+        self.globals = dict()
 
 
     def add_child(self, node):
@@ -486,11 +599,36 @@ class Node:
             nodes.pop(node.file_name)
 
 
-    def remove_all_children_and_funcs(self):
+    def remove_all_children(self):
         for child in self.children:
             self.remove_child(node)
         self.funcs.clear()
+        self.classes.clear()
 
+
+    def find_class(self, class_name):
+        visited = set()
+        if class_name == 'Handle':
+            return [('Close()\t(function: void) [handles]', 'Close()')]
+        elif class_name == 'Handle.static':
+            return []
+        return self.__find_class_recur(class_name, visited)
+
+
+    def __find_class_recur(self, class_name, visited):
+        if self in visited:
+            return
+        visited.add(self)
+
+        if class_name in self.classes.keys():
+            return self.classes[class_name]
+
+        for child in self.children:
+            c = child.__find_class_recur(class_name, visited)
+            if c is not None:
+                return c
+
+        return None
 
 class TextReader:
     def __init__(self, text):
@@ -621,7 +759,7 @@ def process_lines(line_reader, node):
                     continue
 
                 pos = buffer.find('{')
-                print('Skipping public')
+                # print('Skipping public')
                 if pos != -1: # if line contains {, jump to it
                     buffer = buffer[pos:]
                 else: # otherwise, skip to next line
@@ -648,21 +786,24 @@ def process_lines(line_reader, node):
                 node.funcs.add((name + '\t(methodmap)' + file, name))
 
                 if inherited is not None:
-                    # print('Found methodmap: ' + name + ' < ' + inherited)
-                    if inherited in classes.keys():
-                        # print(classes[inherited])
-                        classes[name] = set(classes[inherited])
-                        classes[static_name] = set(classes[inherited+'.static'])
+                    c = node.find_class(inherited)
+                    if c is not None:
+                        node.classes[name] = set(c)
+                        node.classes[static_name] = set(node.find_class(inherited+'.static'))
+                    else:
+                        node.classes[name] = set()
+                        node.classes[static_name] = set()
                 else:
-                    classes[name] = set()
-                    classes[static_name] = set()
+                    node.classes[name] = set()
+                    node.classes[static_name] = set()
 
                 in_comment = False
                 searching = True
                 pos = -1
                 buffer = buffer[len(m.group(0)):]
                 strlen = 0
-                print('new buffer: \'' + buffer + '\'')
+
+                # print('new buffer: \'' + buffer + '\'')
                 while pos == -1 and searching:
                     if buffer:
                         i = 0
@@ -708,7 +849,7 @@ def process_lines(line_reader, node):
                         buffer = read_line(line_reader)
                     strlen = len(buffer)
 
-                print('found methodmap brace. new buffer: \'' + buffer + '\'' + ' len: ' + str(strlen))
+                # print('found methodmap brace. new buffer: \'' + buffer + '\'' + ' len: ' + str(strlen))
                 while brace_level > 0:
                     i = 0
                     while i < strlen:
@@ -749,7 +890,7 @@ def process_lines(line_reader, node):
 
                 mmbody = re.sub(r'[ \t]{2,}', ' ', mmbody).strip()
                 mmbody = re.sub(r'(\)|property[ \t]\b\w+\b[ \t]\b\w+\b);? ', r'\1\n', mmbody)
-                print('Body: ' + mmbody + '\n')
+                # print('Body: ' + mmbody + '\n')
 
                 # constructor
                 m = re.search(r'public[ \t](?:native[ \t])?{}[ \t]*\((.*?)\)'.format(name), mmbody)
@@ -782,7 +923,7 @@ def process_lines(line_reader, node):
                             autocomplete += '${%d:%s}' % (i, param.strip())
                         i += 1
                     autocomplete += ')'
-                    classes[name].add((func + '()\t(function: ' + ret + ')' + file, autocomplete))
+                    node.classes[name].add((func + '()\t(function: ' + ret + ')' + file, autocomplete))
                 # static function
                 for m in re.finditer(r'public[ \t]static[ \t](?:native[ \t])?(\w+)\b[ \t](\w+)[ \t]*\((.*?)\)', mmbody):
                     ret = m.group(1)
@@ -798,29 +939,29 @@ def process_lines(line_reader, node):
                             autocomplete += '${%d:%s}' % (i, param.strip())
                         i += 1
                     autocomplete += ')'
-                    classes[static_name].add((func + '()\t(function: ' + ret + ')' + file, autocomplete))
+                    node.classes[static_name].add((func + '()\t(function: ' + ret + ')' + file, autocomplete))
                 # property
                 for m in re.finditer(r'property[ \t](\w+)[ \t](\w+)', mmbody):
                     ret = m.group(1)
                     prop = m.group(2)
 
-                    classes[name].add((prop+'\t(property: ' + ret + ')' + file, prop))
+                    node.classes[name].add((prop+'\t(property: ' + ret + ')' + file, prop))
 
-                classes[name] = sorted(classes[name])
-                classes[static_name] = sorted(classes[static_name])
+                node.classes[name] = sorted(node.classes[name])
+                node.classes[static_name] = sorted(node.classes[static_name])
 
             elif function_re.search(buffer):
                 (buffer, found_comment, brace_level) = get_full_function_string(line_reader, node, buffer, found_comment, brace_level)
 
             elif re.search('^[ \t]*(?:type(?:def|set)|func(?:tag|enum))', buffer):
                 pos = buffer.find('{')
-                print('Skipping func type def')
+                print('Skipping typedef')
                 if pos != -1: # if line contains {, jump to it
                     buffer = buffer[pos:]
                 else: # otherwise, skip to next line
                     continue
-            else:
-                print('End of checks: ' + buffer)
+            # else:
+                # print('End of checks: ' + buffer)
 
         (buffer, found_comment, brace_level) = read_string(buffer, found_comment, brace_level)
 
@@ -1109,9 +1250,9 @@ comment_re = re.compile(r'\/\*(.*?)\*\/')
 pubvar_re = re.compile(r'^[ \t]*public[ \t]+const[ \t]+\w+[ \t]+(\w+)\b\s*;')
 methodmap_re = re.compile(r'^[ \t]*methodmap[ \t]+\b(\w+)\b(?:\s*<\s*(\w+)\b)?')
 file = ''
-classes = dict(
-    {
-        'Handle': [('Close()\t(function: void) [handles]', 'Close()')],
-        'Handle.static':[]
-    }
-)
+# all_classes = dict(
+#     {
+#         'Handle': [('Close()\t(function: void) [handles]', 'Close()')],
+#         'Handle.static':[]
+#     }
+# )

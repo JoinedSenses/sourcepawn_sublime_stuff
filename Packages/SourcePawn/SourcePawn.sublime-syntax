@@ -64,8 +64,8 @@ contexts:
     - include: preprocessor
     - include: comments
     - include: variable-decl-oldsyntax # this has to show up before 'new' is introduced
-    - include: unique-keywords
     - include: case-default
+    - include: unique-keywords
     - include: constants
     - include: strings
     - include: operators
@@ -626,6 +626,7 @@ contexts:
     - include: preprocessor
 
   enum_struct_variable:
+    - meta_scope: meta.variable.sp
     - match: '{{identifier}}'
       scope: storage.type.sp
       push:

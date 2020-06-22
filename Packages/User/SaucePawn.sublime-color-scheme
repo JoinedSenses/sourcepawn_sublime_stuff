@@ -134,7 +134,7 @@
 		},
 		{
 			"scope": "keyword.control.import",
-			"foreground": "#d95f4c",
+			"foreground": "#ff624a",
 			"font_style": "italic",
 		},
 		{
@@ -156,7 +156,7 @@
 		},
 		{
 			"scope": "keyword.operator.word",
-			"foreground":"#e37766"
+			"foreground":"#ff624a"
 		},
 		{
 			"scope": "keyword.other",
@@ -257,11 +257,12 @@
 		{
 			"scope": "storage.type",
 			"foreground": "#66D9EF",
-			// "font_style": "italic",
+			"font_style": "bold",
 		},
 		{
 			"scope": "string",
 			"foreground": "#ffaaaa",
+			"font_style":"italic"
 		},
 		// Support
 		{
@@ -296,12 +297,13 @@
 		// Variable
 		{
 			"scope": "variable",
-			"foreground": "#1fc6ab",
+			"foreground": "#ffffff",
 		},
 		{
 			"scope": "variable.function",
-			"foreground": "#6fcdfc",
+			"foreground": "#95BDDC",
 			"font_style": "bold"
+			// "font_style": "italic"
 		},
 		{
 			"scope": "variable.language",
@@ -315,7 +317,7 @@
 		},
 		{
 			"scope": "variable.other.constant",
-			"foreground": "#b7cf97",
+			"foreground": "#dd96e0",
 			"font_style":"italic"
 		},
 		{
