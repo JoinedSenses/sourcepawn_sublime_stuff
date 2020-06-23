@@ -257,7 +257,7 @@
 		{
 			"scope": "storage.type",
 			"foreground": "#66D9EF",
-			"font_style": "bold",
+			// "font_style": "bold",
 		},
 		{
 			"scope": "string",
@@ -301,8 +301,8 @@
 		},
 		{
 			"scope": "variable.function",
-			"foreground": "#95BDDC",
-			"font_style": "bold"
+			"foreground": "#8ed1b9",
+			// "font_style": "bold"
 			// "font_style": "italic"
 		},
 		{

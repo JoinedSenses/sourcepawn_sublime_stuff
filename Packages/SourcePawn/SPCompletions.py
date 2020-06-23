@@ -252,6 +252,7 @@ class SPCompletions(sublime_plugin.EventListener):
                                 window.destroy_output_panel('temp_check_sp')
 
                                 c = current_node.find_class(retval)
+                                print(c)
                                 if c is not None:
                                     if c:
                                         return (
@@ -260,11 +261,11 @@ class SPCompletions(sublime_plugin.EventListener):
                                             sublime.INHIBIT_EXPLICIT_COMPLETIONS|
                                             sublime.INHIBIT_REORDER
                                         )
-                                    return (
-                                        None,
-                                        sublime.INHIBIT_WORD_COMPLETIONS|
-                                        sublime.INHIBIT_EXPLICIT_COMPLETIONS
-                                    )
+                                return (
+                                    None,
+                                    sublime.INHIBIT_WORD_COMPLETIONS|
+                                    sublime.INHIBIT_EXPLICIT_COMPLETIONS
+                                )
 
                     window.destroy_output_panel('temp_check_sp')
 
@@ -519,7 +520,7 @@ class ProcessQueueThread(watchdog.utils.DaemonThread):
         process_include_file(current_node)
 
 
-    def load_from_file(self, view_file_name, base_file_name, parent_node, base_node, base_includes):
+    def load_from_file(self, view_file_name, base_file_name, parent_node, base_node, base_includes):   
         (file_name, exists) = get_file_name(view_file_name, base_file_name)
         if not exists:
             print ('Include File Not Found: %s' % base_file_name)
@@ -536,7 +537,7 @@ class ProcessQueueThread(watchdog.utils.DaemonThread):
 
         with codecs.open(file_name, 'r', 'utf-8') as f:
             print ('Processing Include File %s' % file_name)
-            includes = re.findall(r'^[ \t]*#include[ \t]+[<"]([^>"]+)[>"]', f.read(), re.MULTILINE)
+            includes = includes_re.findall(f.read())
 
         for include in includes:
             self.load_from_file(view_file_name, include, node, base_node, base_includes)
@@ -610,7 +611,7 @@ class Node:
         visited = set()
         if class_name == 'Handle':
             return [('Close()\t(function: void) [handles]', 'Close()')]
-        elif class_name == 'Handle.static':
+        if class_name == 'Handle.static':
             return []
         return self.__find_class_recur(class_name, visited)
 
@@ -619,7 +620,7 @@ class Node:
         if self in visited:
             return
         visited.add(self)
-
+        print('searching {} for {}'.format(self.file_name, class_name))
         if class_name in self.classes.keys():
             return self.classes[class_name]
 
@@ -1240,7 +1241,7 @@ file_observer = watchdog.observers.Observer()
 process_thread = ProcessQueueThread()
 file_event_handler = IncludeFileEventHandler()
 include_dirs = Wrapper()
-includes_re = re.compile(r'^[ \t*]*#include[ \t]+[<"]([^>"]+)[>"]')
+includes_re = re.compile(r'^[ \t]*#include[ \t]+[<"]([^>"]+)[>"]', re.MULTILINE)
 local_re = re.compile(r'\.(sp|inc)$')
 enum_re = re.compile(r'^[ \t]*enum\b[ \t]+(struct\b[ \t]+)?([\w_]+)?')
 function_re = re.compile(r'^[ \t]*(?:(native|stock|forward)\b[ \t]+)?(?:([\w_]+)(?:[ \t]+|:))?([\w_]+[ \t]*\()')

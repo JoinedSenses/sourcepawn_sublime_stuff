@@ -1582,10 +1582,9 @@ contexts:
         - match: ':'
           scope: punctuation.separator.sp
           pop: true
+        - include: expressions
         - match: '{{identifier}}'
           scope: variable.other.constant
-
-        - include: expressions
 
   retag:
     - match: \bview_as\b
@@ -1606,7 +1605,7 @@ contexts:
         - match: (?=\S)
           pop: true
 
-    - match: '({{identifier}})\s*(:)(?!\s*:)'
+    - match: '({{identifier}})(:)(?![ \t]*:)'
       captures:
         1: storage.type.sp
         2: punctuation.separator.sp
