@@ -156,7 +156,7 @@
 		},
 		{
 			"scope": "keyword.operator.word",
-			"foreground":"#ff624a"
+			"foreground":"#ef7c66"
 		},
 		{
 			"scope": "keyword.other",
