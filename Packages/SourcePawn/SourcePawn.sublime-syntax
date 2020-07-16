@@ -189,7 +189,7 @@ contexts:
       scope: punctuation.section.brackets.begin.sp
       push:
         - meta_scope: meta.brackets.sp
-        - match: \}
+        - match: \]
           scope: punctuation.section.brackets.end.sp
           pop: true
 
