@@ -71,7 +71,7 @@ contexts:
     - include: operators
     - include: parens
     - include: brackets
-    - include: block
+    - include: braces
     - include: retag
     - include: accessor
     - include: variable-usage-early
@@ -1535,6 +1535,7 @@ contexts:
         - match: \]
           scope: punctuation.section.brackets.end.sp
           pop: true
+
         - include: expressions
 
   parens:
@@ -1548,7 +1549,7 @@ contexts:
 
         - include: expressions
 
-  block:
+  braces:
     - match: \{
       scope: punctuation.section.braces.begin.sp
       push:
@@ -1802,7 +1803,7 @@ contexts:
           scope: invalid.illegal.sp
 
   variable-decl:
-    - match: '(?<=^|[;\(\{\}]|\*\/|\bstatic\b|\bconst\b)(?=\s*(?!{{local_lookahead}}|{{global_decl_lookahead}})({{identifier}})(?!\s*[^\[\w\s]))'
+    - match: '(?<=^|[;\(\{\}]|\*\/|\bstatic\b|\bconst\b)(?=\s*(?!{{local_lookahead}}|{{global_decl_lookahead}})({{identifier}}(?!\s*\[\s*[^\s\]]))(?!\s*[^\[\w\s]))'
       branch_point: var_decl_begin
       branch:
         - - meta_scope: meta.variable.sp
