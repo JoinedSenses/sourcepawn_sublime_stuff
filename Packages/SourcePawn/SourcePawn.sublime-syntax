@@ -1803,7 +1803,7 @@ contexts:
           scope: invalid.illegal.sp
 
   variable-decl:
-    - match: '(?<=^|[;\(\{\}]|\*\/|\bstatic\b|\bconst\b)(?=\s*(?!{{local_lookahead}}|{{global_decl_lookahead}})({{identifier}}(?!\s*\[\s*[^\s\]]))(?!\s*[^\[\w\s]))'
+    - match: '(?<=^|[;\(\{\}]|\*\/|\bstatic\b|\bconst\b)(?=\s*(?!{{local_lookahead}}|{{global_decl_lookahead}})({{identifier}}(?!\s*[^\[\w\s])))'
       branch_point: var_decl_begin
       branch:
         - - meta_scope: meta.variable.sp
@@ -1817,6 +1817,7 @@ contexts:
                   - match: \]
                     scope: punctuation.section.brackets.end.sp
                     pop: true
+
                   - match: \S
                     fail: var_decl_begin
 
@@ -1841,6 +1842,7 @@ contexts:
                         pop: true
                       - match: (?=\s*\()
                         fail: var_decl_begin
+
                       - include: comments
 
                       - include: brackets
@@ -1862,9 +1864,6 @@ contexts:
                             pop: 4
                           - include: expressions
 
-
-                          
-
                       # - include: comments
 
                       - match: '(?=[[:alpha:]_\.])'
@@ -1877,7 +1876,7 @@ contexts:
               - match: (?=\S)
                 fail: var_decl_begin
 
-        - - match: ''
+        - - match: '.'
             pop: true
 
 
