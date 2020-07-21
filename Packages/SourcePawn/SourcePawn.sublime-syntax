@@ -1583,7 +1583,12 @@ contexts:
         - match: ':'
           scope: punctuation.separator.sp
           pop: true
+
         - include: constants
+
+        - match: ','
+          scope: punctuation.separator.sp
+
         - match: '{{identifier}}'
           scope: variable.other.constant
 
