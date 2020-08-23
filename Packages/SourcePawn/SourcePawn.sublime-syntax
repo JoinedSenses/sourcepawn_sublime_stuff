@@ -291,9 +291,14 @@ contexts:
         - include: preprocessor-line-continuation
         - include: preprocessor-comments
         - match: \bdefined\b
-          scope: keyword.control.import.define.sp
+          scope: keyword.operator.word.sp
           push:
-            - match: '{{identifier}}'
+            - match: '({{identifier}})|(\()[ \t]*({{identifier}})[ \t]*(\))'
+              captures:
+                1: variable.other.constant.sp
+                2: punctuation.section.group.begin.sp
+                3: variable.other.constant.sp
+                4: punctuation.section.group.end.sp
               scope: variable.other.constant.sp
               pop: true
             - match: '{{end_of_line}}'
@@ -734,6 +739,8 @@ contexts:
                     scope: meta.class.methodmap.sp meta.block.sp punctuation.section.block.end.sp
                     pop: 2
                   - include: methodmap-body
+              - match: '__nullable__'
+                scope: constant.language.sp
               - include: comments
               - match: (?=\S)
                 fail: methodmap_begin
@@ -1607,6 +1614,8 @@ contexts:
         - match: '{{identifier}}'
           scope: variable.other.constant
 
+        - include: comments
+
   retag:
     - match: \bview_as\b
       scope: keyword.operator.word.viewas.sp
@@ -1682,6 +1691,16 @@ contexts:
           pop: true
 
   unique-keywords:
+    - match: \bdefined\b
+      scope: keyword.operator.word.sp
+      push:
+        - match: '({{identifier}})|(\()[ \t]*({{identifier}})[ \t]*(\))'
+          captures:
+            1: variable.other.constant.sp
+            2: punctuation.section.group.begin.sp
+            3: variable.other.constant.sp
+            4: punctuation.section.group.end.sp
+          pop: true
     - match: \bbreak\b
       scope: keyword.control.flow.break.sp
     - match: \bcontinue\b
