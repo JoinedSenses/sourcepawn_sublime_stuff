@@ -9,7 +9,7 @@
 	"smart_indent": true,
 	"detect_indentation": false,
 	"tab_size": 4,
-	"translate_tabs_to_spaces": true,
+	"translate_tabs_to_spaces": false,
 	"draw_indent_guides": false,
 
 	"auto_complete_include_snippets": "true",
