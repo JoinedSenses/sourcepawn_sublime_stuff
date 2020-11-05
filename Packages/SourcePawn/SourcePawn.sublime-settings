@@ -7,12 +7,12 @@
 
     // "word_separators": "./\\()\"':,;<>~!@#$%^&*|+=[]{}`~?",
     "smart_indent": true,
-    "detect_indentation": true,
+    "detect_indentation": false,
     "tab_size": 4,
+    "translate_tabs_to_spaces": true,
     "draw_indent_guides": false,
 
     "auto_complete_include_snippets": "true",
-    "auto_complete_preserve_order":"some",
+    "auto_complete_preserve_order":"none",
     "auto_complete_selector": "source - comment - string.quoted",
-
 }
