@@ -508,7 +508,7 @@ class ProcessQueueThread(watchdog.utils.DaemonThread):
             print ('Processing Include File %s' % file_name)
             includes = includes_re.findall(f.read())
 
-        self.load_from_file(view_file_name, 'sourcemod', current_node, current_node, base_includes)
+        self.load_from_file(file_name, 'sourcemod', current_node, current_node, base_includes)
         for include in includes:
             if include == 'sourcemod':
                 continue
