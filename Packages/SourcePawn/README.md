@@ -12,9 +12,9 @@ Includes [watchdog python module](https://https://github.com/gorakhargosh/watchd
 
 ### Via [package control](https://packagecontrol.io/installation)
 
-1. Press `Control+Shift+P` or `Cmd+Shift+P` (on Mac)
-2. Type **Package Control: Install Package**, hit enter.
-3. Type in **SourcePawn Completions**, hit enter again.
+~~1. Press `Control+Shift+P` or `Cmd+Shift+P` (on Mac)~~
+~~2. Type **Package Control: Install Package**, hit enter.~~
+~~3. Type in **SourcePawn Completions**, hit enter again.~~
 
 ### Manually
 
