@@ -1,6 +1,8 @@
 # sourcepawn_sublime_stuff
 Theme, syntax highlighter, bracket highlighter, whatever
 
+Requires Sublime Text 4 (Dev)
+
 This stuff goes in %APPDATA%\Sublime Folder Name Here/
 
 See https://github.com/JoinedSenses/sourcepawn_sublime_stuff/tree/master/Packages/SourcePawn for configuring
