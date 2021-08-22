@@ -688,6 +688,21 @@ def process_include_file(node):
     with codecs.open(node.file_name, 'r', 'utf-8') as file:
         process_lines(file, node)
 
+def skipMultiline(line_reader, buffer):
+    while buffer.startswith('/*'):
+        pos = buffer.find('*/')
+        while pos == -1:
+            buffer = read_line(line_reader)
+            if buffer is None:
+                return None
+            pos = buffer.find('*/')
+
+        idx = pos + 2
+        length = len(buffer)
+        if idx >= length:
+            idx = length - 1
+        buffer = buffer[idx].strip()
+    return buffer
 
 def process_lines(line_reader, node):
     node.funcs.clear()
@@ -712,14 +727,10 @@ def process_lines(line_reader, node):
         if not buffer or buffer.startswith('//'):
             continue
             
-        # assumes no nested comments. compiler marks those as invalid
-        while buffer.startswith('/*'):
-            # print('Skipping multi-line comment')
-            pos = buffer.find('*/');
-            while pos == -1:
-                buffer = read_line(line_reader)
-                pos = buffer.find('*/')
-            buffer = buffer[pos+2:].strip()
+        buffer = skipMultiline(line_reader, buffer)
+
+        if buffer is None:
+            break
 
         if not buffer or buffer.startswith('//'):
             continue
