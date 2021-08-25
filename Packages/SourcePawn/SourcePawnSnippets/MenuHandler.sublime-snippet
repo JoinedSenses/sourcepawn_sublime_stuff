@@ -43,7 +43,7 @@ public int ${1:menuHandler}(Menu menu, MenuAction action, int param1, int param2
 
 			// return ITEMDRAW_DEFAULT;
 		\}}${11:
-		case MenuAction_DisplayItem {
+		case MenuAction_DisplayItem: {
 			// Item text is being drawn to the display
 			// (param1=client, param2=item)
 
