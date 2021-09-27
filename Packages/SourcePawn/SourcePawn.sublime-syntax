@@ -76,9 +76,9 @@ contexts:
       scope: invalid.illegal.stray-bracket-end.sp
 
   late-expressions:
-    - include: function-call
-    - match: \b(?:static\b|const\b)
+    - match: \b(?:static|const)\b
       scope: storage.modifier.sp
+    - include: function-call
     - include: variable-decl
     # - include: variable-usage-late
     - match: ';'
@@ -1607,6 +1607,7 @@ contexts:
           pop: true
 
         - include: constants
+        - include: const_char
 
         - match: ','
           scope: punctuation.separator.sp
