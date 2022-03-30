@@ -74,6 +74,8 @@ contexts:
       scope: punctuation.separator.sp
     - match: '[\)\}\]]'
       scope: invalid.illegal.stray-bracket-end.sp
+    - match: ';'
+      scope: punctuation.terminator.sp
 
   late-expressions:
     - match: \b(?:static|const)\b
@@ -81,8 +83,7 @@ contexts:
     - include: function-call
     - include: variable-decl
     # - include: variable-usage-late
-    - match: ';'
-      scope: punctuation.terminator.sp
+
 
 # ---------------------------------------------------------------------------
 
@@ -1537,7 +1538,8 @@ contexts:
                     - match: \)
                       scope: meta.group.sp punctuation.section.group.end.sp
                       pop: 2
-                    - include: expressions
+                    - include: early-expressions
+                    - include: function-call
 
               - match: (?=\S)
                 fail: function-call-begin
