@@ -1308,6 +1308,7 @@ contexts:
             pop: true
 
   function-params:
+    - include: function-call
     - match: (?=\S)
       branch_point: function_param_begin
       branch:
