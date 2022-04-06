@@ -2,6 +2,7 @@ import sys
 import os.path
 import re
 from trieregex import TrieRegEx as TRE # https://github.com/ermanh/trieregex
+import pyperclip
 
 DEBUG = False
 
@@ -97,4 +98,9 @@ for i in range(1, len(sys.argv)):
                 tre.add(constant)
                 if DEBUG: print('Const added: {}'.format(constant))
 
-print(tre.regex())
+result = tre.regex()
+
+if DEBUG: print(result)
+
+pyperclip.copy(result)
+print("Output copied to clipboard")
