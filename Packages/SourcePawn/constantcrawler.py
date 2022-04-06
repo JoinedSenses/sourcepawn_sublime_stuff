@@ -103,4 +103,4 @@ result = tre.regex()
 if DEBUG: print(result)
 
 pyperclip.copy(result)
-print("Output copied to clipboard")
+print("Output copied to clipboard (Len: {})".format(len(result)))
