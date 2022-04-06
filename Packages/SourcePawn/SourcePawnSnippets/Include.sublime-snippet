@@ -23,7 +23,7 @@ public Extension __ext_$1 = {
 \};
 
 #if !defined REQUIRE_EXTENSIONS
-public void __ext_$1_SetNTVOptional()
+public void __ext_$1_SetNTVOptional() {
 	// MarkNativeAsOptional("");
 \}
 #endif
