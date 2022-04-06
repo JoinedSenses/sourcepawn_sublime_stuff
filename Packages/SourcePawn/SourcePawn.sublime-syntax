@@ -39,6 +39,7 @@ contexts:
 # ---------------------------------------------------------------------------
 
   global:
+    - include: struct
     - include: enum
     - include: methodmap
     - include: functag
@@ -46,7 +47,7 @@ contexts:
     - include: typedef
     - include: typeset
     - include: native-forward
-    - include: public-const
+    - include: public-var
     - include: public
     - include: variable-decl-oldsyntax
     - include: function-decl # no multiline because this sucks to match.
@@ -403,6 +404,34 @@ contexts:
           pop: true
         - include: preprocessor-line-continuation
         - include: preprocessor-comments
+
+# ---------------------------------------------------------------------------
+
+### struct - No one should be making these, so this is gonna be lazy
+  struct:
+    - match: '(?<=^|[;\)\}]|\*\/)\s*(struct)(?:[ \t]+(\w+)\b)?'
+      scope: storage.type.struct.sp
+      captures:
+        1: keyword.declaration.struct.sp
+        2: entity.name.struct.sp
+      push:
+        - match: \{
+          scope: punctuation.section.braces.begin.sp
+          set:
+            - match: \}
+              scope:  punctuation.section.braces.end.sp
+              pop: true
+            - include: comments
+            - match: (public)(?:[ \t]+(const))?[ \t]+(\w+)(?:(\[)(\]))?[ \t]+(\w+)\b
+              captures:
+                1: storage.modifier.sp
+                2: storage.modifier.sp
+                3: storage.type.sp
+                4: punctuation.section.brackets.begin.sp
+                5: punctuation.section.brackets.end.sp
+                6: variable.other.member.sp
+            - match: ;
+              scope: punctuation.terminator.sp
 
 # ---------------------------------------------------------------------------
 
@@ -912,8 +941,8 @@ contexts:
 
 # ---------------------------------------------------------------------------
 
-  public-const:
-    - match: (public)[ \t]+(const)[ \t]+(\w+)(?:[ \t]+|:)(\w+)\b
+  public-var:
+    - match: (public)(?:[ \t]+(const))?[ \t]+(\w+)(?:[ \t]+|:)(\w+)\b(?![ \t]*(?:=|\())
       captures:
         1: storage.modifier.sp
         2: storage.modifier.sp
