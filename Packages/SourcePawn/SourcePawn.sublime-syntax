@@ -39,8 +39,6 @@ contexts:
 # ---------------------------------------------------------------------------
 
   global:
-    - include: comments
-    - include: preprocessor
     - include: enum
     - include: methodmap
     - include: functag
@@ -1035,13 +1033,17 @@ contexts:
                                 set:
                                   - match: (?=[,\}])
                                     pop: true
+
+                                  - match: '(?=#)'
+                                    pop: true
+
                                   - include: expressions
 
                                   - match: \s*(?={{identifier}}\s*=)
                                     scope: invalid.illegal.missing-comma.sp
                                     pop: true
 
-                                  - include: preprocessor
+                                  # - include: preprocessor
 
                               - match: \s*(?={{identifier}}\s*=)
                                 scope: invalid.illegal.missing-comma.sp
