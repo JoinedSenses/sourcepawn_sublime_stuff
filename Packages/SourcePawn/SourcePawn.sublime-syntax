@@ -942,7 +942,7 @@ contexts:
 # ---------------------------------------------------------------------------
 
   public-var:
-    - match: (public)(?:[ \t]+(const))?[ \t]+(\w+)(?:[ \t]+|:)(\w+)\b(?![ \t]*(?:=|\())
+    - match: (public)[ \t]+(const)[ \t]+(\w+)(?:[ \t]+|:)(\w+)\b(?![ \t]*(?:=|\())
       captures:
         1: storage.modifier.sp
         2: storage.modifier.sp
