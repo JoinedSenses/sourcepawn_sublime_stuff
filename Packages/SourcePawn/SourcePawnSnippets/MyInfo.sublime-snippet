@@ -9,5 +9,5 @@ public Plugin myinfo = {
 }$0
 ]]></content>
 	<tabTrigger>__myinfo</tabTrigger>
-	<scope>source.sp & meta.function & meta.block</scope>
+	<scope>source.sp - meta.function</scope>
 </snippet>
