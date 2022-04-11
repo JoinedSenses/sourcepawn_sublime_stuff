@@ -1,6 +1,6 @@
 <snippet>
 	<content><![CDATA[
-public int ${1:menuHandler}(Menu menu, MenuAction action, int param1, int param2) {
+public int ${1:MenuHandler}(Menu menu, MenuAction action, int param1, int param2) {
 	switch (action) {$0${2:
 		case MenuAction_Start: {
 			// A menu has been started
@@ -55,7 +55,7 @@ public int ${1:menuHandler}(Menu menu, MenuAction action, int param1, int param2
 }
 ]]></content>
 	<!-- Optional: Set a tabTrigger to define how to trigger the snippet -->
-	<tabTrigger>_menuhandler</tabTrigger>
+	<tabTrigger>__MenuHandler(Menu, MenuAction, int, int) : int</tabTrigger>
 	<!-- Optional: Set a scope to limit where the snippet will trigger -->
-	<scope>source.sp</scope>
+	<scope>source.sp - meta.function</scope>
 </snippet>

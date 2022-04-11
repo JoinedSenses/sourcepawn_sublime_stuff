@@ -1,0 +1,14 @@
+<snippet>
+	<content><![CDATA[
+public Action ${1:NormalSHook}(int clients[MAXPLAYERS], int &numClients, char sample[PLATFORM_MAX_PATH], int &entity,
+		int &channel, float &volume, int &level, int &pitch, int &flags, char soundEntry[PLATFORM_MAX_PATH], int &seed) {
+	$0
+
+	return Plugin_Continue;
+}
+]]></content>
+	<!-- Optional: Set a tabTrigger to define how to trigger the snippet -->
+	<tabTrigger>__NormalSHook(int[MAXPLAYERS], int&, char[PLATFORM_MAX_PATH], int&, int&, float&, int&, int&, int&, char[PLATFORM_MAX_PATH], int&) : Action</tabTrigger>
+	<!-- Optional: Set a scope to limit where the snippet will trigger -->
+	<scope>source.sp - meta.function</scope>
+</snippet>

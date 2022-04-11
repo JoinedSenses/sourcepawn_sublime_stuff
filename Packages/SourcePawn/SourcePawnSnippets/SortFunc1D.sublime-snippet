@@ -1,0 +1,13 @@
+<snippet>
+	<content><![CDATA[
+public int ${1:SortFunc1D}(any elem1, any elem2, const any[] array, any data) {
+	$0
+
+	return 0;
+}
+]]></content>
+	<!-- Optional: Set a tabTrigger to define how to trigger the snippet -->
+	<tabTrigger>__SortFunc1D(any, any, const any[], any) : int</tabTrigger>
+	<!-- Optional: Set a scope to limit where the snippet will trigger -->
+	<scope>source.sp - meta.function</scope>
+</snippet>

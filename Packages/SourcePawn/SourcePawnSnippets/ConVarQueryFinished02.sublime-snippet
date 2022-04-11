@@ -1,0 +1,11 @@
+<snippet>
+	<content><![CDATA[
+public void ${1:ConVarQueryFinished}(QueryCookie cookie, int client, ConVarQueryResult result, const char[] cvarName, const char[] cvarValue, any value)) {
+	$0
+}
+]]></content>
+	<!-- Optional: Set a tabTrigger to define how to trigger the snippet -->
+	<tabTrigger>__ConVarQueryFinished(QueryCookie, int, ConVarQueryResult, const char[], const char[], any)) : void</tabTrigger>
+	<!-- Optional: Set a scope to limit where the snippet will trigger -->
+	<scope>source.sp - meta.function</scope>
+</snippet>

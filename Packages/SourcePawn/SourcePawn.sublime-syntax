@@ -1840,7 +1840,7 @@ contexts:
         1: punctuation.definition.keyword.sp
         2: keyword.other.documentation.param.sp
         3: variable.parameter.sp
-    - match: '\b(TODO|ToDo|FixMe|FIXME|NOTE|BUG|XXX|HACK|IDEA)\b(?:\s*[-:])?'
+    - match: '\b(TODO|FIXME|NOTE|BUG|XXX|HACK|IDEA|NOTICE)\b(?:\s*[-:])?'
       scope: keyword.other.documentation.note.sp
 
 # ---------------------------------------------------------------------------

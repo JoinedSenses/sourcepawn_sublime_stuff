@@ -1,10 +1,13 @@
 <snippet>
 	<content><![CDATA[
-public Action ${1:commandListener}(int client, const char[] command, int argc) {
+public Action ${1:CommandListener}(int client, const char[] command, int argc) {
 	$0
+
 	return Plugin_Continue;
 }
 ]]></content>
-	<tabTrigger>_cmdlistener</tabTrigger>
-	<source>source.sp</source>
+	<!-- Optional: Set a tabTrigger to define how to trigger the snippet -->
+	<tabTrigger>__CommandListener(int, const char[], int) : Action</tabTrigger>
+	<!-- Optional: Set a scope to limit where the snippet will trigger -->
+	<scope>source.sp - meta.function</scope>
 </snippet>

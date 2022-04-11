@@ -1,9 +1,9 @@
 <snippet>
 	<content><![CDATA[
-public void ${1:sqlTxnFailure}(Database db, any data, int numQueries, const char[] error, int failIndex, any[] queryData) {
+public void ${1:SQLTxnFailure}(Database db, any data, int numQueries, const char[] error, int failIndex, any[] queryData) {
 	$0
 }
 ]]></content>
-	<tabTrigger>_sqltxnfailure</tabTrigger>
-	<source>source.sp</source>
+	<tabTrigger>__SQLTxnFailure(Database, any, int, const char[], int failIndex, any[]) : void</tabTrigger>
+	<scope>source.sp - meta.function</scope>
 </snippet>

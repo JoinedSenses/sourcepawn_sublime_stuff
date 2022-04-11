@@ -1,0 +1,13 @@
+<snippet>
+	<content><![CDATA[
+public void ${1:SDKHookCB}(int victim, int attacker, int inflictor, float damage, int damagetype, int weapon,
+		const float damageForce[3], const float damagePosition[3], int damagecustom) {
+	$0
+}
+]]></content>
+	<!-- Optional: Set a tabTrigger to define how to trigger the snippet -->
+	<tabTrigger>__SDKHookCB(int, int, int, float, int, int, const float[3], const float[3], int) : void</tabTrigger>
+	<!-- Optional: Set a scope to limit where the snippet will trigger -->
+	<scope>source.sp - meta.function</scope>
+	<description>OnTakeDamagePost OnTakeDamageAlivePost</description>
+</snippet>

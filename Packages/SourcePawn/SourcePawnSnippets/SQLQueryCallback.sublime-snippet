@@ -1,6 +1,6 @@
 <snippet>
 	<content><![CDATA[
-public void ${1:sqlQueryCallback}(Database db, DBResultSet results, const char[] error, ${2:any data}) {
+public void ${1:SQLQueryCallback}(Database db, DBResultSet results, const char[] error, any data) {
 	if (!db || !results || error[0]) {
 		LogError("$1 - Query failed! (%s)", error);
 		return;
@@ -9,6 +9,6 @@ public void ${1:sqlQueryCallback}(Database db, DBResultSet results, const char[]
 	$0
 }
 ]]></content>
-	<tabTrigger>_sqlquerycallback</tabTrigger>
-	<source>source.sp</source>
+	<tabTrigger>__SQLQueryCallback(Database, DBResultSet, const char[], any) : void</tabTrigger>
+	<scope>source.sp - meta.function</scope>
 </snippet>

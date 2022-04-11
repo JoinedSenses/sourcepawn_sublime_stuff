@@ -1,0 +1,13 @@
+<snippet>
+	<content><![CDATA[
+public int ${1:SortFuncADTArray}(int index1, int index2, Handle array, any data) {
+	$0
+
+	return 0;
+}
+]]></content>
+	<!-- Optional: Set a tabTrigger to define how to trigger the snippet -->
+	<tabTrigger>__SortFuncADTArray(int, int, Handle, any) : int</tabTrigger>
+	<!-- Optional: Set a scope to limit where the snippet will trigger -->
+	<scope>source.sp - meta.function</scope>
+</snippet>

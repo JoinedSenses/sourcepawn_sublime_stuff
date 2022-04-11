@@ -23,6 +23,6 @@ public Action $2(int client, int args) {
 	return Plugin_Handled;
 }
 ]]></content>
-	<tabTrigger>_test</tabTrigger>
-	<source>source.sp</source>
+	<tabTrigger>__test</tabTrigger>
+	<scope>source.sp - meta.function</scope>
 </snippet>

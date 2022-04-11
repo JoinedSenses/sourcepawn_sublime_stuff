@@ -1,0 +1,13 @@
+<snippet>
+	<content><![CDATA[
+public Action ${1:MsgHook}(UserMsg msg_id, BfRead msg, const int[] players, int playersNum, bool reliable, bool init) {
+	$0
+
+	return Plugin_Continue;
+}
+]]></content>
+	<!-- Optional: Set a tabTrigger to define how to trigger the snippet -->
+	<tabTrigger>__MsgHook(UserMsg, BfRead, const int[], int, bool, bool) : Action</tabTrigger>
+	<!-- Optional: Set a scope to limit where the snippet will trigger -->
+	<scope>source.sp - meta.function</scope>
+</snippet>

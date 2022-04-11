@@ -1,0 +1,14 @@
+<snippet>
+	<content><![CDATA[
+public Action ${1:SDKHookCB}(int weapon) {
+	$0
+
+	return Plugin_Continue
+}
+]]></content>
+	<!-- Optional: Set a tabTrigger to define how to trigger the snippet -->
+	<tabTrigger>__SDKHookCB(int) : Action</tabTrigger>
+	<!-- Optional: Set a scope to limit where the snippet will trigger -->
+	<scope>source.sp - meta.function</scope>
+	<description>Reload</description>
+</snippet> 

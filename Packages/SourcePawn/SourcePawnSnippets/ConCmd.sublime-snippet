@@ -1,0 +1,10 @@
+<snippet>
+	<content><![CDATA[
+public Action ${1:ConCmd}(int client, int args) {
+	$0
+	return Plugin_Handled;
+}
+]]></content>
+	<tabTrigger>__ConCmd(int, int) : Action</tabTrigger>
+	<scope>source.sp - meta.function</scope>
+</snippet>

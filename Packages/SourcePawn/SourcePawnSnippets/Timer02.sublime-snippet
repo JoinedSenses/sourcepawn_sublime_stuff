@@ -1,0 +1,10 @@
+<snippet>
+	<content><![CDATA[
+public Action ${1:Timer}(Handle timer, any data) {
+	$0
+	return Plugin_Continue;
+}
+]]></content>
+	<tabTrigger>__Timer(Handle, any) : Action</tabTrigger>
+	<scope>source.sp - meta.function</scope>
+</snippet>

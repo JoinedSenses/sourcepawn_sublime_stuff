@@ -1,7 +1,9 @@
 <snippet>
 	<content><![CDATA[
-public void ${1:cookieMenuHandler}(int client, CookieMenuAction action, any info, char[] buffer, int maxlen)$0
+public void ${1:CookieMenuHandler}(int client, CookieMenuAction action, any info, char[] buffer, int maxlen) {
+	$0
+}
 ]]></content>
-	<tabTrigger>_cookiemenuhandler</tabTrigger>
-	<source>source.sp</source>
+	<tabTrigger>__CookieMenuHandler(int, CookieMenuAction, any, char[], int) : void</tabTrigger>
+	<scope>source.sp - meta.function</scope>
 </snippet>

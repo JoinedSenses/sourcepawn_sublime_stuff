@@ -1,0 +1,12 @@
+<snippet>
+	<content><![CDATA[
+public void ${1:VoteHandler}(Menu menu, int num_votes, int num_clients, const int[][] client_info,
+		int num_items, const int[][] item_info) {
+	$0
+}
+]]></content>
+	<!-- Optional: Set a tabTrigger to define how to trigger the snippet -->
+	<tabTrigger>__VoteHandler(Menu, int, int, const int[][], int, const int[][]) : void</tabTrigger>
+	<!-- Optional: Set a scope to limit where the snippet will trigger -->
+	<scope>source.sp - meta.function</scope>
+</snippet>

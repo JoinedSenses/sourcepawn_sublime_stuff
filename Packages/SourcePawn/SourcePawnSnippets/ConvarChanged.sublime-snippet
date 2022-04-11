@@ -1,9 +1,9 @@
 <snippet>
 	<content><![CDATA[
-public void ${1:cvarChanged}(ConVar convar, const char[] oldValue, const char[] newValue) {
+public void ${1:ConVarChanged}(ConVar convar, const char[] oldValue, const char[] newValue) {
 	$0
 }
 ]]></content>
-	<tabTrigger>_cvarchanged</tabTrigger>
-	<source>source.sp</source>
+	<tabTrigger>__ConVarChanged(ConVar, const char[], const char[]) : void</tabTrigger>
+	<scope>source.sp - meta.function</scope>
 </snippet>

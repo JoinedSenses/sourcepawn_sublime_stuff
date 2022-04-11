@@ -1,0 +1,11 @@
+<snippet>
+	<content><![CDATA[
+public void ${1:MsgPostHook}(UserMsg msg_id, bool sent) {
+	$0
+}
+]]></content>
+	<!-- Optional: Set a tabTrigger to define how to trigger the snippet -->
+	<tabTrigger>__MsgPostHook(UserMsg, bool) : void</tabTrigger>
+	<!-- Optional: Set a scope to limit where the snippet will trigger -->
+	<scope>source.sp - meta.function</scope>
+</snippet>

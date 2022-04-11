@@ -30,6 +30,6 @@ public void OnPluginStart() {
 	$0
 }
 ]]></content>
-	<tabTrigger>_newplugin</tabTrigger>
-	<source>source.sp</source>
+	<tabTrigger>__newplugin</tabTrigger>
+	<scope>source.sp - meta.function</scope>
 </snippet>

@@ -1,0 +1,11 @@
+<snippet>
+	<content><![CDATA[
+public Action ${1:SrvCmd}(int args) {
+	$0
+
+	return Plugin_Handled;
+}
+]]></content>
+	<tabTrigger>__SrvCmd(int) : Action</tabTrigger>
+	<scope>source.sp - meta.function</scope>
+</snippet>

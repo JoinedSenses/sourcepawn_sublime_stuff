@@ -1,11 +1,11 @@
 <snippet>
 	<content><![CDATA[
 methodmap ${1:name} ${2:< Handle} {
-	public $1(${3:}) {
+	public $1($3) {
 		return view_as<$1>($0);
 	}
 }
 ]]></content>
 	<tabTrigger>methodmap</tabTrigger>
-	<source>source.sp</source>
+	<scope>source.sp - meta.function</scope>
 </snippet>

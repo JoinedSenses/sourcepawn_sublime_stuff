@@ -1,9 +1,9 @@
 <snippet>
 	<content><![CDATA[
-public void ${1:sqlTxnSuccess}(Database db, any data, int numQueries, DBResultSet[] results, any[] queryData) {
+public void ${1:SQLTxnSuccess}(Database db, any data, int numQueries, DBResultSet[] results, any[] queryData) {
 	$0
 }
 ]]></content>
-	<tabTrigger>_sqltxnsuccess</tabTrigger>
-	<source>source.sp</source>
+	<tabTrigger>__SQLTxnSuccess(Database, any, int, DBResultSet[], any[]) : void</tabTrigger>
+	<scope>source.sp - meta.function</scope>
 </snippet>

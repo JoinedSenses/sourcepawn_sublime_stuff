@@ -1,8 +1,8 @@
 <snippet>
 	<content><![CDATA[
-if (${1:/* condition */}) {
-	${2:/* code */}
+if ($1) {
+	$0
 }]]></content>
 	<tabTrigger>if</tabTrigger>
-	<scope>source.sp</scope>
+	<scope>source.sp & meta.function & meta.block</scope>
 </snippet>

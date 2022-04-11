@@ -1,0 +1,15 @@
+<snippet>
+	<content><![CDATA[
+public Action ${1:SDKHookCB}(int victim, int &attacker, int &inflictor, float &damage, int &damagetype, int &weapon,
+		float damageForce[3], float damagePosition[3], int damagecustom) {
+	$0
+
+	return Plugin_Continue;
+}
+]]></content>
+	<!-- Optional: Set a tabTrigger to define how to trigger the snippet -->
+	<tabTrigger>__SDKHookCB(int, int&, int&, float&, int&, int&, float[3], float[3], int) : Action</tabTrigger>
+	<!-- Optional: Set a scope to limit where the snippet will trigger -->
+	<scope>source.sp - meta.function</scope>
+	<description>OnTakeDamage OnTakeDamageAlive</description>
+</snippet>

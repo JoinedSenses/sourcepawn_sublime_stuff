@@ -1,12 +1,12 @@
 <snippet>
 	<content><![CDATA[
 typeset ${1:Func} {
-	function ${2:type} (${3:/* ... */});
-	function ${4:type} (${5:/* ... */});
+	function ${2:type} ($3);
+	function ${4:type} ($5);
 }
 ]]></content>
 	<!-- Optional: Set a tabTrigger to define how to trigger the snippet -->
 	<tabTrigger>typeset</tabTrigger>
 	<!-- Optional: Set a scope to limit where the snippet will trigger -->
-	<scope>source.sp</scope>
+	<scope>source.sp - meta.function</scope>
 </snippet>

@@ -1,7 +1,7 @@
-<!-- <snippet>
+<snippet>
 	<content><![CDATA[
-view_as<${1:type}>(${2:$TM_CURRENT_WORD})
+view_as<$1>($2)
 ]]></content>
 	<tabTrigger>view_as</tabTrigger>
 	<scope>source.sp</scope>
-</snippet> -->
+</snippet>

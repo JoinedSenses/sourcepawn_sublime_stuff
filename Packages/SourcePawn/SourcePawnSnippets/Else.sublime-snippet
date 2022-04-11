@@ -1,9 +1,9 @@
 <snippet>
 	<content><![CDATA[
 else {
-	${1:/* code */}
+	${1:}
 }
 ]]></content>
 	<tabTrigger>else</tabTrigger>
-	<scope>source.sp</scope>
+	<scope>source.sp & meta.function & meta.block</scope>
 </snippet>
