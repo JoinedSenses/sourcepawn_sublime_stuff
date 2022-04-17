@@ -9,6 +9,7 @@ from trieregex import TrieRegEx # https://github.com/ermanh/trieregex
 
 argparser = ArgumentParser(description='Crawls through include directories and files to generate a regex trie for matching constants')
 argparser.add_argument('--debug', help='Enable debug messages', action='store_true')
+argparser.add_argument('--recursive', help='Enable recusive directory crawling', action='store_true')
 argparser.add_argument('paths', metavar='Paths', type=str, nargs='+', help='Paths to crawl. Can be directory or file.')
 argparser.add_argument_group()
 
@@ -53,7 +54,7 @@ def main(args: list[str]):
             if args.endswith('.inc'):
                 with open(arg) as f: parse_file(f, trie)
         elif os.path.isdir(arg):
-            parse_directory(arg, trie)
+            parse_directory(arg, parsedargs.recursive, trie)
 
     result: str = trie.regex()
     Debug.log('-- Result: --\n{}'.format(result))
@@ -65,18 +66,28 @@ def main(args: list[str]):
         print('No results')
 
 
-def parse_directory(dir: str, trie: TrieRegEx) -> None:
+def parse_directory(dir: str, recursive: bool, trie: TrieRegEx) -> None:
     """
-    Crawls through all files in directory and subdirectory in an attempt to parse
+    Attempts to parse files within the given directory
 
     Args:
-        dir (str): The directory to search through.
+        dir (str): The directory to crawl through
+        recursive (bool): If true, crawls through all subdirectories
         trie (TrieRegEx): The trie to add results to.
     """
-    for path, _, files in os.walk(dir):
-        for name in files:
-            if name.endswith('.inc'):
-                with open(os.path.join(path, name)) as f: parse_file(f, trie)
+    if recursive:
+        for path, _, files in os.walk(dir):
+            for name in files:
+                if name.endswith('.inc'):
+                    with open(os.path.join(path, name)) as f: parse_file(f, trie)
+    else:
+        # loop through each file in the directory
+        for file_name in os.listdir(dir):
+            # if it's not a .inc file, skip it
+            if not file_name.endswith('.inc'): continue
+
+            # open and read the file
+            with open(os.path.join(dir, file_name)) as f: parse_file(f, trie)
 
 
 def parse_file(f: TextIOWrapper, trie: TrieRegEx) -> None:
