@@ -23,41 +23,37 @@ class Debug:
         if Debug.__enabled: print(value)
 
 
-def main(paths: list[str]):
+def main(args: list[str]):
     """
     Crawls through include directories and files to generate a regex trie for matching constants.
     Ignores variables IN_ALL_CAPS since those are already discovered with a basic all-caps regex for the
     purpose of syntax highlighting.
 
     Args:
-        args (list[str]): _description_
+        args (list[str]): List of paths to process
     """
-    if len(paths) < 1:
+    if len(args) < 1:
         argparser.print_help()
         sys.exit(1)
 
+    error: str = ''
+    for arg in args:
+        if not os.path.exists(arg):
+            error += '\n  Path not found: {}'.format(arg)
+    if error:
+        print('\nErrors detected:{}'.format(error))
+        sys.exit(1)
+    
     trie: TrieRegEx = TrieRegEx()
 
-    error: str = ''
     # loop through all args and attempt to parse
-    for path in paths:
+    for arg in args:
         # if arg is file and ends with .inc, then parse it
-        if os.path.isfile(path):
-            if path.endswith('.inc'):
-                with open(path) as f: parse_file(f, trie)
-            continue
-
-        if not os.path.isdir(path):
-            error += '\n  Path not found: {}'.format(path)
-            continue
-
-        # loop through each file in the directory
-        for file_name in os.listdir(path):
-            # if it's not a .inc file, skip it
-            if not file_name.endswith('.inc'): continue
-
-            # open and read the file
-            with open(os.path.join(path, file_name)) as f: parse_file(f, trie)      
+        if os.path.isfile(arg):
+            if args.endswith('.inc'):
+                with open(arg) as f: parse_file(f, trie)
+        elif os.path.isdir(arg):
+            parse_directory(arg, trie)
 
     result: str = trie.regex()
     Debug.log('-- Result: --\n{}'.format(result))
@@ -65,9 +61,22 @@ def main(paths: list[str]):
     if result:
         pyperclip.copy(result)
         print('Output copied to clipboard (Len: {})'.format(len(result)))
+    else:
+        print('No results')
 
-    if error:
-        print('\nErrors detected:{}'.format(error))
+
+def parse_directory(dir: str, trie: TrieRegEx) -> None:
+    """
+    Crawls through all files in directory and subdirectory in an attempt to parse
+
+    Args:
+        dir (str): The directory to search through.
+        trie (TrieRegEx): The trie to add results to.
+    """
+    for path, _, files in os.walk(dir):
+        for name in files:
+            if name.endswith('.inc'):
+                with open(os.path.join(path, name)) as f: parse_file(f, trie)
 
 
 def parse_file(f: TextIOWrapper, trie: TrieRegEx) -> None:
