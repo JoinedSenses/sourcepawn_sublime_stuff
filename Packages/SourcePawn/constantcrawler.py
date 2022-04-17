@@ -38,6 +38,7 @@ def main(paths: list[str]):
 
     trie: TrieRegEx = TrieRegEx()
 
+    error: str = ''
     # loop through all args and attempt to parse
     for path in paths:
         # if arg is file and ends with .inc, then parse it
@@ -47,7 +48,7 @@ def main(paths: list[str]):
             continue
 
         if not os.path.isdir(path):
-            print('Path not found: {}'.format(path))
+            error += '\n  Path not found: {}'.format(path)
             continue
 
         # loop through each file in the directory
@@ -61,8 +62,12 @@ def main(paths: list[str]):
     result: str = trie.regex()
     Debug.log('-- Result: --\n{}'.format(result))
 
-    pyperclip.copy(result)
-    print('Output copied to clipboard (Len: {})'.format(len(result)))
+    if result:
+        pyperclip.copy(result)
+        print('Output copied to clipboard (Len: {})'.format(len(result)))
+
+    if error:
+        print('\nErrors detected:{}'.format(error))
 
 
 def parse_file(f: TextIOWrapper, trie: TrieRegEx) -> None:
