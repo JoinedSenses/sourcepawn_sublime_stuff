@@ -141,6 +141,13 @@ def parse_defines(code: str, trie: TrieRegEx) -> None:
 
 
 def parse_publicconstants(code: str, trie: TrieRegEx) -> None:
+    """
+    Finds public const variables and adds them to the regex trie
+
+    Args:
+        code (str): Text to search through.
+        trie (TrieRegEx): Trie to add results to.
+    """
     # match public constants aka magic variables
     for constant_match in re.finditer(r'public[ \t]+const[ \t]+\w+[ \t]+(\w+)\b', code):
         constant: str = constant_match.group(1)
