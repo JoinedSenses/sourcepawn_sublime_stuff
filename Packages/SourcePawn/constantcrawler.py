@@ -7,7 +7,7 @@ from trieregex import TrieRegEx # https://github.com/ermanh/trieregex
 
 DEBUG = False
 
-def main():
+def main(args: list[str]):
     """
     Crawls through include directories to generate a regex trie for matching constants.
     Ignores variables IN_ALL_CAPS since those are already discovered with a basic all-caps regex for the
@@ -20,9 +20,7 @@ def main():
     trie = TrieRegEx()
 
     # loop through all args and attempt to parse
-    for i in range(1, len(sys.argv)):
-        arg = sys.argv[i]
-
+    for arg in args:
         # if arg is file and ends with .inc, then parse it
         if os.path.isfile(arg):
             if arg.endswith('.inc'):
@@ -46,6 +44,7 @@ def main():
 
     pyperclip.copy(result)
     print("Output copied to clipboard (Len: {})".format(len(result)))
+
 
 def parse_file(f: TextIOWrapper, trie: TrieRegEx) -> None:
     """
@@ -142,5 +141,5 @@ def parse_publicconstants(code: str, trie: TrieRegEx) -> None:
         if DEBUG: print('Const added: {}'.format(constant))
 
 # -------------
-
-main()
+if __name__ == "__main__":
+    main(sys.argv)
