@@ -2,48 +2,67 @@ import os.path
 import pyperclip
 import re
 import sys
+from argparse import ArgumentParser
 from io import TextIOWrapper
 from trieregex import TrieRegEx # https://github.com/ermanh/trieregex
 
-DEBUG: bool = False
 
-def main(args: list[str]):
+argparser = ArgumentParser(description='Crawls through include directories and files to generate a regex trie for matching constants')
+argparser.add_argument('--debug', help='Enable debug messages', action='store_true')
+argparser.add_argument('paths', metavar='Paths', type=str, nargs='+', help='Paths to crawl. Can be directory or file.')
+argparser.add_argument_group()
+
+parsedargs = argparser.parse_args()
+
+
+class Debug:
+    __enabled = parsedargs.debug
+
+    @staticmethod
+    def log(value: str) -> None:
+        if Debug.__enabled: print(value)
+
+
+def main(paths: list[str]):
     """
     Crawls through include directories and files to generate a regex trie for matching constants.
     Ignores variables IN_ALL_CAPS since those are already discovered with a basic all-caps regex for the
     purpose of syntax highlighting.
+
+    Args:
+        args (list[str]): _description_
     """
-    if len(sys.argv) < 2:
-        print("Expected one or more parameters for include directory path ({})".format(len(sys.argv)))
+    if len(paths) < 1:
+        argparser.print_help()
         sys.exit(1)
 
     trie: TrieRegEx = TrieRegEx()
 
     # loop through all args and attempt to parse
-    for arg in args:
+    for path in paths:
         # if arg is file and ends with .inc, then parse it
-        if os.path.isfile(arg):
-            if arg.endswith('.inc'):
-                with open(arg) as f: parse_file(f, trie)
+        if os.path.isfile(path):
+            if path.endswith('.inc'):
+                with open(path) as f: parse_file(f, trie)
             continue
 
-        if not os.path.isdir(arg):
-            print('Path not found: {}'.format(arg))
+        if not os.path.isdir(path):
+            print('Path not found: {}'.format(path))
             continue
 
         # loop through each file in the directory
-        for file_name in os.listdir(arg):
+        for file_name in os.listdir(path):
             # if it's not a .inc file, skip it
             if not file_name.endswith('.inc'): continue
 
             # open and read the file
-            with open(os.path.join(arg, file_name)) as f: parse_file(f, trie)      
+            with open(os.path.join(path, file_name)) as f: parse_file(f, trie)      
 
     result: str = trie.regex()
-    if DEBUG: print(result)
+    Debug.log('-- Result: --\n{}'.format(result))
 
     pyperclip.copy(result)
-    print("Output copied to clipboard (Len: {})".format(len(result)))
+    print('Output copied to clipboard (Len: {})'.format(len(result)))
 
 
 def parse_file(f: TextIOWrapper, trie: TrieRegEx) -> None:
@@ -54,7 +73,7 @@ def parse_file(f: TextIOWrapper, trie: TrieRegEx) -> None:
         f (TextIOWrapper): The file to parse
         tre (TrieRegEx): The trie to add results to.
     """
-    if DEBUG: print('-- Reading from {} --'.format(f.name))
+    Debug.log('-- Reading from {} --'.format(f.name))
 
     code: str = f.read()
 
@@ -78,7 +97,7 @@ def parse_enums(code: str, trie: TrieRegEx) -> None:
     """
     # scoop the innards from all enums, excluding enum structs
     for enum_innards_match in re.finditer(r'enum(?!\s+struct)(?:.|\n)*?{((?:.|\n)*?)}', code):
-        if DEBUG: print('-- Enum match: --\n{}\n-------'.format(enum_innards_match.group(0)))
+        Debug.log('-- Enum match: --\n{}\n-------'.format(enum_innards_match.group(0)))
         enum_innards: str = enum_innards_match.group(1)
 
         # try to get each enum variable
@@ -90,11 +109,11 @@ def parse_enums(code: str, trie: TrieRegEx) -> None:
 
             # skip if already contains
             if (trie.has(def_text)):
-                if DEBUG: print('Skipping enum, already added: {}'.format(def_text))
+                Debug.log('Skipping enum, already added: {}'.format(def_text))
                 continue
 
             trie.add(def_text)
-            if DEBUG: print('Enum added: {}'.format(def_text))
+            Debug.log('Enum added: {}'.format(def_text))
 
 
 def parse_defines(code: str, trie: TrieRegEx) -> None:
@@ -114,11 +133,11 @@ def parse_defines(code: str, trie: TrieRegEx) -> None:
         
         # skip if already contains
         if (trie.has(define)):
-            if DEBUG: print('Skipping define, already added: {}'.format(define))
+            Debug.log('Skipping define, already added: {}'.format(define))
             continue
 
         trie.add(define)
-        if DEBUG: print('Define added: {}'.format(define))
+        Debug.log('Define added: {}'.format(define))
 
 
 def parse_publicconstants(code: str, trie: TrieRegEx) -> None:
@@ -131,14 +150,12 @@ def parse_publicconstants(code: str, trie: TrieRegEx) -> None:
 
         # skip if already contains
         if (trie.has(constant)):
-            if DEBUG: print('Skipping const, already added: {}'.format(constant))
+            Debug.log('Skipping const, already added: {}'.format(constant))
             continue
 
         trie.add(constant)
-        if DEBUG: print('Const added: {}'.format(constant))
+        Debug.log('Const added: {}'.format(constant))
 
 
 # -------------
-
-if __name__ == "__main__":
-    main(sys.argv)
+if __name__ == '__main__': main(parsedargs.paths)
