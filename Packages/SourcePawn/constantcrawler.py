@@ -5,11 +5,11 @@ import sys
 from io import TextIOWrapper
 from trieregex import TrieRegEx # https://github.com/ermanh/trieregex
 
-DEBUG = False
+DEBUG: bool = False
 
 def main(args: list[str]):
     """
-    Crawls through include directories to generate a regex trie for matching constants.
+    Crawls through include directories and files to generate a regex trie for matching constants.
     Ignores variables IN_ALL_CAPS since those are already discovered with a basic all-caps regex for the
     purpose of syntax highlighting.
     """
@@ -17,7 +17,7 @@ def main(args: list[str]):
         print("Expected one or more parameters for include directory path ({})".format(len(sys.argv)))
         sys.exit(1)
 
-    trie = TrieRegEx()
+    trie: TrieRegEx = TrieRegEx()
 
     # loop through all args and attempt to parse
     for arg in args:
@@ -39,7 +39,7 @@ def main(args: list[str]):
             # open and read the file
             with open(os.path.join(arg, file_name)) as f: parse_file(f, trie)      
 
-    result = trie.regex()
+    result: str = trie.regex()
     if DEBUG: print(result)
 
     pyperclip.copy(result)
@@ -56,18 +56,15 @@ def parse_file(f: TextIOWrapper, trie: TrieRegEx) -> None:
     """
     if DEBUG: print('-- Reading from {} --'.format(f.name))
 
-    code = f.read()
+    code: str = f.read()
 
     # remove multi-line comments
-    code = re.sub(r'\/\*(.|\n)*?\*\/', '', code)
-
+    code = re.sub(r'/\*(.|\n)*?\*/', '', code)
     #remove single-line comments
-    code = re.sub(r'\/\/.*$', '', code)
+    code = re.sub(r'//.*$', '', code)
 
     parse_enums(code, trie)
-
     parse_defines(code, trie)
-
     parse_publicconstants(code, trie)
 
 
@@ -82,11 +79,11 @@ def parse_enums(code: str, trie: TrieRegEx) -> None:
     # scoop the innards from all enums, excluding enum structs
     for enum_innards_match in re.finditer(r'enum(?!\s+struct)(?:.|\n)*?{((?:.|\n)*?)}', code):
         if DEBUG: print('-- Enum match: --\n{}\n-------'.format(enum_innards_match.group(0)))
-        enum_innards = enum_innards_match.group(1)
+        enum_innards: str = enum_innards_match.group(1)
 
         # try to get each enum variable
         for enum_def_match in re.finditer(r'(?:^|\n)\s*?(\w+)\b', enum_innards):
-            def_text = enum_def_match.group(1)
+            def_text: str = enum_def_match.group(1)
 
             # if it's all uppercase, skip it
             if (re.match(r'\b[A-Z_\d]+\b', def_text)): continue
@@ -110,7 +107,7 @@ def parse_defines(code: str, trie: TrieRegEx) -> None:
     """
     # match all defines
     for define_match in re.finditer(r'^#define[ \t]*(\w+)\b[ \t]', code):
-        define = define_match.group(1)
+        define: str = define_match.group(1)
 
         # if all uppercase, ignore. Typically they should be uppercase but maybe there's an exception
         if (re.match(r'\b[A-Z_\d]+\b', define)): continue
@@ -127,7 +124,7 @@ def parse_defines(code: str, trie: TrieRegEx) -> None:
 def parse_publicconstants(code: str, trie: TrieRegEx) -> None:
     # match public constants aka magic variables
     for constant_match in re.finditer(r'public[ \t]+const[ \t]+\w+[ \t]+(\w+)\b', code):
-        constant = constant_match.group(1)
+        constant: str = constant_match.group(1)
 
         # if all uppercase, ignore
         if (re.match(r'\b[A-Z_\d]+\b', constant)): continue
@@ -140,6 +137,8 @@ def parse_publicconstants(code: str, trie: TrieRegEx) -> None:
         trie.add(constant)
         if DEBUG: print('Const added: {}'.format(constant))
 
+
 # -------------
+
 if __name__ == "__main__":
     main(sys.argv)
