@@ -1,4 +1,7 @@
+from os import PathLike
+from pathlib import PurePath
 import os.path
+import pathlib
 import pyperclip
 import re
 import sys
@@ -54,7 +57,7 @@ def main(args: list[str]):
             if args.endswith('.inc'):
                 with open(arg) as f: parse_file(f, trie)
         elif os.path.isdir(arg):
-            parse_directory(arg, parsedargs.recursive, trie)
+            parse_directory(PurePath(arg), parsedargs.recursive, trie)
 
     result: str = trie.regex()
     Debug.log('-- Result: --\n{}'.format(result))
@@ -66,7 +69,7 @@ def main(args: list[str]):
         print('No results')
 
 
-def parse_directory(dir: str, recursive: bool, trie: TrieRegEx) -> None:
+def parse_directory(dir: PathLike, recursive: bool, trie: TrieRegEx) -> None:
     """
     Attempts to parse files within the given directory
 
