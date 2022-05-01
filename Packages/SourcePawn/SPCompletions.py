@@ -27,6 +27,10 @@ import watchdog.observers
 import watchdog.utils
 from watchdog.utils.bricks import OrderedSetQueue
 
+PLUGIN_NAME = lambda: 'SourcePawn Completions'
+
+SETTINGS_FILENAME = lambda: PLUGIN_NAME() + '.sublime-settings'
+
 class Wrapper:
     def __init__(self):
         self.value = []
@@ -46,7 +50,7 @@ def unload_handler():
     # Get process_thread to stop by adding something to the queue
     to_process.put(('', ''))
     # remove callback
-    _get_settings().clear_on_change('SourcePawn Completions')
+    _get_settings().clear_on_change(PLUGIN_NAME())
 
 
 class SPCompletions(sublime_plugin.EventListener):
@@ -54,9 +58,24 @@ class SPCompletions(sublime_plugin.EventListener):
         process_thread.start()
         self.delay_queue = None
         file_observer.start()
+        self.clear_console();
+
+
+    def clear_console(self):
+        """
+        Clears sublime console
+        """
+        a = sublime.load_settings("Preferences.sublime-settings")
+        current = a.get("console_max_history_lines")
+        a.set("console_max_history_lines", 1)
+        print("")
+        a.set("console_max_history_lines", current)
 
 
     def on_activated(self, view):
+        """ Built-In:
+        Called when a view gains input focus.
+        """
         if not self.is_sourcepawn_file(view):
             return
         file_name = view.file_name()
@@ -65,85 +84,137 @@ class SPCompletions(sublime_plugin.EventListener):
 
 
     def on_activated_async(self, view):
+        """ Built-In:
+        Called when a view gains input focus.
+        Runs in a separate thread, and does not block the application.
+        """
         _save_user_settings()
 
 
     def on_modified(self, view):
+        """ Built-In:
+        Called after changes have been made to a view.
+        """
         self.add_to_queue_delayed(view)
 
 
     def on_post_save(self, view):
+        """ Built-In:
+        Called after a view has been saved.
+        """
         self.add_to_queue_now(view)
 
 
     def on_load(self, view):
+        """ Built-In:
+        Called when the file is finished loading.
+        """
         self.add_to_queue_now(view)
 
 
     def add_to_queue_now(self, view):
-        if not self.is_sourcepawn_file(view):
-            return
-        add_to_queue(view)
+        if self.is_sourcepawn_file(view):
+            add_to_queue(view)
 
 
     def add_to_queue_delayed(self, view):
         if not self.is_sourcepawn_file(view):
             return
 
-        if self.delay_queue is not None:
-            self.delay_queue.cancel()
+        deley_queue = self.delay_queue
+        if deley_queue is not None:
+            deley_queue.cancel()
 
         delay_time = _get_settings().get('live_refresh_delay', 1.0)
-        self.delay_queue = Timer(float(delay_time), add_to_queue_forward, [ view ])
-        self.delay_queue.start()
+        deley_queue = Timer(float(delay_time), add_to_queue_forward, [ view ])
+        deley_queue.start()
+        self.delay_queue = deley_queue
 
 
     def is_sourcepawn_file(self, view):
-        return view.file_name() is not None and (view.match_selector(0, 'source.sp') or view.match_selector(0, 'source.inc'))
+        """
+        True if a file is open and the scope is for sourcepawn
+        """
+        return (
+            view.file_name() is not None and
+            view.match_selector(0, 'source.sp')
+        )
 
 
     def on_query_completions(self, view, prefix, locations):
-        # print('queried')
-        if not view.match_selector(locations[0], 'source.sp -string -comment -constant') \
-        and not view.match_selector(locations[0], 'source.inc -string -comment -constant'):
+        """ Built-In:
+        Called whenever completions are to be presented to the user. The prefix is a unicode string of the text to complete.
+        """
+        # Dont query if we're not in a sourcepawn file or if we're in a string, comment, or constant
+        if not view.match_selector(locations[0], 'source.sp -string -comment -constant'):
             return []
 
         file_name = view.file_name()
         if file_name is None:
             return []
 
-        point = locations[0]-1;
-        pointFound = False
+        completions = self.try_get_object_completions(view, locations)
+        if completions is not None:
+            return completions
+
+        # return (self.generate_funcset(view.file_name()), sublime.INHIBIT_WORD_COMPLETIONS | sublime.INHIBIT_EXPLICIT_COMPLETIONS)
+        return (
+            self.generate_funcset(file_name),
+            sublime.INHIBIT_WORD_COMPLETIONS|
+            sublime.INHIBIT_REORDER
+        )
+
+    def try_get_object_completions(self, view, locations):
+        """
+        Checks if attempting to access object with field operator
+
+        return:
+            completions if attempting to access object with field operator, otherwise None
+        """
+
+        point = locations[0]-1
+
+        # try to determine if the cursor is at a location trying to use field accessor
         char = view.substr(point)
-        if char == '.':
-            pointFound = True
-        else:
-            while char.isalpha() and point > 1:
+        # if current char not dot
+        if char != '.':
+            # iterate backwards through letters and spaces
+            while (char.isalpha() or char.isspace()) and point > 1:
                 point -= 1
                 char = view.substr(point)
-            if char == '.':
-                pointFound = True
+            # if no period found then return None, cuz we found nothing.
+            if char != '.':
+                return None
 
-        if pointFound:
-            current_node = nodes[file_name]
+        file_name = view.file_name()
 
-            classes = self.generate_classes(file_name)
-            print('classes:')
-            keys = classes.keys()
-            if keys:
-                for key in classes.keys():
-                    print(' ' + key)
-            else:
-                print(' none')
+        current_node = nodes[file_name]
 
-            print('point found')
-            wordpoint = point-1
-            char = view.substr(point-1)
-            hit_brace = False
+        classes = self.get_classes(file_name)
+        print('classes:', end='\n ')
+        
+        keys = classes.keys()
+        if keys:
+            print(*keys, sep='\n ')
+        else:
+            print('none')
 
-            # do some stupid stuff if there are brackets.
+        print('point found')
+
+        wordpoint = point-1
+        char = view.substr(point-1)
+
+        check_for_brace = True
+        while check_for_brace:
+            check_for_brace = False
+            # iterate backwards through spaces since its valid to have them
+            while char.isspace() and wordpoint > 1:
+                wordpoint -= 1
+                char = view.substr(wordpoint)
+
+            # if we hit a bracket, then try to skip backwards over them to support arrays
             while char == ']':
-                hit_brace = True
+                check_for_brace = True
                 bracelevel = 1
                 wordpoint -= 1
 
@@ -159,156 +230,151 @@ class SPCompletions(sublime_plugin.EventListener):
 
                 char = view.substr(wordpoint)
 
-            if not char.isalpha():
-                print('Could not find valid char: ' + char)
-                return (
-                    None,
-                    sublime.INHIBIT_WORD_COMPLETIONS|
-                    sublime.INHIBIT_EXPLICIT_COMPLETIONS
-                )
 
-            print('Found valid char')
 
-            var_region = view.word(wordpoint)
-            var = view.substr(var_region).strip()
-            print('variable is: ' + var)
+        # give up if we couldnt find a word
+        if not char.isalpha():
+            print('Could not find valid char: ' + char)
+            return (
+                None,
+                sublime.INHIBIT_WORD_COMPLETIONS|
+                sublime.INHIBIT_EXPLICIT_COMPLETIONS
+            )
 
-            if not var:
-                return (
-                    None,
-                    sublime.INHIBIT_WORD_COMPLETIONS|
-                    sublime.INHIBIT_EXPLICIT_COMPLETIONS
-                )
+        print('Found valid char')
 
-            if re.match(r'\b[a-zA-Z_]\w*\b', var):
-                # check if static access
-                varstatic = var + '.static'
-                # if varstatic in all_classes.keys():
-                c = current_node.find_class(varstatic)
-                if c is not None:
-                    if c:
-                        return (
-                            c,
-                            sublime.INHIBIT_WORD_COMPLETIONS|
-                            sublime.INHIBIT_EXPLICIT_COMPLETIONS|
-                            sublime.INHIBIT_REORDER
-                        )
+        var_region = view.word(wordpoint)
+        var = view.substr(var_region).strip()
+        print('variable is: ' + var)
+
+        if not var:
+            return (
+                None,
+                sublime.INHIBIT_WORD_COMPLETIONS|
+                sublime.INHIBIT_EXPLICIT_COMPLETIONS
+            )
+
+        if re.match(r'\b[a-zA-Z_]\w*\b', var):
+            # check if static access
+            varstatic = var + '.static'
+            # if varstatic in all_classes.keys():
+            c = current_node.find_class(varstatic)
+            if c is not None:
+                if c:
                     return (
-                        None,
+                        c,
                         sublime.INHIBIT_WORD_COMPLETIONS|
-                        sublime.INHIBIT_EXPLICIT_COMPLETIONS
+                        sublime.INHIBIT_EXPLICIT_COMPLETIONS|
+                        sublime.INHIBIT_REORDER
                     )
+                return (
+                    None,
+                    sublime.INHIBIT_WORD_COMPLETIONS|
+                    sublime.INHIBIT_EXPLICIT_COMPLETIONS
+                )
 
-                # check if local
-                print(view.scope_name(point))
-                begin = var_region.begin() - 1
-                while view.match_selector(begin, 'source.sp meta.function | meta.function.parameters'):
-                    begin -= 1;
-                begin += 1
+            # check if local
+            print(view.scope_name(point))
+            begin = var_region.begin() - 1
+            while view.match_selector(begin, 'source.sp meta.function | meta.function.parameters'):
+                begin -= 1;
+            begin += 1
 
-                region = view.substr(sublime.Region(begin, point))
-                if region:
-                    print('Found beginning at {}'.format(begin))
+            region = view.substr(sublime.Region(begin, point))
+            if region:
+                print('Found beginning at {}'.format(begin))
+                print(region)
+
+                print('searching')
+                m = re.search(r'\b([a-zA-Z_]\w+)\b\s+\b{}\b'.format(var), region)
+                if m:
+                    retval = m.group(1)
+                    # if retval in all_classes.keys():
+                    c = current_node.find_class(retval)
+                    if c is not None:
+                        print('type found: ' + retval)
+                        if c:
+                            return (
+                                c,
+                                sublime.INHIBIT_WORD_COMPLETIONS|
+                                sublime.INHIBIT_EXPLICIT_COMPLETIONS|
+                                sublime.INHIBIT_REORDER
+                            )
+                        return (
+                            None,
+                            sublime.INHIBIT_WORD_COMPLETIONS|
+                            sublime.INHIBIT_EXPLICIT_COMPLETIONS
+                        )
+
+                # output text to a new view, apply syntax,
+                window = sublime.active_window()
+                panel = window.create_output_panel('temp_check_sp', unlisted=True)
+                panel.assign_syntax('Packages/SourcePawn/SourcePawn.sublime-syntax')
+                panel.run_command('append', {'characters': region})
+
+                for r in panel.find_by_selector('source.sp meta.variable.sp'):
+                    region = re.sub('[ \t]{2,}', ' ', panel.substr(r).strip().replace('\n', ''))
+
                     print(region)
 
-                    print('searching')
-                    m = re.search(r'\b([a-zA-Z_]\w+)\b\s+\b{}\b'.format(var), region)
+                    m = re.search(r'^([a-zA-Z_]\w+)\b', region)
                     if m:
                         retval = m.group(1)
-                        # if retval in all_classes.keys():
-                        c = current_node.find_class(retval)
-                        if c is not None:
-                            print('type found: ' + retval)
-                            if c:
-                                return (
-                                    c,
-                                    sublime.INHIBIT_WORD_COMPLETIONS|
-                                    sublime.INHIBIT_EXPLICIT_COMPLETIONS|
-                                    sublime.INHIBIT_REORDER
-                                )
+                        if re.search(r'(?:{}|,) +{}'.format(retval, var), region):
+                            print('Found local type. It\'s {}'.format(retval))
+
+                            window.destroy_output_panel('temp_check_sp')
+
+                            c = current_node.find_class(retval)
+                            print(c)
+                            if c is not None:
+                                if c:
+                                    return (
+                                        all_classes[retval],
+                                        sublime.INHIBIT_WORD_COMPLETIONS|
+                                        sublime.INHIBIT_EXPLICIT_COMPLETIONS|
+                                        sublime.INHIBIT_REORDER
+                                    )
                             return (
                                 None,
                                 sublime.INHIBIT_WORD_COMPLETIONS|
                                 sublime.INHIBIT_EXPLICIT_COMPLETIONS
                             )
 
-                    # output text to a new view, apply syntax,
-                    window = sublime.active_window()
-                    panel = window.create_output_panel('temp_check_sp', unlisted=True)
-                    panel.assign_syntax('Packages/SourcePawn/SourcePawn.sublime-syntax')
-                    panel.run_command('append', {'characters': region})
+                window.destroy_output_panel('temp_check_sp')
 
-                    for r in panel.find_by_selector('source.sp meta.variable.sp'):
-                        region = re.sub('[ \t]{2,}', ' ', panel.substr(r).strip().replace('\n', ''))
+            # check if global
+            print('searching files for type')
+            for v in sublime.active_window().views():
+                for r in v.find_by_selector('source.sp meta.variable.sp -meta.block.sp'):
+                    region = re.sub('[ \t]{2,}', ' ', v.substr(r).strip().replace('\n', ''))
+                    print(region)
+                    m = re.search(r'^([a-zA-Z_]\w+)\b', region)
+                    if m:
+                        retval = m.group(1)
+                        if re.search(r'(?:{}|,) +{}'.format(retval, var), region):
 
-                        print(region)
-
-                        m = re.search(r'^([a-zA-Z_]\w+)\b', region)
-                        if m:
-                            retval = m.group(1)
-                            if re.search(r'(?:{}|,) +{}'.format(retval, var), region):
-                                print('Found local type. It\'s {}'.format(retval))
-
-                                window.destroy_output_panel('temp_check_sp')
-
-                                c = current_node.find_class(retval)
-                                print(c)
-                                if c is not None:
-                                    if c:
-                                        return (
-                                            all_classes[retval],
-                                            sublime.INHIBIT_WORD_COMPLETIONS|
-                                            sublime.INHIBIT_EXPLICIT_COMPLETIONS|
-                                            sublime.INHIBIT_REORDER
-                                        )
+                            print('Found type. It\'s {}'.format(retval))
+                            c = current_node.find_class(retval)
+                            if c is not None:
+                                if c:
+                                    return (
+                                        c,
+                                        sublime.INHIBIT_WORD_COMPLETIONS|
+                                        sublime.INHIBIT_EXPLICIT_COMPLETIONS|
+                                        sublime.INHIBIT_REORDER
+                                    )
                                 return (
                                     None,
                                     sublime.INHIBIT_WORD_COMPLETIONS|
                                     sublime.INHIBIT_EXPLICIT_COMPLETIONS
                                 )
 
-                    window.destroy_output_panel('temp_check_sp')
-
-                # check if global
-                print('searching files for type')
-                for v in sublime.active_window().views():
-                    for r in v.find_by_selector('source.sp meta.variable.sp -meta.block.sp'):
-                        region = re.sub('[ \t]{2,}', ' ', v.substr(r).strip().replace('\n', ''))
-                        print(region)
-                        m = re.search(r'^([a-zA-Z_]\w+)\b', region)
-                        if m:
-                            retval = m.group(1)
-                            if re.search(r'(?:{}|,) +{}'.format(retval, var), region):
-
-                                print('Found type. It\'s {}'.format(retval))
-                                c = current_node.find_class(retval)
-                                if c is not None:
-                                    if c:
-                                        return (
-                                            c,
-                                            sublime.INHIBIT_WORD_COMPLETIONS|
-                                            sublime.INHIBIT_EXPLICIT_COMPLETIONS|
-                                            sublime.INHIBIT_REORDER
-                                        )
-                                    return (
-                                        None,
-                                        sublime.INHIBIT_WORD_COMPLETIONS|
-                                        sublime.INHIBIT_EXPLICIT_COMPLETIONS
-                                    )
-
-            return ( # Found a dot but unknown type
-                None,
-                sublime.INHIBIT_WORD_COMPLETIONS|
-                sublime.INHIBIT_EXPLICIT_COMPLETIONS
-            )
-
-        # return (self.generate_funcset(view.file_name()), sublime.INHIBIT_WORD_COMPLETIONS | sublime.INHIBIT_EXPLICIT_COMPLETIONS)
-        return (
-            self.generate_funcset(file_name),
+        return ( # Found a dot but unknown type
+            None,
             sublime.INHIBIT_WORD_COMPLETIONS|
-            sublime.INHIBIT_REORDER
+            sublime.INHIBIT_EXPLICIT_COMPLETIONS
         )
-
 
     def generate_funcset(self, file_name):
         funcset = set()
@@ -330,7 +396,7 @@ class SPCompletions(sublime_plugin.EventListener):
 
         funcset.update(node.funcs)
 
-    def generate_classes(self, file_name):
+    def get_classes(self, file_name):
         classes = dict(
             {
                 'Handle': [('Close()\t(function: void) [handles]', 'Close()')],
@@ -341,25 +407,25 @@ class SPCompletions(sublime_plugin.EventListener):
         visited = set()
 
         node = nodes[file_name]
-        self.generate_classes_recur(node, classes, visited)
+        self.get_classes_recur(node, classes, visited)
         return classes
 
-    def generate_classes_recur(self, node, classes, visited):
+    def get_classes_recur(self, node, classes, visited):
         if node in visited:
             return
 
         visited.add(node)
         for child in node.children:
-            self.generate_classes_recur(child, classes, visited)
+            self.get_classes_recur(child, classes, visited)
 
         classes.update(node.classes)
 
-def _settings_filename():
-    return 'SourcePawn Completions.sublime-settings'
+
+
 
 
 def _get_settings():
-    return sublime.load_settings(_settings_filename())
+    return sublime.load_settings(SETTINGS_FILENAME())
 
 
 def on_settings_modified():
@@ -369,7 +435,7 @@ def on_settings_modified():
 def load_include_dir(register_callback = False):
     settings = _get_settings()
     if register_callback:
-        settings.add_on_change('SourcePawn Completions', on_settings_modified)
+        settings.add_on_change(PLUGIN_NAME(), on_settings_modified)
 
     dirs = settings.get('include_directory', '.')
     include_dirs.set(dirs)
@@ -414,7 +480,7 @@ def _save_user_settings():
     settings = _get_settings()
     if not settings.get('bootstrapped'):
         settings.set('bootstrapped', True)
-        sublime.save_settings(_settings_filename())
+        sublime.save_settings(SETTINGS_FILENAME())
         # build-system
         build_filename = 'SourcePawn.sublime-build'
         build = sublime.load_settings(build_filename)
@@ -422,9 +488,9 @@ def _save_user_settings():
         if not build.get('file_patterns'):
             build.set('file_patterns', ['*.sp'])
         if not build.get('quiet'):
-            build.set('quiet', true)
+            build.set('quiet', True)
         if not build.get('file_regex'):
-            build.set('file_regex', '(.*)\\((\\d+)\\) : ()(.*$)')
+            build.set('file_regex', r'(.*)\\((\\d+)\\) : ()(.*$)')
         if not build.get('selector'):
             build.set('selector', 'source.sp')
 
@@ -571,11 +637,7 @@ def get_or_add_node(file_name):
 
     return (node, False)
 
-# class SPObj:
-#     def __init__(self):
-#         self.name = ''
-#         self.properties = dict() # name: ret
-#         self.functions = dict() # name: ret
+
 
 class Node:
     def __init__(self, file_name):
@@ -602,7 +664,7 @@ class Node:
 
     def remove_all_children(self):
         for child in self.children:
-            self.remove_child(node)
+            self.remove_child(child)
         self.funcs.clear()
         self.classes.clear()
 
@@ -619,9 +681,14 @@ class Node:
     def __find_class_recur(self, class_name, visited):
         if self in visited:
             return
+
         visited.add(self)
-        print('searching {} for {}'.format(self.file_name, class_name))
-        if class_name in self.classes.keys():
+
+        print('searching {} for {}'.format(self.file_name, class_name), end='\n ')
+        keys = self.classes.keys();
+        print(*keys, sep='\n ')
+
+        if class_name in keys:
             return self.classes[class_name]
 
         for child in self.children:
@@ -647,21 +714,21 @@ class TextReader:
             return retval
         return ''
 
-DEPRECATED_FUNCTIONS = [
-    'native Float:operator*',
-    'native Float:operator/',
-    'native Float:operator+',
-    'native Float:operator-',
-    'stock Float:operator*',
-    'stock Float:operator/',
-    'stock Float:operator+',
-    'stock Float:operator-',
-    'stock bool:operator=',
-    'stock bool:operator!',
-    'stock bool:operator>',
-    'stock bool:operator<',
-    'forward operator%('
-]
+#DEPRECATED_FUNCTIONS = [
+#    'native Float:operator*',
+#    'native Float:operator/',
+#    'native Float:operator+',
+#    'native Float:operator-',
+#    'stock Float:operator*',
+#    'stock Float:operator/',
+#    'stock Float:operator+',
+#    'stock Float:operator-',
+#    'stock bool:operator=',
+#    'stock bool:operator!',
+#    'stock bool:operator>',
+#    'stock bool:operator<',
+#    'forward operator%('
+#]
 
 loaded_files = set() # to prevent loading files more than once
 docs = dict() # map function name to documentation
@@ -671,25 +738,34 @@ funcs = defaultdict(list) # map include files to functions
 # Code after this point adapted from
 # https://forums.alliedmods.net/showpost.php?p=1866026&postcount=19
 # Credit to MCPAN (mcpan@foxmail.com)
-def read_line(file):
+def read_line(line_reader):
     """read_line(File) -> string"""
-    line = file.readline()
-    if len(line) > 0:
-        return comment_re.sub(' ', line).strip()
-    return None
+    line = line_reader.readline()
+    if not line:
+        return None
+
+    line = line.strip()
+
+    if line.startswith('//'):
+        return read_line(line_reader)
+
+    line = skipMultiline(line_reader, line)
+    if not line:
+        line = read_line(line_reader)
+    return line
 
 
 def process_buffer(text, node):
-    text_reader = TextReader(text)
-    process_lines(text_reader, node)
+    process_lines(TextReader(text), node)
 
 
 def process_include_file(node):
-    with codecs.open(node.file_name, 'r', 'utf-8') as file:
-        process_lines(file, node)
+    with codecs.open(node.file_name, 'r', 'utf-8') as f:
+        process_lines(TextReader(f.read()), node)
+
 
 def skipMultiline(line_reader, buffer):
-    while buffer.startswith('/*'):
+    while buffer and buffer.startswith('/*'):
         pos = buffer.find('*/')
         while pos == -1:
             buffer = read_line(line_reader)
@@ -698,42 +774,32 @@ def skipMultiline(line_reader, buffer):
             pos = buffer.find('*/')
 
         idx = pos + 2
-        length = len(buffer)
-        if idx >= length:
-            idx = length - 1
-        buffer = buffer[idx].strip()
+        if idx >= len(buffer):
+            buffer = read_line(line_reader)
+        else:
+            buffer = buffer[idx].strip()
+
     return buffer
+
 
 def process_lines(line_reader, node):
     node.funcs.clear()
 
     found_comment = False
     found_enum = False
+    found_enumstruct = False
     brace_level = 0
 
-    global file
-    file = os.path.basename(node.file_name).rsplit('.')[0]
-    if file:
-        file = ' [' + file + ']'
-
-    semicolonRequired = False
+    global current_file_name
+    current_file_name = os.path.basename(node.file_name).rsplit('.')[0]
+    if current_file_name:
+        current_file_name = ' [' + current_file_name + ']'
 
     while True:
         buffer = read_line(line_reader)
 
         if buffer is None:
             break
-
-        if not buffer or buffer.startswith('//'):
-            continue
-            
-        buffer = skipMultiline(line_reader, buffer)
-
-        if buffer is None:
-            break
-
-        if not buffer or buffer.startswith('//'):
-            continue
 
         if brace_level == 0:
             m = enum_re.search(buffer)
@@ -745,9 +811,16 @@ def process_lines(line_reader, node):
                     enum_contents = ''
 
                     if enum_type is not None:
-                        node.funcs.add((enum_type+'\t(enum)' + file, enum_type))
+                        node.funcs.add((enum_type+'\t(enum)' + current_file_name, enum_type))
                 else:
-                    node.funcs.add((enum_type+'\t(enum struct)' + file, enum_type))
+                    if enum_type is not None:
+                        print('Found enum struct: ' + m.group(0))
+                        found_enumstruct = True
+                        enum_contents = ''
+                        
+                        node.funcs.add((enum_type+'\t(enum struct)' + current_file_name, enum_type))
+                        node.classes[enum_type] = set()
+
 
             elif buffer.startswith('#'):
                 if buffer.strip().startswith('#pragma deprecated'):
@@ -767,7 +840,7 @@ def process_lines(line_reader, node):
                 if m:
                     val = m.group(1)
                     print('Found public const: ' + val)
-                    node.funcs.add((val + '\t(const)' + file, val))
+                    node.funcs.add((val + '\t(const)' + current_file_name, val))
                     continue
 
                 pos = buffer.find('{')
@@ -786,8 +859,7 @@ def process_lines(line_reader, node):
                     continue
 
             elif buffer.startswith('methodmap '):
-                
-                #  (funcname + '\t(function' + return_type + ')' + file, autocomplete)
+                #  (funcname + '\t(function' + return_type + ')' + current_file_name, autocomplete)
                 m = methodmap_re.search(buffer)
                 if not m:
                     continue
@@ -795,7 +867,7 @@ def process_lines(line_reader, node):
                 name = m.group(1)
                 static_name = name+'.static'
                 inherited = m.group(2)
-                node.funcs.add((name + '\t(methodmap)' + file, name))
+                node.funcs.add((name + '\t(methodmap)' + current_file_name, name))
 
                 if inherited is not None:
                     c = node.find_class(inherited)
@@ -919,7 +991,7 @@ def process_lines(line_reader, node):
                         i += 1
                     autocomplete += ')'
 
-                    node.funcs.add((name+'()\t(constructor)' + file, autocomplete))
+                    node.funcs.add((name+'()\t(constructor)' + current_file_name, autocomplete))
                 # function
                 for m in re.finditer(r'public[ \t](?:native[ \t])?\b(?!native)(\w+)\b[ \t](\w+)[ \t]*\((.*?)\)', mmbody):
                     ret = m.group(1)
@@ -935,7 +1007,7 @@ def process_lines(line_reader, node):
                             autocomplete += '${%d:%s}' % (i, param.strip())
                         i += 1
                     autocomplete += ')'
-                    node.classes[name].add((func + '()\t(function: ' + ret + ')' + file, autocomplete))
+                    node.classes[name].add((func + '()\t(function: ' + ret + ')' + current_file_name, autocomplete))
                 # static function
                 for m in re.finditer(r'public[ \t]static[ \t](?:native[ \t])?(\w+)\b[ \t](\w+)[ \t]*\((.*?)\)', mmbody):
                     ret = m.group(1)
@@ -951,13 +1023,13 @@ def process_lines(line_reader, node):
                             autocomplete += '${%d:%s}' % (i, param.strip())
                         i += 1
                     autocomplete += ')'
-                    node.classes[static_name].add((func + '()\t(function: ' + ret + ')' + file, autocomplete))
+                    node.classes[static_name].add((func + '()\t(function: ' + ret + ')' + current_file_name, autocomplete))
                 # property
                 for m in re.finditer(r'property[ \t](\w+)[ \t](\w+)', mmbody):
                     ret = m.group(1)
                     prop = m.group(2)
 
-                    node.classes[name].add((prop+'\t(property: ' + ret + ')' + file, prop))
+                    node.classes[name].add((prop+'\t(property: ' + ret + ')' + current_file_name, prop))
 
                 node.classes[name] = sorted(node.classes[name])
                 node.classes[static_name] = sorted(node.classes[static_name])
@@ -982,6 +1054,8 @@ def process_lines(line_reader, node):
 
         if found_enum:
             (buffer, enum_contents, found_enum) = process_enum(node, buffer, enum_contents, found_enum)
+        elif found_enumstruct:
+            (buffer, enum_contents, found_enumstruct) = process_enumstruct(node, buffer, enum_contents, found_enumstruct)
         elif buffer.startswith('#define '):
             buffer = get_preprocessor_define(node, buffer)
 
@@ -1005,7 +1079,7 @@ def process_variable(node, buffer):
             elif c == ' ' or c == '=' or c == ';':
                 result = result.strip()
                 if result != '':
-                    node.funcs.add((result + '\t(variable)' + file, result))
+                    node.funcs.add((result + '\t(variable)' + current_file_name, result))
                 result = ''
                 consumingName = False
                 consumingBrackets = False
@@ -1018,12 +1092,12 @@ def process_variable(node, buffer):
 
     result = result.strip()
     if result != '':
-        node.funcs.add((result + '\t(variable)' + file, result))
+        node.funcs.add((result + '\t(variable)' + current_file_name, result))
 
     return ''
 
 
-def process_enum(node, buffer, enum_contents, found_enum):
+def process_enum(node, buffer: str, enum_contents: str, found_enum: bool):
     print('Processing enum: ' + buffer)
 
     pos = buffer.find('}')
@@ -1054,7 +1128,7 @@ def process_enum(node, buffer, enum_contents, found_enum):
             elif c == ',':
                 buffer = buffer.strip()
                 if buffer != '':
-                    node.funcs.add((buffer + '\t(enum' + enum_type + ')' + file, buffer))
+                    node.funcs.add((buffer + '\t(enum' + enum_type + ')' + current_file_name, buffer))
 
                 ignore = False
                 buffer = ''
@@ -1065,11 +1139,19 @@ def process_enum(node, buffer, enum_contents, found_enum):
 
         buffer = buffer.strip()
         if buffer != '':
-            node.funcs.add((buffer + '\t(enum' + enum_type + ')' + file, buffer))
+            node.funcs.add((buffer + '\t(enum' + enum_type + ')' + current_file_name, buffer))
 
         buffer = ''
 
     return (buffer, enum_contents, found_enum)
+
+def process_enumstruct(node, buffer, enum_contents, found_enumstruct):
+    print('Processing enum struct: ' + buffer)
+
+    found_enumstruct = False
+    print('Skipping enum struct - Unimplemented')
+
+    return (buffer, enum_contents, found_enumstruct)
 
 
 def get_preprocessor_define(node, buffer):
@@ -1082,7 +1164,7 @@ def get_preprocessor_define(node, buffer):
         buffer = ''
         name = define.group(1)
         value = define.group(2).strip()
-        node.funcs.add((name + '\t(constant: ' + value + ')' + file, name))
+        node.funcs.add((name + '\t(constant: ' + value + ')' + current_file_name, name))
     return buffer
 
 
@@ -1126,7 +1208,8 @@ def get_full_function_string(line_reader, node, buffer, found_comment, brace_lev
 
         (buffer, found_comment, brace_level) = read_string(buffer, found_comment, brace_level)
 
-    if full_func_str is not None and not full_func_str in DEPRECATED_FUNCTIONS:
+    #if full_func_str is not None and not full_func_str in DEPRECATED_FUNCTIONS:
+    if full_func_str is not None:
         process_function_string(node, full_func_str)
 
     return (buffer, found_comment, brace_level)
@@ -1139,22 +1222,22 @@ def process_function_string(node, func):
 
     print('Processing Function: ' + func)
 
-    file = os.path.basename(node.file_name).rsplit('.')[0]
-    if file:
-        file = ' [' + file + ']'
+    #file = os.path.basename(node.file_name).rsplit('.')[0]
+    #if file:
+    #    file = ' [' + file + ']'
 
     func_type = ''
     return_type = ': '
     remaining = ''
 
     m = fullfunction_re.search(func)
-    if m:
-        if m.group(1):
-            func_type += m.group(1) + ' '
-        return_type += func_type + (m.group(2) if m.group(2) else '_')
-        remaining = m.group(3)
-    else:
+    if not m:
         return
+
+    if m.group(1):
+        func_type += m.group(1) + ' '
+    return_type += func_type + (m.group(2) if m.group(2) else '_')
+    remaining = m.group(3)
 
 
     split = remaining.split('(', 1)
@@ -1176,7 +1259,7 @@ def process_function_string(node, func):
         i += 1
     autocomplete += ')'
 
-    node.funcs.add((funcname + '()\t(function' + return_type + ')' + file, autocomplete))
+    node.funcs.add((funcname + '()\t(function' + return_type + ')' + current_file_name, autocomplete))
 
 
 def skip_brace_line(line_reader, buffer):
@@ -1258,10 +1341,10 @@ enum_re = re.compile(r'^[ \t]*enum\b[ \t]+(struct\b[ \t]+)?([\w_]+)?')
 function_re = re.compile(r'^[ \t]*(?:(native|stock|forward)\b[ \t]+)?(?:([\w_]+)(?:[ \t]+|:))?([\w_]+[ \t]*\()')
 fullfunction_re = re.compile(r'^[ \t]*(?:(native|stock|forward)\b[ \t]+)?(?:([\w_]+)(?: +|:))?([\w_]+ *\(.*?\))')
 define_re = re.compile(r'#define[ \t]+([^\s]+)[\s]+(.+)')
-comment_re = re.compile(r'\/\*(.*?)\*\/')
+comment_re = re.compile(r'/\*(.*?)\*/')
 pubvar_re = re.compile(r'^[ \t]*public[ \t]+const[ \t]+\w+[ \t]+(\w+)\b\s*;')
 methodmap_re = re.compile(r'^[ \t]*methodmap[ \t]+\b(\w+)\b(?:\s*<\s*(\w+)\b)?')
-file = ''
+current_file_name = ''
 # all_classes = dict(
 #     {
 #         'Handle': [('Close()\t(function: void) [handles]', 'Close()')],
