@@ -1,0 +1,23 @@
+{
+	"folders": [
+		{
+			"path": "."
+		}
+	],
+	"settings": {
+		"files.exclude": {
+			"**/**.class": true
+		},
+		"antlr4.generation": {
+			// "mode": "internal",
+			"mode": "external",
+			"language": "Python3",
+			"outputDir": ".",
+			"listeners": true,
+			"visitors": true,
+			// "alternativeJar": "./lib/antlr-4.9.2-complete.jar"
+			"alternativeJar": "./lib/antlr-4.10.1-complete.jar"
+		},
+		"git.enabled":false,
+	}
+}

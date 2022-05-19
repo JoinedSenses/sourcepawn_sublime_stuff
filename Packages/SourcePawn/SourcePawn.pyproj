@@ -1,0 +1,136 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003" DefaultTargets="Build">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{67696446-c889-41c9-a0d2-4375a83636e1}</ProjectGuid>
+    <ProjectHome />
+    <StartupFile>SPCompletions.py</StartupFile>
+    <SearchPath />
+    <WorkingDirectory>.</WorkingDirectory>
+    <OutputPath>.</OutputPath>
+    <ProjectTypeGuids>{888888a0-9f3d-457c-b088-3a5042f75d52}</ProjectTypeGuids>
+    <LaunchProvider>Standard Python launcher</LaunchProvider>
+    <InterpreterId />
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)' == 'Debug'" />
+  <PropertyGroup Condition="'$(Configuration)' == 'Release'" />
+  <PropertyGroup>
+    <VisualStudioVersion Condition=" '$(VisualStudioVersion)' == '' ">10.0</VisualStudioVersion>
+  </PropertyGroup>
+  <ItemGroup>
+    <Content Include="grammar\testactions.js" />
+    <Content Include="notes.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="grammar\antlr4\atn\ATN.py" />
+    <Compile Include="grammar\antlr4\atn\ATNConfig.py" />
+    <Compile Include="grammar\antlr4\atn\ATNConfigSet.py" />
+    <Compile Include="grammar\antlr4\atn\ATNDeserializationOptions.py" />
+    <Compile Include="grammar\antlr4\atn\ATNDeserializer.py" />
+    <Compile Include="grammar\antlr4\atn\ATNSimulator.py" />
+    <Compile Include="grammar\antlr4\atn\ATNState.py" />
+    <Compile Include="grammar\antlr4\atn\ATNType.py" />
+    <Compile Include="grammar\antlr4\atn\LexerAction.py" />
+    <Compile Include="grammar\antlr4\atn\LexerActionExecutor.py" />
+    <Compile Include="grammar\antlr4\atn\LexerATNSimulator.py" />
+    <Compile Include="grammar\antlr4\atn\ParserATNSimulator.py" />
+    <Compile Include="grammar\antlr4\atn\PredictionMode.py" />
+    <Compile Include="grammar\antlr4\atn\SemanticContext.py" />
+    <Compile Include="grammar\antlr4\atn\Transition.py" />
+    <Compile Include="grammar\antlr4\atn\__init__.py" />
+    <Compile Include="grammar\antlr4\BufferedTokenStream.py" />
+    <Compile Include="grammar\antlr4\CommonTokenFactory.py" />
+    <Compile Include="grammar\antlr4\CommonTokenStream.py" />
+    <Compile Include="grammar\antlr4\dfa\DFA.py" />
+    <Compile Include="grammar\antlr4\dfa\DFASerializer.py" />
+    <Compile Include="grammar\antlr4\dfa\DFAState.py" />
+    <Compile Include="grammar\antlr4\dfa\__init__.py" />
+    <Compile Include="grammar\antlr4\error\DiagnosticErrorListener.py" />
+    <Compile Include="grammar\antlr4\error\ErrorListener.py" />
+    <Compile Include="grammar\antlr4\error\Errors.py" />
+    <Compile Include="grammar\antlr4\error\ErrorStrategy.py" />
+    <Compile Include="grammar\antlr4\error\__init__.py" />
+    <Compile Include="grammar\antlr4\FileStream.py" />
+    <Compile Include="grammar\antlr4\InputStream.py" />
+    <Compile Include="grammar\antlr4\IntervalSet.py" />
+    <Compile Include="grammar\antlr4\Lexer.py" />
+    <Compile Include="grammar\antlr4\ListTokenSource.py" />
+    <Compile Include="grammar\antlr4\LL1Analyzer.py" />
+    <Compile Include="grammar\antlr4\Parser.py" />
+    <Compile Include="grammar\antlr4\ParserInterpreter.py" />
+    <Compile Include="grammar\antlr4\ParserRuleContext.py" />
+    <Compile Include="grammar\antlr4\PredictionContext.py" />
+    <Compile Include="grammar\antlr4\Recognizer.py" />
+    <Compile Include="grammar\antlr4\RuleContext.py" />
+    <Compile Include="grammar\antlr4\StdinStream.py" />
+    <Compile Include="grammar\antlr4\Token.py" />
+    <Compile Include="grammar\antlr4\TokenStreamRewriter.py" />
+    <Compile Include="grammar\antlr4\tree\Chunk.py" />
+    <Compile Include="grammar\antlr4\tree\ParseTreeMatch.py" />
+    <Compile Include="grammar\antlr4\tree\ParseTreePattern.py" />
+    <Compile Include="grammar\antlr4\tree\ParseTreePatternMatcher.py" />
+    <Compile Include="grammar\antlr4\tree\RuleTagToken.py" />
+    <Compile Include="grammar\antlr4\tree\TokenTagToken.py" />
+    <Compile Include="grammar\antlr4\tree\Tree.py" />
+    <Compile Include="grammar\antlr4\tree\Trees.py" />
+    <Compile Include="grammar\antlr4\tree\__init__.py" />
+    <Compile Include="grammar\antlr4\Utils.py" />
+    <Compile Include="grammar\antlr4\xpath\XPath.py" />
+    <Compile Include="grammar\antlr4\xpath\XPathLexer.py" />
+    <Compile Include="grammar\antlr4\xpath\__init__.py" />
+    <Compile Include="grammar\antlr4\_pygrun.py" />
+    <Compile Include="grammar\antlr4\__init__.py" />
+    <Compile Include="grammar\SourcePawnLexer.py" />
+    <Compile Include="grammar\SourcePawnParser.py" />
+    <Compile Include="grammar\SourcePawnParserListener.py" />
+    <Compile Include="grammar\SourcePawnParserVisitor.py" />
+    <Compile Include="misc\constantcrawler.py" />
+    <Compile Include="pathtools\path.py" />
+    <Compile Include="pathtools\patterns.py" />
+    <Compile Include="pathtools\version.py" />
+    <Compile Include="pathtools\__init__.py" />
+    <Compile Include="SPCompletions.py" />
+    <Compile Include="watchdog\events.py" />
+    <Compile Include="watchdog\observers\api.py" />
+    <Compile Include="watchdog\observers\fsevents.py" />
+    <Compile Include="watchdog\observers\fsevents2.py" />
+    <Compile Include="watchdog\observers\inotify.py" />
+    <Compile Include="watchdog\observers\inotify_buffer.py" />
+    <Compile Include="watchdog\observers\inotify_c.py" />
+    <Compile Include="watchdog\observers\kqueue.py" />
+    <Compile Include="watchdog\observers\polling.py" />
+    <Compile Include="watchdog\observers\read_directory_changes.py" />
+    <Compile Include="watchdog\observers\winapi.py" />
+    <Compile Include="watchdog\observers\__init__.py" />
+    <Compile Include="watchdog\tricks\__init__.py" />
+    <Compile Include="watchdog\utils\bricks.py" />
+    <Compile Include="watchdog\utils\compat.py" />
+    <Compile Include="watchdog\utils\decorators.py" />
+    <Compile Include="watchdog\utils\dirsnapshot.py" />
+    <Compile Include="watchdog\utils\echo.py" />
+    <Compile Include="watchdog\utils\importlib2.py" />
+    <Compile Include="watchdog\utils\platform.py" />
+    <Compile Include="watchdog\utils\unicode_paths.py" />
+    <Compile Include="watchdog\utils\win32stat.py" />
+    <Compile Include="watchdog\utils\__init__.py" />
+    <Compile Include="watchdog\version.py" />
+    <Compile Include="watchdog\__init__.py" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="grammar" />
+    <Folder Include="grammar\antlr4" />
+    <Folder Include="grammar\antlr4\atn" />
+    <Folder Include="grammar\antlr4\dfa" />
+    <Folder Include="grammar\antlr4\error" />
+    <Folder Include="grammar\antlr4\tree" />
+    <Folder Include="grammar\antlr4\xpath" />
+    <Folder Include="misc" />
+    <Folder Include="pathtools" />
+    <Folder Include="watchdog" />
+    <Folder Include="watchdog\observers" />
+    <Folder Include="watchdog\tricks" />
+    <Folder Include="watchdog\utils" />
+  </ItemGroup>
+  <Import Project="$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)\Python Tools\Microsoft.PythonTools.targets" />
+</Project>

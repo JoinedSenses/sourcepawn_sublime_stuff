@@ -1,0 +1,1 @@
+start /B grun SourcePawn start ./testinput/testinput-pragma.sp -gui

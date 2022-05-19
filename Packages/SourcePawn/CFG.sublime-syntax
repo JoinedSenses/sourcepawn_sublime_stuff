@@ -5,42 +5,52 @@ file_extensions: [cfg]
 scope: source.cfg
 
 variables:
-  end_of_line: '(?<!\\)(\\\\)*\K$(?=\n)'
-
+  end_of_line: '(?=(?:\r\n?|\n))'
+  const_char_escape: \\(?:(?:[abefnrtv'"%\\]|(?:x[a-fA-F0-9]{0,2}|(?:[01]?[0-9]?[0-9]|2[0-4][0-9]|25[0-5]));?)|\n)
 
 contexts:
   main:
     - include: expressions
 
   expressions:
-    - match: (?<!\\)(\\\\)*\K\"
-      scope: punctuation.definition.string.begin.sp
+    - match: \"
+      scope: punctuation.definition.string.begin.cfg
       push:
-        - meta_scope: string.quoted.double.sp
-        - match: (?<!\\)(\\\\)*\K\"
-          scope: punctuation.definition.string.end.sp
+        - meta_scope: string.quoted.double.cfg
+        - match: '({{const_char_escape}})|(\\.)'
+          captures:
+            1: constant.character.escape.cfg
+            2: invalid.illegal.unexpected-character.cfg
+        - match: \"
+          scope: punctuation.definition.string.end.cfg
+          pop: true
+        - match: \s*\\$
+          scope: punctuation.separator.continuation.cfg
+        - match: \s*$
+          scope: invalid.illegal.unexpected-eol.cfg
           pop: true
 
-    - match: (?<!\\)(\\\\)*\K\/\*
+    - match: \/\*
       captures:
-        0: punctuation.definition.comment.begin.sp
+        0: punctuation.definition.comment.begin.cfg
       push:
-        - meta_scope: comment.block.sp
+        - meta_scope: comment.block.cfg
         - match: \*\/
-          scope: punctuation.definition.comment.end.sp
+          scope: punctuation.definition.comment.end.cfg
           pop: true
 
     - match: '\/\/'
       scope: puncutation.definition.comment
       push:
-        - meta_scope: comment.line.sp
+        - meta_scope: comment.line.cfg
+        - match: \\{{end_of_line}}
+          scope: punctuation.separator.continuation.cfg
         - match: '{{end_of_line}}'
           pop: true
-        - match: (?<!\\)(?:\\\\)*\K(\\)$(?=\n)
-          scope: punctuation.separator.continuation.sp
-        - include: comment_keywords
+        - match: '\b(TODO|FIXME|NOTE|BUG|XXX|HACK|IDEA|NOTICE)\b(?:\s*[-:])?'
+          scope: keyword.other.documentation.note.cfg
 
-    - match: (?<!\.)(?:\s|^)(\d+\.?\d*)([^\d\s]+)?\s
+    - match: (?:\s|^)(\d+\.?\d*)([^\d\s]+)?\s
       captures:
         1: constant.numeric
         2: invalid.illegal
@@ -57,4 +67,3 @@ contexts:
           pop: true
 
         - include: expressions
-

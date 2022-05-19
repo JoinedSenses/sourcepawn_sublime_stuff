@@ -1,4 +1,5 @@
 {
+    "bootstrapped": true,
     // path to sourcemod "scripting/include" folder
     // Windows example: // Support for multiple directories. Searches top to bottom until it finds include
     // "include_directory": [
