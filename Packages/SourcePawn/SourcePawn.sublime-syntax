@@ -8,16 +8,16 @@ file_extensions:
 scope: source.sp
 
 variables:
-  numerals_binary: '\b0b[01]+\b'
+  numerals_binary: '\b0b[01_]*\b'
   numerals_hex: '\b0x[0-9a-fA-F]{0,8}\b'
-  numerals_intfloat: '\b\d+(\.\d*)?(e-?\d*)?\b'
+  numerals_intfloat: '\b\d+(\.[\d_]*)?(e-?[\d_]*)?\b'
   numerals: '{{numerals_binary}}|{{numerals_hex}}|{{numerals_intfloat}}'
 
   identifier: '(?:\b[[:alpha:]_]\w*\b)'
   control_keywords: 'break|case|continue|default|do|else|for|if|return|switch|while'
   end_of_line: '(?:\r\n?|\n)'
   str_format_char: '%[!\-\d\.]*[%bcdfiLNstTuxX]?'
-  const_char_escape: \\(?:(?:[abefnrt'"%\\]|(?:x[a-fA-F0-9]{0,2}|(?:[01]?[0-9]?[0-9]|2[0-4][0-9]|25[0-5]));?)|\n)
+  const_char_escape: \\(?:(?:[abefnrtv'"%\\]|(?:x[a-fA-F0-9]{0,2}|(?:[01]?[0-9]?[0-9]|2[0-4][0-9]|25[0-5]));?)|\n)
 
   operator: (?:operator(?:\*|/|\+\+?|--?|!=?|>=?|<=?|==|%))
 
@@ -25,7 +25,6 @@ variables:
   local_lookahead: \b(?:if|else|for|while|do|return|switch|case|continue|break|delete|new|decl|static|const|sizeof|cellsof|tagof)\b
   invalid_var_lookahead: (?=[;\)\}])|{{global_decl_lookahead}}|(?={{local_lookahead}})|(?=\s*{{identifier}}(?:\s*\(|\s+{{identifier}}))
 
-  # Overkill. I have a formatted version with comments for maintenance
   ALL_CONSTANTS: \b(?:T(?:F(?:C(?:ond_(?:H(?:a(?:lloween(?:Kart(?:NoTurn|Cage|Dash)?|G(?:hostMode|iant)|T(?:hriller|iny)|SpeedBoost|CritCandy|QuickHeal|BombHead|HellHeal|InHell)|sRune)|ealing(?:Debuff)?)|R(?:une(?:Re(?:sist|gen)|Imbalance|Precision|Knockout|Strength|Agility|Vampire|Warlock|Haste)|e(?:strictToMelee|programmed|genBuffed)|adiusHealOnDamage|ocketPack)|C(?:rit(?:On(?:F(?:lagCapture|irstBlood)|Damage|Kill|Win)|C(?:anteen|ola)|DemoCharge|RuneTemp|Mmmph|Hype)|ompetitive(?:Winner|Loser)|loak(?:Flicker|ed)|harging)|S(?:mall(?:B(?:ulletResist|lastResist)|FireResist)|p(?:eedBuffAlly|awnOutline)|wimming(?:NoEffects|Curse)|tealthed(?:UserBuffFade)?|upernovaRune|apped|lowed)|D(?:e(?:fenseBuff(?:NoCritBlock|Mmmph|ed)|adRingered|moBuff)|isguis(?:e(?:d(?:AsDispenser)?|Removed)|ing)|odgeChance|azed)|P(?:a(?:sstime(?:PenaltyDebuff|Interception)|rachute(?:Deployed)?)|owerupModeDominant|lague(?:Rune)?|reventDeath)|U(?:ber(?:charge(?:d(?:OnTakeDamage|Canteen|Hidden)?|Fading)|B(?:ulletResist|lastResist)|FireResist)|nknown[12])|M(?:e(?:digunDebuff|leeOnly|gaHeal)|arkedForDeath(?:Silent)?|i(?:niCritOnKill|lked)|VMBotRadiowave)|B(?:l(?:ast(?:Jumping|Immune)|eeding)|u(?:lletImmune|rningPyro|ffed)|alloonHead|onked)|G(?:rappl(?:ingHook(?:Bleeding|SafeFall|Latched)?|ed(?:ByPlayer|ToPlayer))|as)|T(?:eleport(?:edGlow|ing)|mpDamageBonus|aunting)|K(?:ing(?:Aura|Rune)|nockedIntoAir|ritzkrieged)|No(?:Taunting_DEPRECATED|HealingDamageBuff)|F(?:reezeInput|ireImmune|ocusBuff)|O(?:bscuredSmoke|verhealed|nFire)|A(?:fterburnImmune|irCurrent)|EyeaductUnderworld|InHealRadius|LostFooting|Jarated|Zoomed)|lass_(?:S(?:oldier|niper|cout|py)|Engineer|DemoMan|Unknown|Heavy|Medic|Pyro))|Resource_(?:D(?:e(?:fenses|aths)|ominations)|B(?:uildingsDestroyed|ackstabs)|Re(?:supplyPoints|venge)|T(?:otalScore|eleports)|Hea(?:lPoints|dshots)|P(?:layerClass|ing)|KillAssists|MaxHealth|Captures|Invulns|Score)|Holiday_(?:Halloween(?:OrFullMoon(?:OrValentines)?)?|C(?:ommunityUpdate|hristmas)|ValentinesDay|EndOfTheLine|MeetThePyro|AprilFools|Birthday|FullMoon|Invalid|Soldier)|Object(?:_(?:S(?:apper|entry)|CartDispenser|Teleporter|Dispenser)|Mode_(?:E(?:ntrance|xit)|None))|WeaponSlot_(?:P(?:rimary|DA)|Secondary|Building|Item[12]|Grenade|Melee)|Team_(?:Unassigned|Spectator|Blue|Red))|opMenu(?:Action_(?:D(?:isplay(?:Option|Title)|rawOption)|RemoveObject|SelectOption)|Position_(?:Last(?:Category|Root)|Start)|Object_(?:Category|Item))|hisPointer_(?:CBaseEntity|Address|Ignore))|C(?:S(?:Weapon_(?:K(?:NIFE(?:_(?:S(?:URVIVAL_BOWIE|KELETON|TILETTO)|G(?:YPSY_JACKKNIFE|HOST|UT|G)|C(?:LASSIC|ANIS|ORD)|F(?:ALCHION|LIP)|T(?:ATICAL)?|M9_BAYONET|WIDOWMAKER|BUTTERFLY|KARAMBIT|OUTDOOR|URSUS|PUSH))?|EVLAR)|M(?:A(?:X_WEAPONS(?:_NO_KNIFES)?|C10|G7)|4A1(?:_SILENCER)?|P(?:5NAVY|7|9)|OLOTOV|ELEE|249|3)|S(?:C(?:AR(?:17|20)|OUT)|MOKEGRENADE|G55[026]|AWEDOFF|NOWBALL|PANNER|HIELD|SG08)|H(?:E(?:A(?:VYASSAULTSUIT|LTHSHOT)|GRENADE)|KP2000|AMMER)|F(?:I(?:VESEVEN|REBOMB|STS)|RAGGRENADE|LASHBANG|AMAS)|B(?:REACHCHARGE|UMPMINE|AYONET|IZON)|T(?:A(?:GGRENADE|BLET|SER)|EC9|MP)|D(?:E(?:FUSER|AGLE|COY)|IVERSION)|N(?:IGHTVISION|O(?:NE|VA)|EGEV)|A(?:SSAULTSUIT|K47|UG|WP|XE)|G(?:ALIL(?:AR)?|3SG1|LOCK)|U(?:SP(?:_SILENCER)?|MP45)|C(?:UTTERS|Z75A|4)|P(?:2(?:28|50)|90)|INCGRENADE|REVOLVER|XM1014|ELITE)|RoundEnd_(?:T(?:errorist(?:s(?:S(?:urrender|topped)|NotEscaped|Escaped|Planted)|Win)|arget(?:Bombed|Saved))|CT(?:S(?:toppedEscape|urrender)|sReachedHostage|Win)|VIP(?:NotEscaped|Escaped|Killed)|Hostages(?:NotRescued|Rescued)|BombDefused|GameStart|Draw))|o(?:okie(?:Menu(?:Action_(?:DisplayOption|SelectOption)|_(?:OnOff(?:_Int)?|YesNo(?:_Int)?))|Access_P(?:r(?:otected|ivate)|ublic))|nVar(?:Query_(?:Not(?:Found|Valid)|Cancelled|Protected|Okay)|Bound_(?:Lower|Upper))|mmand_(?:Allow|Deny))|allConv_(?:FASTCALL|THISCALL|STDCALL|CDECL))|S(?:DK(?:Hook_(?:Weapon(?:Can(?:SwitchTo(?:Post)?|Use(?:Post)?)|Switch(?:Post)?|Equip(?:Post)?|Drop(?:Post)?)|S(?:tartTouch(?:Post)?|pawn(?:Post)?|houldCollide|etTransmit)|T(?:raceAttack(?:Post)?|hink(?:Post)?|ouch(?:Post)?)|P(?:ostThink(?:Post)?|reThink(?:Post)?)|G(?:roundEntChangedPost|etMaxHealth)|OnTakeDamage(?:Alive(?:Post)?|Post)?|VPhysicsUpdate(?:Post)?|CanBeAutobalanced|EndTouch(?:Post)?|Blocked(?:Post)?|FireBulletsPost|Reload(?:Post)?|Use(?:Post)?)|C(?:all_(?:S(?:erver|tatic)|Entity(?:List)?|GameRules|Player|Raw)|onf_(?:Signature|Address|Virtual))|Type_(?:CBase(?:Entity|Player)|PlainOldData|QAngle|String|Vector|Edict|Float|Bool)|Pass_(?:P(?:ointer|lain)|By(?:Value|Ref))|Library_(?:Engine|Server))|MC(?:Error_(?:Invalid(?:Section[12345]|Property1|Tokens)|Stream(?:Error|Open)|TokenOverflow|Custom|Okay)|Parse_(?:Halt(?:Fail)?|Continue))|ort_(?:Descending|Ascending|Integer|Random|String|Float))|M(?:enu(?:Action_(?:D(?:isplay(?:Item)?|rawItem)|Vote(?:Cancel|Start|End)|S(?:elect|tart)|Cancel|End)|S(?:ource_(?:No(?:rmal|ne)|External|RawPanel)|tyle_(?:Default|Radio|Valve))|Cancel_(?:Exit(?:Back)?|Disconnected|Interrupted|NoDisplay|Timeout)|End_(?:Voting(?:Cancelled|Done)|Exit(?:Back)?|Cancelled|Selected))|RES_(?:Changed(?:Override|Handled)|Supercede|Override|Handled|Ignored)|a(?:pChange_(?:RoundEnd|Instant|MapEnd)|xClients))|P(?:l(?:ugin_(?:C(?:ontinue|hanged|reated)|E(?:victed|rror)|Uncompiled|BadLoad|Handled|Running|Failed|Loaded|Paused|Stop)|Info_(?:Description|Version|Author|Name|URL))|rop(?:Field_(?:V(?:ariant|ector)|String(?:_T)?|Unsupported|Integer|Entity|Float)|_(?:Data|Send))|a(?:ram_(?:Float(?:ByRef)?|Cell(?:ByRef)?|A(?:rray|ny)|VarArgs|String)|th_SM))|R(?:oundState_(?:R(?:oundRunning|estart)|B(?:etweenRounds|onus)|Sta(?:lemate|rtGame)|Pre(?:round|game)|GameOver|TeamWin|Init)|eturnType_(?:C(?:BaseEntity|harPtr)|V(?:ector(?:Ptr)?|oid)|String(?:Ptr)?|Unknown|Edict|Float|Bool|Int)|a(?:ngeType_(?:Audibility|Visibility)|yType_(?:EndPoint|Infinite)))|D(?:Hook(?:Register_(?:E(?:B[PX]|D[IX]|S[IP]|AX|CX)|D(?:efault|H|L)|XMM[01234567]|A[HL]|B[HL]|C[HL]|ST0)|Pass_(?:O(?:ASSIGNOP|CTOR|DTOR)|By(?:Ref|Val)))|B(?:Val_(?:TypeMismatch|Error|Data|Null)|Bind_(?:String|Float|Int)|Prio_(?:Normal|High|Low))|ialogType_(?:M(?:enu|sg)|AskConnect|Entry|Text))|A(?:d(?:min(?:_(?:C(?:h(?:a(?:ngemap|t)|eats)|on(?:vars|fig)|ustom[123456])|R(?:eservation|CON|oot)|Password|Generic|Unban|Kick|Slay|Vote|Ban)|Cache_(?:Overrides|Admins|Groups))|dress_Null)|PLRes_(?:S(?:ilentFailure|uccess)|Failure)|uthId_(?:Steam(?:ID64|2|3)|Engine)|ccess_(?:Effective|Real))|E(?:ngine_(?:Bl(?:a(?:ckMesa|de)|oodyGoodTime)|D(?:O(?:DS|TA|I)|arkMessiah)|S(?:ourceSDK200[67]|DK2013)|C(?:S(?:GO|S)|ontagion)|Left4Dead2?|NuclearDawn|AlienSwarm|Insurgency|Original|Portal2|Unknown|HL2DM|EYE|TF2)|ventHookMode_P(?:ost(?:NoCopy)?|re)|T_(?:Ignore|Single|Event|Hook))|F(?:i(?:leT(?:ime_(?:Last(?:Access|Change)|Created)|ype_(?:Directory|Unknown|File))|ndMap_(?:No(?:nCanonical|tFound)|F(?:uzzyMatch|ound)|PossiblyAvailable))|eature(?:Status_(?:Un(?:available|known)|Available)|Type_(?:Capability|Native)))|Hook(?:ParamType_(?:C(?:BaseEntity|harPtr)|Object(?:Ptr)?|String(?:Ptr)?|VectorPtr|Unknown|Edict|Float|Bool|Int)|Type_(?:GameRules|Entity|Raw)|_P(?:ost|re))|O(?:bjectValueType_(?:C(?:BaseEntityPtr|harPtr)|Ehandle(?:Ptr)?|Vector(?:Ptr)?|Float(?:Ptr)?|Bool(?:Ptr)?|Int(?:Ptr)?|String)|verride_Command(?:Group)?)|N(?:ominate_(?:A(?:lreadyInVote|dded)|InvalidMap|Replaced|VoteFull)|etFlow_(?:Incoming|Outgoing|Both)|umberType_Int(?:16|32|8))|KvData_(?:N(?:UMTYPES|one)|WString|String|UInt64|Color|Float|Int|Ptr)|I(?:dentity_(?:Extension|Plugin|Core)|mmunity_(?:Default|Global))|Listen(?:Type_(?:Created|Deleted)|_(?:Default|Yes|No))|U(?:se_(?:O(?:ff|n)|Toggle|Set)|M_(?:Protobuf|BitBuf))|VoteCancel_(?:Generic|NoVotes)|return)\b
 
 # ---------------------------------------------------------------------------
@@ -77,17 +76,19 @@ contexts:
     - include: variable-usage-early
     - match: \b(?:bool|char|[fF]loat|int|void|String|Handle)\b
       scope: storage.type.sp
+    - match: \b(?:const)\b
+      scope: storage.modifier.sp
     - match: ','
       scope: punctuation.separator.sp
     - match: '[\)\}\]]'
       scope: invalid.illegal.stray-bracket-end.sp
     - match: ';'
       scope: punctuation.terminator.sp
-
-  late-expressions:
     - match: \b(?:static|const)\b
       scope: storage.modifier.sp
     - include: function-call
+
+  late-expressions:
     - include: variable-decl
     - include: variable-decl-oldsyntax
     # - include: variable-usage-late
@@ -1562,7 +1563,7 @@ contexts:
                 - match: \)
                   scope: meta.group.sp punctuation.section.group.end.sp
                   pop: true
-                - include: expressions
+                - include: early-expressions
 
         - match: '{{identifier}}'
           scope: variable.other.member.sp
@@ -1606,7 +1607,6 @@ contexts:
                       scope: meta.group.sp punctuation.section.group.end.sp
                       pop: 2
                     - include: early-expressions
-                    - include: function-call
 
               - match: (?=\S)
                 fail: function-call-begin
@@ -1741,7 +1741,9 @@ contexts:
           pop: true
         - match: '{{str_format_char}}'
           scope: constant.other.placeholder.sp
-        - match: '[ \t]*{{end_of_line}}'
+        - match: \\{{end_of_line}}
+          scope: punctuation.separator.continuation.sp
+        - match: '\s*{{end_of_line}}'
           scope: invalid.illegal.unexpected-eol.sp
           pop: true
 
@@ -1983,6 +1985,7 @@ contexts:
                             pop: 4
                           - match: '{{invalid_var_lookahead}}'
                             pop: 4
+                            
                           - include: expressions
 
                       # - include: comments
