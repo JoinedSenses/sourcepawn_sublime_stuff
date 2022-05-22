@@ -1,4 +1,4 @@
-# Generated from c:\Users\Arron\AppData\Roaming\Sublime Text\Packages\SourcePawn\grammar\SourcePawnParser.g4 by ANTLR 4.10.1
+# Generated from ./SourcePawnParser.g4 by ANTLR 4.10.1
 # encoding: utf-8
 from antlr4 import *
 from io import StringIO
@@ -219,12 +219,6 @@ class SourcePawnParser ( Parser ):
             if hasattr( listener, "exitStart" ):
                 listener.exitStart(self)
 
-        def accept(self, visitor:ParseTreeVisitor):
-            if hasattr( visitor, "visitStart" ):
-                return visitor.visitStart(self)
-            else:
-                return visitor.visitChildren(self)
-
 
 
 
@@ -278,12 +272,6 @@ class SourcePawnParser ( Parser ):
         def exitRule(self, listener:ParseTreeListener):
             if hasattr( listener, "exitMethodmap" ):
                 listener.exitMethodmap(self)
-
-        def accept(self, visitor:ParseTreeVisitor):
-            if hasattr( visitor, "visitMethodmap" ):
-                return visitor.visitMethodmap(self)
-            else:
-                return visitor.visitChildren(self)
 
 
 
@@ -341,12 +329,6 @@ class SourcePawnParser ( Parser ):
             if hasattr( listener, "exitMethodmapbody" ):
                 listener.exitMethodmapbody(self)
 
-        def accept(self, visitor:ParseTreeVisitor):
-            if hasattr( visitor, "visitMethodmapbody" ):
-                return visitor.visitMethodmapbody(self)
-            else:
-                return visitor.visitChildren(self)
-
 
 
 
@@ -402,12 +384,6 @@ class SourcePawnParser ( Parser ):
         def exitRule(self, listener:ParseTreeListener):
             if hasattr( listener, "exitBuiltinstoragetype" ):
                 listener.exitBuiltinstoragetype(self)
-
-        def accept(self, visitor:ParseTreeVisitor):
-            if hasattr( visitor, "visitBuiltinstoragetype" ):
-                return visitor.visitBuiltinstoragetype(self)
-            else:
-                return visitor.visitChildren(self)
 
 
 

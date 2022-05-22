@@ -84,11 +84,11 @@ contexts:
       scope: invalid.illegal.stray-bracket-end.sp
     - match: ';'
       scope: punctuation.terminator.sp
-
-  late-expressions:
     - match: \b(?:static|const)\b
       scope: storage.modifier.sp
     - include: function-call
+
+  late-expressions:
     - include: variable-decl
     - include: variable-decl-oldsyntax
     # - include: variable-usage-late
@@ -1563,7 +1563,7 @@ contexts:
                 - match: \)
                   scope: meta.group.sp punctuation.section.group.end.sp
                   pop: true
-                - include: expressions
+                - include: early-expressions
 
         - match: '{{identifier}}'
           scope: variable.other.member.sp
@@ -1607,7 +1607,6 @@ contexts:
                       scope: meta.group.sp punctuation.section.group.end.sp
                       pop: 2
                     - include: early-expressions
-                    - include: function-call
 
               - match: (?=\S)
                 fail: function-call-begin
@@ -1986,6 +1985,7 @@ contexts:
                             pop: 4
                           - match: '{{invalid_var_lookahead}}'
                             pop: 4
+                            
                           - include: expressions
 
                       # - include: comments

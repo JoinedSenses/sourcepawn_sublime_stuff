@@ -1,4 +1,4 @@
-# Generated from c:\Users\Arron\AppData\Roaming\Sublime Text\Packages\SourcePawn\grammar\SourcePawnLexer.g4 by ANTLR 4.10.1
+# Generated from ./SourcePawnLexer.g4 by ANTLR 4.10.1
 from antlr4 import *
 from io import StringIO
 import sys
