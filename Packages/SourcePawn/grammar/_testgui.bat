@@ -1,1 +1,4 @@
-start /B grun SourcePawn start ./testinput/testinput-pragma.sp -gui
+@echo off
+set /p testfile="Enter file to test: "
+cd .\.antlr\
+grun SourcePawn compilationUnit ..\testinput\%testfile%.sp -gui

@@ -11,16 +11,6 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 from __future__ import annotations
-from grammar.SourcePawnParser import SourcePawnParser
-import grammar.SourcePawnParser
-from grammar.SourcePawnLexer import SourcePawnLexer
-import grammar.SourcePawnLexer
-from antlr4 import *
-import grammar.antlr4 as antlr4
-from watchdog.utils.bricks import OrderedSetQueue
-import watchdog.utils
-import watchdog.observers
-import watchdog.events
 import importlib
 import os
 from pathlib import Path
@@ -35,11 +25,24 @@ from threading import Timer
 
 current_dir = os.path.dirname(__file__)
 sys.path.append(current_dir)
+from watchdog.utils.bricks import OrderedSetQueue
+import watchdog.utils
+import watchdog.observers
+import watchdog.events
 
-
+sys.path.append(os.path.join(current_dir, 'grammar'))
+import grammar.SourcePawnLexer
 importlib.reload(grammar.SourcePawnLexer)
-
+import grammar.SourcePawnParser
 importlib.reload(grammar.SourcePawnParser)
+
+import grammar.antlr4 as antlr4
+importlib.reload(antlr4)
+from grammar.SourcePawnParser import SourcePawnParser
+from grammar.SourcePawnLexer import SourcePawnLexer
+
+
+
 
 
 def PLUGIN_NAME(): return 'SourcePawn Completions'
@@ -49,6 +52,8 @@ def BUILDSETTINGS_FILENAME(): return 'SourcePawn.sublime-build'
 
 FILE_OBSERVER = watchdog.observers.Observer()
 FILE_PROCESS_QUEUE = OrderedSetQueue()
+
+
 
 
 def clear_console():
@@ -346,6 +351,22 @@ def _get_settings():
 def on_settings_modified() -> None:
     load_include_dir()
 
+class IncludeFileEventHandler(watchdog.events.FileSystemEventHandler):
+    def __init__(self):
+        watchdog.events.FileSystemEventHandler.__init__(self)
+
+    def on_created(self, event):
+        sublime.set_timeout(lambda: on_modified_main_thread(event.src_path), 0)
+
+    def on_modified(self, event):
+        sublime.set_timeout(lambda: on_modified_main_thread(event.src_path), 0)
+
+    def on_deleted(self, event):
+        sublime.set_timeout(lambda: on_deleted_main_thread(event.src_path), 0)
+
+
+FILE_EVENT_HANDLER = IncludeFileEventHandler()
+
 
 def load_include_dir(register_callback: bool = False) -> None:
     settings = _get_settings()
@@ -432,21 +453,7 @@ def _save_user_settings() -> None:
         sublime.save_settings(build_filename)
 
 
-class IncludeFileEventHandler(watchdog.events.FileSystemEventHandler):
-    def __init__(self):
-        watchdog.events.FileSystemEventHandler.__init__(self)
 
-    def on_created(self, event):
-        sublime.set_timeout(lambda: on_modified_main_thread(event.src_path), 0)
-
-    def on_modified(self, event):
-        sublime.set_timeout(lambda: on_modified_main_thread(event.src_path), 0)
-
-    def on_deleted(self, event):
-        sublime.set_timeout(lambda: on_deleted_main_thread(event.src_path), 0)
-
-
-FILE_EVENT_HANDLER = IncludeFileEventHandler()
 
 
 def on_modified_main_thread(file_path: str) -> None:
@@ -594,8 +601,9 @@ def process_buffer(text: str, node: Node):
     # for t in lexer.getAllTokens(): Debug.Log(f'{t.line}:{t.column} {t.text} {lexer.symbolicNames[t.type]}')
 
     stream = antlr4.CommonTokenStream(lexer)
-    # stream.fill()
+    stream.fill()
 
     parser = SourcePawnParser(stream)
-    tree = parser.start()
+    # parser.addErrorListener(parse_error_listener)
+    tree = parser.compilationUnit()
     Debug.Log(tree.toStringTree(parser.ruleNames))

@@ -74,10 +74,8 @@ contexts:
     - include: retag
     - include: accessor
     - include: variable-usage-early
-    - match: \b(?:bool|char|[fF]loat|int|void|String|Handle)\b
+    - match: \b(?:bool|char|[fF]loat|Handle|int|object|String|void)\b
       scope: storage.type.sp
-    - match: \b(?:const)\b
-      scope: storage.modifier.sp
     - match: ','
       scope: punctuation.separator.sp
     - match: '[\)\}\]]'
